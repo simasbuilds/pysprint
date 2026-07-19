@@ -13,12 +13,18 @@
 
 {% block content %}
 <section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="pill">✨ 100% free · No installs · Code in your browser</span>
-      <h1>Learn Python by<br><span class="grad">actually writing Python</span></h1>
-      <p class="hero-sub">{{ n_lessons }} interactive lessons, {{ n_challenges }} arena challenges and a spaced-repetition review engine. Every lesson runs real Python in your browser — type, run, and level up from your very first line of code to building APIs.</p>
-      <div class="hero-cta">
+      <span class="pill stagger d1"><span class="pulse-dot"></span> 100% free · No installs · Code in your browser</span>
+      <h1 class="stagger d2">Learn Python by<br><span class="grad">actually writing Python</span></h1>
+      <p class="hero-sub stagger d3">{{ n_lessons }} interactive lessons, {{ n_challenges }} arena challenges and a spaced-repetition review engine. Every lesson runs real Python in your browser — type, run, and level up from your very first line of code to building APIs.</p>
+      <div class="hero-cta stagger d4">
         {% if user %}
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
         {% else %}
@@ -26,10 +32,10 @@
         {% endif %}
         <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
       </div>
-      <div class="hero-stats">
-        <div><strong>{{ n_lessons }}</strong><span>Interactive lessons</span></div>
-        <div><strong>{{ n_challenges }}</strong><span>Coding challenges</span></div>
-        <div><strong>{{ n_achievements }}</strong><span>Achievements</span></div>
+      <div class="hero-stats stagger d5">
+        <div><strong data-count="{{ n_lessons }}">0</strong><span>Interactive lessons</span></div>
+        <div><strong data-count="{{ n_challenges }}">0</strong><span>Coding challenges</span></div>
+        <div><strong data-count="{{ n_achievements }}">0</strong><span>Achievements</span></div>
       </div>
     </div>
     <div class="hero-demo card">

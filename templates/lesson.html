@@ -28,6 +28,29 @@
 
     <section class="lesson-content">{{ lesson.content|safe }}</section>
 
+    {% if extras %}
+    <section class="callout-grid">
+      {% if extras.real_world %}
+      <div class="callout card world">
+        <h3>🌍 Where you'll use this</h3>
+        <p>{{ extras.real_world|safe }}</p>
+      </div>
+      {% endif %}
+      {% if extras.pitfalls %}
+      <div class="callout card mistakes">
+        <h3>⚠️ Common mistakes</h3>
+        <ul>{% for p in extras.pitfalls %}<li>{{ p|safe }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+      {% if extras.pro_tip %}
+      <div class="callout card protip">
+        <h3>💎 Pro tip</h3>
+        <p>{{ extras.pro_tip|safe }}</p>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
     <section class="card editor-block">
       <h2 class="block-title">💻 Try it — live example</h2>
       <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">example.py</span></div>

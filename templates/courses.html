@@ -9,9 +9,15 @@
 </section>
 
 <section class="section">
+  <div class="filter-chips" role="group" aria-label="Filter by level">
+    <button class="chip on" data-level="all">All levels</button>
+    <button class="chip" data-level="beginner">Beginner</button>
+    <button class="chip" data-level="intermediate">Intermediate</button>
+    <button class="chip" data-level="advanced">Advanced</button>
+  </div>
   <div class="course-list">
     {% for c in courses %}
-    <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-row card" style="--accent: {{ c.color }}">
+    <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-row card" data-level="{{ c.level|lower }}" style="--accent: {{ c.color }}">
       <span class="course-icon lg">{{ c.icon }}</span>
       <div class="course-row-body">
         <div class="course-row-top">
@@ -36,4 +42,19 @@
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('.filter-chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      const level = chip.dataset.level;
+      document.querySelectorAll('.course-row').forEach(row => {
+        row.classList.toggle('hidden', level !== 'all' && row.dataset.level !== level);
+      });
+    });
+  });
+</script>
 {% endblock %}

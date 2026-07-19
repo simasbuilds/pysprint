@@ -30,6 +30,8 @@ database.py          SQLite layer (stdlib sqlite3, no ORM). Schema lives here.
 data/
   courses.py         THE CURRICULUM. 6 courses × lessons (content/example/
                      challenge/quiz). This is where 90% of edits happen.
+  lesson_extras.py   Per-lesson deep-dive callouts (real_world / pitfalls /
+                     pro_tip), keyed by (course_slug, lesson_slug)
   challenges.py      Standalone arena challenges (10)
   achievements.py    Achievement defs; each has a `check(stats)` lambda
 templates/           Jinja pages, all extend base.html
@@ -59,6 +61,11 @@ static/js/
    `data/achievements.py`.
 6. **No frontend build step.** Vanilla JS + CSS, CDN only for fonts and
    Pyodide. Keep it that way — it's a feature.
+7. **Light theme is the default**; dark mode via `data-theme="dark"` on
+   `<html>`, toggled in the nav and persisted in localStorage. All colors
+   come from CSS custom properties in `:root` / `[data-theme="dark"]` —
+   never hardcode a color in a component rule. Code editors deliberately
+   stay dark in both themes.
 
 ## Adding content
 

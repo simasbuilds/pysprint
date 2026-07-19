@@ -23,6 +23,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    // Apply saved theme before first paint (no flash). Light is the default.
+    (function () {
+      var t = localStorage.getItem('pysprint-theme') || 'light';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
   {% block head %}{% endblock %}
   {% block structured_data %}
   <script type="application/ld+json">
@@ -34,6 +41,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+  <div class="read-progress" id="readProgress" aria-hidden="true"></div>
 
   <header class="nav">
     <div class="nav-inner">
@@ -60,6 +68,7 @@
           <a class="btn btn-ghost btn-sm" href="{{ url_for('login') }}">Log in</a>
           <a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Start free</a>
         {% endif %}
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">🌙</button>
         <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -96,6 +105,7 @@
   </footer>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
+  <button class="to-top" id="toTop" aria-label="Back to top">↑</button>
 
   <!-- Achievement celebration modal -->
   <div id="achieveModal" class="modal" hidden>

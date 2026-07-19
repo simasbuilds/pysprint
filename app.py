@@ -18,6 +18,7 @@ import database as db
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.courses import COURSES, get_course, get_lesson, total_lessons
+from data.lesson_extras import get_extras
 
 load_dotenv()
 
@@ -147,6 +148,7 @@ def lesson(slug, lesson_slug):
         prev=lessons[idx - 1] if idx > 0 else None,
         next=lessons[idx + 1] if idx + 1 < len(lessons) else None,
         done=done, n_lessons=len(lessons),
+        extras=get_extras(slug, lesson_slug),
     )
 
 
