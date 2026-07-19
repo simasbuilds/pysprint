@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Smart Review — Spaced-Repetition Python Flashcards | PySprint{% endblock %}
+{% block description %}PySprint's built-in study engine: every Python concept as a flashcard, scheduled with spaced repetition so you never forget what you learned.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>🧠 Smart Review</h1>
+  <p>Every quiz concept on PySprint, turned into flashcards and scheduled with <strong>spaced repetition</strong> — cards you find hard come back sooner, cards you know come back later. Five minutes a day keeps everything fresh.</p>
+</section>
+
+<section class="section narrow">
+  <div class="review-stats card" id="reviewStats">
+    <div><strong id="statDue">0</strong><span>Due now</span></div>
+    <div><strong id="statNew">0</strong><span>New</span></div>
+    <div><strong id="statLearned">0</strong><span>Learned</span></div>
+    <div><strong id="statTotal">0</strong><span>Total cards</span></div>
+  </div>
+
+  <div class="flashcard-zone">
+    <div class="flashcard card" id="flashcard" tabindex="0" role="button" aria-label="Flashcard — click to flip">
+      <div class="flashcard-face" id="cardFront">
+        <span class="flash-course" id="cardCourse"></span>
+        <p id="cardQuestion">Loading cards…</p>
+        <span class="flash-hint">Click or press Space to reveal</span>
+      </div>
+      <div class="flashcard-face back" id="cardBack" hidden>
+        <p class="flash-answer" id="cardAnswer"></p>
+        <p class="flash-explain" id="cardExplain"></p>
+      </div>
+    </div>
+    <div class="review-actions" id="reviewActions" hidden>
+      <button class="btn btn-danger" data-grade="0">😵 Again<br><small>&lt; 1 min</small></button>
+      <button class="btn btn-warn" data-grade="1">🤔 Hard<br><small>10 min</small></button>
+      <button class="btn btn-primary" data-grade="2">🙂 Good<br><small>1 day</small></button>
+      <button class="btn btn-success" data-grade="3">😎 Easy<br><small>4 days</small></button>
+    </div>
+    <p class="review-done card" id="reviewDone" hidden>🎉 All caught up! Come back later — spaced repetition works best in short daily sessions.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script id="cardData" type="application/json">{{ cards|tojson }}</script>
+<script src="{{ url_for('static', filename='js/review.js') }}"></script>
+{% endblock %}

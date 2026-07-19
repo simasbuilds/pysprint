@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}404 — Page Not Found | PySprint{% endblock %}
+{% block description %}This page could not be found on PySprint.{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="card auth-card center">
+    <pre class="code-output">Traceback (most recent call last):
+  File "pysprint.py", line 404, in &lt;browse&gt;
+PageNotFoundError: nothing lives at this URL</pre>
+    <h1>404</h1>
+    <p class="muted">Even the best developers hit exceptions. Let's handle this one:</p>
+    <a class="btn btn-primary" href="{{ url_for('home') }}">→ Back to safety</a>
+  </div>
+</section>
+{% endblock %}

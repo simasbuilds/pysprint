@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — {{ course.title }} | PySprint{% endblock %}
+{% block description %}Interactive Python lesson: {{ lesson.title }}. Learn, run real code in your browser, and pass the challenge to earn {{ lesson.xp }} XP.{% endblock %}
+
+{% block content %}
+<div class="lesson-layout" style="--accent: {{ course.color }}">
+  <aside class="lesson-side card">
+    <a class="crumbs" href="{{ url_for('course_detail', slug=course.slug) }}">← {{ course.title }}</a>
+    <div class="progress-track" role="progressbar" aria-valuenow="{{ (idx + 1) }}" aria-valuemin="0" aria-valuemax="{{ n_lessons }}">
+      <div class="progress-fill" style="width: {{ ((idx + 1) / n_lessons * 100)|round|int }}%"></div>
+    </div>
+    <span class="progress-label">Lesson {{ idx + 1 }} of {{ n_lessons }}</span>
+    <nav class="side-lessons" aria-label="Course lessons">
+      {% for l in course.lessons %}
+      <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
+         class="side-lesson {% if l.slug == lesson.slug %}current{% endif %} {% if l.slug in done %}is-done{% endif %}">
+        <span>{% if l.slug in done %}✓{% else %}{{ loop.index }}{% endif %}</span> {{ l.title }}
+      </a>
+      {% endfor %}
+    </nav>
+  </aside>
+
+  <article class="lesson-main">
+    <header class="lesson-header">
+      <h1>{{ lesson.title }}</h1>
+      <div class="course-meta"><span>⏱ {{ lesson.minutes }} min</span><span>⚡ {{ lesson.xp }} XP</span></div>
+    </header>
+
+    <section class="lesson-content">{{ lesson.content|safe }}</section>
+
+    <section class="card editor-block">
+      <h2 class="block-title">💻 Try it — live example</h2>
+      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">example.py</span></div>
+      <textarea id="exampleCode" class="code-input" rows="8" spellcheck="false" aria-label="Example code editor">{{ lesson.example }}</textarea>
+      <div class="editor-bar">
+        <button class="btn btn-run" id="exampleRun">▶ Run</button>
+        <button class="btn btn-ghost btn-sm" id="exampleReset">Reset</button>
+      </div>
+      <pre id="exampleOut" class="code-output" aria-live="polite">Output appears here…</pre>
+    </section>
+
+    <section class="card editor-block challenge-block">
+      <h2 class="block-title">🎯 Challenge <span class="xp-tag">+{{ lesson.xp }} XP</span></h2>
+      <p class="challenge-prompt">{{ lesson.challenge.prompt|safe }}</p>
+      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">challenge.py</span></div>
+      <textarea id="challengeCode" class="code-input" rows="10" spellcheck="false" aria-label="Challenge code editor">{{ lesson.challenge.starter }}</textarea>
+      <div class="editor-bar">
+        <button class="btn btn-run" id="challengeRun">▶ Run & Check</button>
+        <button class="btn btn-ghost btn-sm" id="hintBtn">💡 Hint</button>
+        <button class="btn btn-ghost btn-sm" id="solutionBtn">👀 Solution</button>
+      </div>
+      <p id="hintBox" class="hint-box" hidden>💡 {{ lesson.challenge.hint }}</p>
+      <pre id="solutionBox" class="code-output solution-box" hidden>{{ lesson.challenge.solution }}</pre>
+      <pre id="challengeOut" class="code-output" aria-live="polite">Run your code to check it…</pre>
+      <div id="challengeResult" class="check-result" hidden></div>
+    </section>
+
+    {% if lesson.quiz %}
+    <section class="card quiz-block" id="quizBlock">
+      <h2 class="block-title">❓ Quick quiz</h2>
+      {% for q in lesson.quiz %}
+      <fieldset class="quiz-q" data-answer="{{ q.answer }}">
+        <legend>{{ loop.index }}. {{ q.q }}</legend>
+        {% set qi = loop.index0 %}
+        {% for opt in q.options %}
+        <label class="quiz-opt">
+          <input type="radio" name="q{{ qi }}" value="{{ loop.index0 }}">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+        <p class="quiz-explain" hidden>{{ q.explain }}</p>
+      </fieldset>
+      {% endfor %}
+      <button class="btn btn-primary" id="quizCheck">Check answers</button>
+      <span id="quizScore" class="quiz-score"></span>
+    </section>
+    {% endif %}
+
+    <section class="card notes-block">
+      <h2 class="block-title">📝 My notes <span class="muted">(saved on this device)</span></h2>
+      <textarea id="lessonNotes" class="notes-input" rows="4" placeholder="Write anything you want to remember from this lesson…"></textarea>
+    </section>
+
+    <footer class="lesson-footer">
+      {% if prev %}
+      <a class="btn btn-ghost" href="{{ url_for('lesson', slug=course.slug, lesson_slug=prev.slug) }}">← {{ prev.title }}</a>
+      {% else %}<span></span>{% endif %}
+      <button class="btn btn-primary btn-lg" id="completeBtn"
+              data-course="{{ course.slug }}" data-lesson="{{ lesson.slug }}"
+              {% if lesson.slug in done %}data-done="1"{% endif %}>
+        {% if lesson.slug in done %}✓ Completed — mark again{% else %}Complete lesson (+{{ lesson.xp }} XP){% endif %}
+      </button>
+      {% if next %}
+      <a class="btn btn-ghost" href="{{ url_for('lesson', slug=course.slug, lesson_slug=next.slug) }}">{{ next.title }} →</a>
+      {% else %}
+      <a class="btn btn-ghost" href="{{ url_for('course_detail', slug=course.slug) }}">Finish course →</a>
+      {% endif %}
+    </footer>
+  </article>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script id="challengeSpec" type="application/json">{{ {"expected": lesson.challenge.expected_output}|tojson }}</script>
+<script>
+  PySprint.initLesson({
+    course: {{ course.slug|tojson }},
+    lesson: {{ lesson.slug|tojson }},
+    starter: {{ lesson.challenge.starter|tojson }},
+    example: {{ lesson.example|tojson }},
+    loggedIn: {{ 'true' if user else 'false' }}
+  });
+</script>
+{% endblock %}

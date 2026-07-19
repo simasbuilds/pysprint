@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Log in — PySprint{% endblock %}
+{% block description %}Log in to PySprint to continue your Python journey — your XP, streak and achievements are waiting.{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <form class="card auth-card" method="post" novalidate>
+    <h1>Welcome back 👋</h1>
+    <p class="muted">Log in to keep your streak alive.</p>
+    {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+    <label>Username or email
+      <input type="text" name="username" required autocomplete="username" autofocus>
+    </label>
+    <label>Password
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <button class="btn btn-primary btn-lg" type="submit">Log in →</button>
+    <p class="auth-alt">New here? <a href="{{ url_for('register') }}">Create a free account</a></p>
+  </form>
+</section>
+{% endblock %}

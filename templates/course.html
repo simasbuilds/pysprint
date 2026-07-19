@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ course.title }} — Python Course | PySprint{% endblock %}
+{% block description %}{{ course.description }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Course",
+ "name": "{{ course.title }}",
+ "description": "{{ course.description }}",
+ "provider": {"@type": "Organization", "name": "PySprint", "url": "{{ site_url }}"},
+ "isAccessibleForFree": true,
+ "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "courseWorkload": "PT{{ course.lessons|sum(attribute='minutes') }}M"}}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="page-head course-head" style="--accent: {{ course.color }}">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('courses') }}">Courses</a> / <span>{{ course.title }}</span></nav>
+  <div class="course-head-row">
+    <span class="course-icon xl">{{ course.icon }}</span>
+    <div>
+      <h1>{{ course.title }}</h1>
+      <p>{{ course.description }}</p>
+      <div class="course-meta">
+        <span class="level-badge level-{{ course.level|lower }}">{{ course.level }}</span>
+        <span>📚 {{ course.lessons|length }} lessons</span>
+        <span>⚡ {{ total_xp }} XP</span>
+        <span>⏱ ~{{ course.lessons|sum(attribute='minutes') }} min</span>
+      </div>
+    </div>
+  </div>
+  {% if user %}
+  <div class="progress-track lg" role="progressbar" aria-valuenow="{{ (done|length / course.lessons|length * 100)|round|int }}" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-fill" style="width: {{ (done|length / course.lessons|length * 100)|round|int }}%"></div>
+  </div>
+  <span class="progress-label">{{ done|length }} / {{ course.lessons|length }} lessons complete</span>
+  {% endif %}
+</section>
+
+<section class="section">
+  <ol class="lesson-list">
+    {% for l in course.lessons %}
+    <li>
+      <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
+         class="lesson-row card {% if l.slug in done %}is-done{% endif %}">
+        <span class="lesson-num">{% if l.slug in done %}✓{% else %}{{ loop.index }}{% endif %}</span>
+        <div class="lesson-row-body">
+          <h3>{{ l.title }}</h3>
+          <div class="course-meta"><span>⏱ {{ l.minutes }} min</span><span>⚡ {{ l.xp }} XP</span>
+            {% if l.quiz %}<span>❓ {{ l.quiz|length }} quiz</span>{% endif %}
+          </div>
+        </div>
+        <span class="course-row-go">{% if l.slug in done %}Review{% else %}Start{% endif %} →</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+  {% if not user %}
+  <div class="card notice">
+    <p>💡 You can take every lesson without an account — but <a href="{{ url_for('register') }}">create a free account</a> to save progress, earn XP and unlock achievements.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

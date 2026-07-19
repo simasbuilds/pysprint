@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Python Courses — PySprint{% endblock %}
+{% block description %}Six structured Python courses: Fundamentals, Data Structures, Functions & OOP, Practical Python, APIs, and Automation. Interactive, free, beginner to advanced.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>Courses</h1>
+  <p>A structured path from your first <code>print()</code> to building APIs and automation. Courses build on each other — start at the top if you're new.</p>
+</section>
+
+<section class="section">
+  <div class="course-list">
+    {% for c in courses %}
+    <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-row card" style="--accent: {{ c.color }}">
+      <span class="course-icon lg">{{ c.icon }}</span>
+      <div class="course-row-body">
+        <div class="course-row-top">
+          <h2>{{ c.title }}</h2>
+          <span class="level-badge level-{{ c.level|lower }}">{{ c.level }}</span>
+        </div>
+        <p>{{ c.description }}</p>
+        <div class="course-meta">
+          <span>📚 {{ c.lessons|length }} lessons</span>
+          <span>⚡ {{ c.lessons|sum(attribute='xp') }} XP</span>
+          <span>⏱ ~{{ c.lessons|sum(attribute='minutes') }} min</span>
+        </div>
+        {% if progress.get(c.slug) is not none %}
+        <div class="progress-track" role="progressbar" aria-valuenow="{{ progress[c.slug] }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-fill" style="width: {{ progress[c.slug] }}%"></div>
+        </div>
+        <span class="progress-label">{{ progress[c.slug] }}% complete</span>
+        {% endif %}
+      </div>
+      <span class="course-row-go">→</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

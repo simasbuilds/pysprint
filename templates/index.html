@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
+{% block description %}Master Python with {{ n_lessons }} interactive lessons across 6 courses — from your first print() to building real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "EducationalOrganization",
+ "name": "PySprint", "url": "{{ site_url }}",
+ "description": "Free interactive Python courses: fundamentals, data structures, OOP, APIs and automation.",
+ "sameAs": ["https://github.com/simasbuilds"]}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <span class="pill">✨ 100% free · No installs · Code in your browser</span>
+      <h1>Learn Python by<br><span class="grad">actually writing Python</span></h1>
+      <p class="hero-sub">{{ n_lessons }} interactive lessons, {{ n_challenges }} arena challenges and a spaced-repetition review engine. Every lesson runs real Python in your browser — type, run, and level up from your very first line of code to building APIs.</p>
+      <div class="hero-cta">
+        {% if user %}
+          <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
+        {% else %}
+          <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start learning free →</a>
+        {% endif %}
+        <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>{{ n_lessons }}</strong><span>Interactive lessons</span></div>
+        <div><strong>{{ n_challenges }}</strong><span>Coding challenges</span></div>
+        <div><strong>{{ n_achievements }}</strong><span>Achievements</span></div>
+      </div>
+    </div>
+    <div class="hero-demo card">
+      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py — try me!</span></div>
+      <textarea id="heroCode" class="code-input" rows="6" spellcheck="false" aria-label="Python code editor">name = "world"
+for i in range(3):
+    print(f"Hello, {name}! ({i + 1})")</textarea>
+      <div class="editor-bar">
+        <button class="btn btn-run" id="heroRun">▶ Run Python</button>
+        <span class="editor-hint">Real Python 3, right here</span>
+      </div>
+      <pre id="heroOut" class="code-output" aria-live="polite">Click Run to execute ↑</pre>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">A complete path, <span class="grad">beginner to builder</span></h2>
+  <p class="section-sub">Six courses that build on each other. Start with zero experience, finish by designing REST APIs and automating real work.</p>
+  <div class="course-grid">
+    {% for c in courses %}
+    <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-card card" style="--accent: {{ c.color }}">
+      <div class="course-top">
+        <span class="course-icon">{{ c.icon }}</span>
+        <span class="level-badge level-{{ c.level|lower }}">{{ c.level }}</span>
+      </div>
+      <h3>{{ c.title }}</h3>
+      <p>{{ c.tagline }}</p>
+      <div class="course-meta">
+        <span>{{ c.lessons|length }} lessons</span>
+        <span>⚡ {{ c.lessons|sum(attribute='xp') }} XP</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section alt">
+  <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
+  <div class="feature-grid">
+    <div class="feature card"><span class="feature-icon">⚡</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
+    <div class="feature card"><span class="feature-icon">🧠</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
+    <div class="feature card"><span class="feature-icon">🏆</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
+    <div class="feature card"><span class="feature-icon">🎯</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
+    <div class="feature card"><span class="feature-icon">⚔️</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
+    <div class="feature card"><span class="feature-icon">📈</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
+  </div>
+</section>
+
+<section class="section cta-band">
+  <h2>Your first line of Python is 10 seconds away.</h2>
+  {% if user %}
+  <a href="{{ url_for('courses') }}" class="btn btn-primary btn-lg">Pick a course →</a>
+  {% else %}
+  <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create your free account →</a>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script>
+  PyRunner.wireSimple('heroRun', 'heroCode', 'heroOut');
+</script>
+{% endblock %}

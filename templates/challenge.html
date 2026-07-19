@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ ch.title }} — Python Challenge | PySprint{% endblock %}
+{% block description %}Solve the "{{ ch.title }}" Python challenge ({{ ch.difficulty }}, {{ ch.xp }} XP) right in your browser on PySprint.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('challenges') }}">Arena</a> / <span>{{ ch.title }}</span></nav>
+  <div class="course-row-top">
+    <h1>{{ ch.title }}</h1>
+    <span class="diff-badge diff-{{ ch.difficulty|lower }}">{{ ch.difficulty }} · ⚡ {{ ch.xp }} XP</span>
+  </div>
+</section>
+
+<section class="section narrow">
+  <div class="card editor-block challenge-block">
+    <p class="challenge-prompt">{{ ch.prompt|safe }}</p>
+    <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">{{ ch.slug }}.py</span></div>
+    <textarea id="challengeCode" class="code-input" rows="12" spellcheck="false" aria-label="Challenge code editor">{{ ch.starter }}</textarea>
+    <div class="editor-bar">
+      <button class="btn btn-run" id="challengeRun">▶ Run & Check</button>
+      <button class="btn btn-ghost btn-sm" id="hintBtn">💡 Hint</button>
+      <button class="btn btn-ghost btn-sm" id="solutionBtn">👀 Solution</button>
+    </div>
+    <p id="hintBox" class="hint-box" hidden>💡 {{ ch.hint }}</p>
+    <pre id="solutionBox" class="code-output solution-box" hidden>{{ ch.solution }}</pre>
+    <pre id="challengeOut" class="code-output" aria-live="polite">Run your code to check it…</pre>
+    <div id="challengeResult" class="check-result" hidden></div>
+  </div>
+  {% if ch.slug in done %}
+  <p class="notice card">✓ You've already solved this one — re-run it any time for practice.</p>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script>
+  PySprint.initChallenge({
+    challenge: {{ ch.slug|tojson }},
+    expected: {{ ch.expected_output|tojson }},
+    loggedIn: {{ 'true' if user else 'false' }}
+  });
+</script>
+{% endblock %}

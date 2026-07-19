@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Python Challenge Arena — PySprint{% endblock %}
+{% block description %}Test your Python skills against 10 graded coding challenges — from vowel counters to rate limiters. Earn big XP and climb the leaderboard.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>⚔️ Challenge Arena</h1>
+  <p>Standalone problems, no hand-holding. Solve them in the browser to bank serious XP. Easy pays 30, Hard pays up to 90.</p>
+</section>
+
+<section class="section">
+  <div class="challenge-grid">
+    {% for ch in challenges %}
+    <a href="{{ url_for('challenge_detail', slug=ch.slug) }}" class="challenge-card card diff-{{ ch.difficulty|lower }} {% if ch.slug in done %}is-done{% endif %}">
+      <div class="challenge-top">
+        <span class="diff-badge">{{ ch.difficulty }}</span>
+        {% if ch.slug in done %}<span class="done-badge">✓ Solved</span>{% endif %}
+      </div>
+      <h3>{{ ch.title }}</h3>
+      <div class="course-meta"><span>⚡ {{ ch.xp }} XP</span></div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

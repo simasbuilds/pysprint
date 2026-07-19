@@ -1,0 +1,111 @@
+"""Standalone challenge arena — graded, XP-bearing coding problems."""
+
+CHALLENGES = [
+    {
+        "slug": "sum-of-evens",
+        "title": "Sum of Evens",
+        "difficulty": "Easy", "xp": 30,
+        "prompt": "Print the sum of all even numbers from 1 to 100 inclusive.",
+        "starter": "# print one number\n",
+        "expected_output": "2550",
+        "hint": "sum(range(2, 101, 2)) — or a loop with i % 2 == 0.",
+        "solution": "print(sum(range(2, 101, 2)))",
+    },
+    {
+        "slug": "vowel-counter",
+        "title": "Vowel Counter",
+        "difficulty": "Easy", "xp": 30,
+        "prompt": "Count the vowels (a, e, i, o, u) in the string <code>\"programming in python is productive\"</code> and print the count.",
+        "starter": 'text = "programming in python is productive"\n# print the vowel count\n',
+        "expected_output": "10",
+        "hint": "sum(1 for ch in text if ch in \"aeiou\")",
+        "solution": 'text = "programming in python is productive"\nprint(sum(1 for ch in text if ch in "aeiou"))',
+    },
+    {
+        "slug": "palindrome-check",
+        "title": "Palindrome Check",
+        "difficulty": "Easy", "xp": 35,
+        "prompt": "Write <code>is_palindrome(s)</code> returning True if <code>s</code> reads the same reversed (ignore case). Print the result for <code>\"Level\"</code> and <code>\"Python\"</code>.",
+        "starter": "def is_palindrome(s):\n    pass\n\nprint(is_palindrome(\"Level\"))\nprint(is_palindrome(\"Python\"))\n",
+        "expected_output": "True\nFalse",
+        "hint": "Lowercase first: s = s.lower(); compare s == s[::-1].",
+        "solution": 'def is_palindrome(s):\n    s = s.lower()\n    return s == s[::-1]\n\nprint(is_palindrome("Level"))\nprint(is_palindrome("Python"))',
+    },
+    {
+        "slug": "second-largest",
+        "title": "Second Largest",
+        "difficulty": "Medium", "xp": 50,
+        "prompt": "Print the second-largest distinct value in the starter list.",
+        "starter": "nums = [17, 42, 8, 42, 23, 4, 23]\n# print one number\n",
+        "expected_output": "23",
+        "hint": "Deduplicate with set(), sort, take index [-2].",
+        "solution": "nums = [17, 42, 8, 42, 23, 4, 23]\nprint(sorted(set(nums))[-2])",
+    },
+    {
+        "slug": "word-frequency",
+        "title": "Word Frequency",
+        "difficulty": "Medium", "xp": 50,
+        "prompt": "Print the three most common words in the starter text, one per line as <code>word count</code>.",
+        "starter": 'text = "the quick fox and the lazy dog and the sleepy cat and the fox"\n# top three words\n',
+        "expected_output": "the 4\nand 3\nfox 2",
+        "hint": "Counter(text.split()).most_common(3)",
+        "solution": 'from collections import Counter\ntext = "the quick fox and the lazy dog and the sleepy cat and the fox"\nfor word, count in Counter(text.split()).most_common(3):\n    print(word, count)',
+    },
+    {
+        "slug": "caesar-cipher",
+        "title": "Caesar Cipher",
+        "difficulty": "Medium", "xp": 55,
+        "prompt": "Shift every lowercase letter in <code>\"hello world\"</code> forward by 3 (wrapping z→c), keep spaces, and print the result.",
+        "starter": 'message = "hello world"\nshift = 3\n# print the encoded message\n',
+        "expected_output": "khoor zruog",
+        "hint": "chr((ord(ch) - ord('a') + shift) % 26 + ord('a')) for letters; keep spaces as-is.",
+        "solution": 'message = "hello world"\nshift = 3\nresult = ""\nfor ch in message:\n    if ch == " ":\n        result += ch\n    else:\n        result += chr((ord(ch) - ord("a") + shift) % 26 + ord("a"))\nprint(result)',
+    },
+    {
+        "slug": "fibonacci",
+        "title": "Fibonacci Sequence",
+        "difficulty": "Medium", "xp": 50,
+        "prompt": "Print the first 10 Fibonacci numbers (starting 0, 1) on one line separated by spaces.",
+        "starter": "# 0 1 1 2 3 5 8 13 21 34\n",
+        "expected_output": "0 1 1 2 3 5 8 13 21 34",
+        "hint": "Track a, b = 0, 1; append to a list; print(\" \".join(map(str, fibs))).",
+        "solution": 'fibs = []\na, b = 0, 1\nfor _ in range(10):\n    fibs.append(a)\n    a, b = b, a + b\nprint(" ".join(map(str, fibs)))',
+    },
+    {
+        "slug": "prime-sieve",
+        "title": "Prime Hunter",
+        "difficulty": "Hard", "xp": 75,
+        "prompt": "Print all prime numbers between 2 and 50 on one line separated by spaces.",
+        "starter": "# primes up to 50\n",
+        "expected_output": "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47",
+        "hint": "A number n is prime if no i in range(2, int(n**0.5)+1) divides it.",
+        "solution": 'primes = []\nfor n in range(2, 51):\n    is_prime = True\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            is_prime = False\n            break\n    if is_prime:\n        primes.append(str(n))\nprint(" ".join(primes))',
+    },
+    {
+        "slug": "matrix-diagonal",
+        "title": "Matrix Diagonals",
+        "difficulty": "Hard", "xp": 75,
+        "prompt": "For the 3×3 matrix in the starter, print the sum of the main diagonal, then the sum of the anti-diagonal.",
+        "starter": "matrix = [\n    [5, 1, 3],\n    [2, 8, 4],\n    [7, 6, 9],\n]\n# two prints\n",
+        "expected_output": "22\n18",
+        "hint": "Main: matrix[i][i]. Anti: matrix[i][len(matrix)-1-i].",
+        "solution": "matrix = [\n    [5, 1, 3],\n    [2, 8, 4],\n    [7, 6, 9],\n]\nn = len(matrix)\nprint(sum(matrix[i][i] for i in range(n)))\nprint(sum(matrix[i][n - 1 - i] for i in range(n)))",
+    },
+    {
+        "slug": "api-rate-limiter",
+        "title": "API Rate Limiter",
+        "difficulty": "Hard", "xp": 90,
+        "prompt": "Implement <code>allow(timestamps, window, limit)</code>: given sorted request timestamps (seconds), return how many requests would be <em>rejected</em> if only <code>limit</code> requests are allowed per rolling <code>window</code> seconds. Process requests in order; a request is rejected if the number of <em>accepted</em> requests in the last <code>window</code> seconds (inclusive) has reached <code>limit</code>. Print the result for the starter data.",
+        "starter": "def allow(timestamps, window, limit):\n    # return number of rejected requests\n    pass\n\nrequests = [1, 2, 2, 3, 4, 10, 10, 11, 12, 12]\nprint(allow(requests, window=5, limit=3))\n",
+        "expected_output": "4",
+        "hint": "Keep a list of accepted timestamps; for each request count accepted ones with t > current - window; reject if count >= limit.",
+        "solution": "def allow(timestamps, window, limit):\n    accepted = []\n    rejected = 0\n    for t in timestamps:\n        recent = [a for a in accepted if a > t - window]\n        if len(recent) >= limit:\n            rejected += 1\n        else:\n            accepted.append(t)\n    return rejected\n\nrequests = [1, 2, 2, 3, 4, 10, 10, 11, 12, 12]\nprint(allow(requests, window=5, limit=3))",
+    },
+]
+
+
+def get_challenge(slug):
+    for c in CHALLENGES:
+        if c["slug"] == slug:
+            return c
+    return None

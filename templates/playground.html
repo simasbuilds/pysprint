@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Python Playground — Run Python Online | PySprint{% endblock %}
+{% block description %}A free online Python 3 playground. Write and run real Python in your browser — no installation, no signup. Powered by WebAssembly.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>🛝 Playground</h1>
+  <p>A blank canvas running real Python 3 in your browser. Experiment freely — your code autosaves on this device.</p>
+</section>
+
+<section class="section narrow">
+  <div class="card editor-block">
+    <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">playground.py</span></div>
+    <textarea id="pgCode" class="code-input" rows="16" spellcheck="false" aria-label="Playground code editor"># Welcome to the PySprint playground!
+# Everything here is real Python 3 running in your browser.
+
+import math
+from collections import Counter
+
+print("2 ** 32 =", 2 ** 32)
+print("sqrt(2)  =", round(math.sqrt(2), 6))
+print(Counter("pysprint").most_common(2))</textarea>
+    <div class="editor-bar">
+      <button class="btn btn-run" id="pgRun">▶ Run (Ctrl+Enter)</button>
+      <button class="btn btn-ghost btn-sm" id="pgClear">Clear output</button>
+      <span class="editor-hint">stdlib included: math, json, csv, re, datetime, collections…</span>
+    </div>
+    <pre id="pgOut" class="code-output tall" aria-live="polite">Output appears here…</pre>
+  </div>
+
+  <div class="card notice">
+    <h3>Ideas to try</h3>
+    <ul>
+      <li>Generate 10 lottery numbers with <code>random.sample(range(1, 60), 10)</code></li>
+      <li>Pretty-print JSON with <code>json.dumps(data, indent=2)</code></li>
+      <li>Solve today's lesson challenge a second, cleverer way</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script>PySprint.initPlayground();</script>
+{% endblock %}
