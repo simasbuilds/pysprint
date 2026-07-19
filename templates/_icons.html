@@ -1,0 +1,6 @@
+{% macro icon(name, class_name='ui-icon', label='') -%}
+<svg class="{{ class_name }}" viewBox="0 0 24 24" focusable="false"
+  {% if label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}>
+  <use href="{{ url_for('static', filename='images/pysprint-icons.svg') }}#ps-{{ name }}"></use>
+</svg>
+{%- endmacro %}

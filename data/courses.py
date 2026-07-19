@@ -16,7 +16,7 @@ COURSES = [
         "tagline": "Zero to confident: syntax, variables, logic and loops.",
         "level": "Beginner",
         "color": "#22d3ee",
-        "icon": "🐍",
+        "icon": "terminal",
         "description": "Your very first steps in Python. No experience needed — by the end you will read and write real Python programs, understand variables, make decisions with conditionals and repeat work with loops.",
         "lessons": [
             {
@@ -249,7 +249,7 @@ COURSES = [
         "tagline": "Lists, dictionaries, tuples, sets — organise data like a pro.",
         "level": "Beginner",
         "color": "#a78bfa",
-        "icon": "📦",
+        "icon": "data",
         "description": "Real programs manage collections of data. Master Python's four built-in containers, slicing, and the elegant comprehension syntax that sets Python apart from every other language.",
         "lessons": [
             {
@@ -447,7 +447,7 @@ COURSES = [
         "tagline": "Write reusable, organised, professional code.",
         "level": "Intermediate",
         "color": "#34d399",
-        "icon": "⚙️",
+        "icon": "function",
         "description": "Functions turn repeated code into reusable building blocks; classes model the real world. This is where you stop writing scripts and start engineering software.",
         "lessons": [
             {
@@ -641,7 +641,7 @@ COURSES = [
         "tagline": "Errors, files, modules and the standard library.",
         "level": "Intermediate",
         "color": "#fbbf24",
-        "icon": "🛠️",
+        "icon": "tools",
         "description": "The skills that separate scripts from software: handle failures gracefully, read and write files, organise code into modules, and lean on Python's legendary standard library.",
         "lessons": [
             {
@@ -809,7 +809,7 @@ COURSES = [
         "tagline": "Consume and build web APIs — the language of the internet.",
         "level": "Intermediate",
         "color": "#f472b6",
-        "icon": "🔌",
+        "icon": "api",
         "description": "APIs power every app you use. Learn HTTP from the ground up, master JSON, consume real APIs with requests, and design and build your own REST API with Flask.",
         "lessons": [
             {
@@ -997,7 +997,7 @@ def add_book():
         "tagline": "Text processing, dates, CSV data and regex — automate everything.",
         "level": "Advanced",
         "color": "#fb7185",
-        "icon": "🤖",
+        "icon": "automation",
         "description": "Turn Python into your personal robot: crunch CSV data, wrangle dates, master regular expressions and build a real log analyzer — the skills behind data pipelines and scripting jobs.",
         "lessons": [
             {

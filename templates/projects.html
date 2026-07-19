@@ -1,28 +1,52 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Real-Life Python Projects — PySprint{% endblock %}
 {% block description %}Build 5 real-world Python projects step by step: budget analyzer, password auditor, to-do app with persistence, sales report generator and a webhook processor.{% endblock %}
+{% block social_image %}{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/real-projects.png') }}{% endblock %}
+{% block social_image_alt %}Python powering budget, security, task, sales and webhook projects{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ItemList","name":"Guided real-world Python projects","numberOfItems":{{ projects|length }},"itemListElement":[
+{% for p in projects %}{"@type":"ListItem","position":{{ loop.index }},"url":"{{ site_url }}{{ url_for('project_detail', slug=p.slug) }}","name":{{ p.title|tojson }}}{% if not loop.last %},{% endif %}{% endfor %}
+]}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>🏗️ Real-Life Projects</h1>
-  <p>Guided builds of the software you actually use — each explained first (<em>how it works in the real world</em>), then constructed step by graded step. Finish one and you've shipped something real.</p>
+<section class="directory-hero directory-dark">
+  <div class="directory-copy">
+    <span class="eyebrow">Five guided builds · 20 graded steps</span>
+    <h1>Stop collecting tutorials. <span>Ship something real.</span></h1>
+    <p>Build the software people actually use—each architecture explained first, then constructed and checked step by step.</p>
+    <div class="directory-actions">
+      <a href="{{ url_for('project_detail', slug='personal-budget') }}" class="btn btn-primary btn-lg">Build your first project →</a>
+      <a href="#projectCatalog" class="btn btn-dark-ghost btn-lg">Browse all five</a>
+    </div>
+  </div>
+  <img src="{{ url_for('static', filename='images/real-projects.png') }}"
+       alt="Python powering budget, security, task, sales and webhook software"
+       width="1774" height="887">
 </section>
 
-<section class="section">
+<section class="section" id="projectCatalog">
+  <div class="catalog-head">
+    <div><span class="eyebrow">Project workshop</span><h2>Pick a system worth building</h2></div>
+    <p>Every project includes professional context, progressive steps, instant checks, and a finished result.</p>
+  </div>
   <div class="project-grid">
     {% for p in projects %}
     <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card {% if p.slug in done %}is-done{% endif %}" style="--accent: {{ p.color }}">
       <div class="project-card-top">
-        <span class="project-icon">{{ p.icon }}</span>
+        <span class="project-icon">{{ icon(p.icon) }}</span>
         <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
       </div>
       <h2>{{ p.title }}</h2>
       <p>{{ p.summary }}</p>
       <div class="course-meta">
-        <span>🧩 {{ p.steps|length }} steps</span>
-        <span>⚡ {{ p.xp }} XP</span>
-        <span>⏱ ~{{ p.minutes }} min</span>
-        {% if p.slug in done %}<span class="done-badge">✓ Shipped</span>{% endif %}
+        <span>{{ icon('layers') }} {{ p.steps|length }} steps</span>
+        <span>{{ icon('bolt') }} {{ p.xp }} XP</span>
+        <span>{{ icon('clock') }} ~{{ p.minutes }} min</span>
+        {% if p.slug in done %}<span class="done-badge">{{ icon('check') }} Shipped</span>{% endif %}
       </div>
       <span class="project-go">Build it →</span>
     </a>

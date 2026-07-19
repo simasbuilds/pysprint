@@ -1,40 +1,142 @@
 {% extends "base.html" %}
-{% block title %}Python Playground — Run Python Online | PySprint{% endblock %}
-{% block description %}A free online Python 3 playground. Write and run real Python in your browser — no installation, no signup. Powered by WebAssembly.{% endblock %}
+{% from "_icons.html" import icon %}
+{% block title %}Python Playground — Browser IDE | PySprint{% endblock %}
+{% block description %}Write, run, import and download real Python 3 in a focused browser IDE — with practical recipes, autosave, run history and zero installation.{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"PySprint Python Playground","applicationCategory":"DeveloperApplication","operatingSystem":"Any modern web browser","url":"{{ site_url }}{{ request.path }}","description":{{ self.description()|striptags|trim|tojson }},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Run Python 3 in the browser","Local autosave","Import and download Python files","Practical starter recipes"]}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>🛝 Playground</h1>
-  <p>A blank canvas running real Python 3 in your browser. Experiment freely — your code autosaves on this device.</p>
+<section class="playground-hero">
+  <div>
+    <span class="eyebrow">Browser IDE · Private by design</span>
+    <h1>Python Playground<span class="grad">.</span></h1>
+    <p>Write and run real Python without leaving the browser. Your workspace autosaves locally.</p>
+  </div>
+  <div class="playground-proof" aria-label="Playground capabilities">
+    <span><i class="status-light"></i> Real Python 3</span>
+    <span>⌁ Standard library included</span>
+    <span>{{ icon('lock') }} Runs in your browser</span>
+  </div>
 </section>
 
-<section class="section narrow">
-  <div class="card editor-block">
-    <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">playground.py</span></div>
-    <textarea id="pgCode" class="code-input" rows="16" spellcheck="false" aria-label="Playground code editor"># Welcome to the PySprint playground!
-# Everything here is real Python 3 running in your browser.
+<section class="playground-section">
+  <div class="playground-layout">
+    <aside class="lab-sidebar card" aria-label="Code recipes and shortcuts">
+      <div class="lab-sidebar-head">
+        <span class="eyebrow">Quick starts</span>
+        <h2>Start from a recipe</h2>
+        <p>Load it, edit it, run it.</p>
+      </div>
+      <div class="recipe-list">
+        <button class="lab-recipe" data-recipe="data">
+          <span>{{ icon('chart') }}</span><div><strong>Analyse sales</strong><small>Lists, totals and max()</small></div><b>→</b>
+        </button>
+        <button class="lab-recipe" data-recipe="text">
+          <span>{{ icon('broom') }}</span><div><strong>Clean customer data</strong><small>Strings and comprehensions</small></div><b>→</b>
+        </button>
+        <button class="lab-recipe" data-recipe="api">
+          <span>{{ icon('cloud') }}</span><div><strong>Parse an API response</strong><small>JSON and nested data</small></div><b>→</b>
+        </button>
+        <button class="lab-recipe" data-recipe="automation">
+          <span>{{ icon('folder') }}</span><div><strong>Organise filenames</strong><small>Paths and grouping</small></div><b>→</b>
+        </button>
+        <button class="lab-recipe" data-recipe="debug">
+          <span>{{ icon('warning') }}</span><div><strong>Fix a broken report</strong><small>Exceptions and validation</small></div><b>→</b>
+        </button>
+      </div>
+      <div class="shortcut-card">
+        <strong>Keyboard</strong>
+        <span><kbd>⌘/Ctrl</kbd><kbd>Enter</kbd> Run</span>
+        <span><kbd>Tab</kbd> Indent</span>
+      </div>
+    </aside>
 
-import math
-from collections import Counter
+    <div class="playground-ide">
+      <div class="ide-topbar">
+        <div class="file-tab">
+          <span class="python-file-icon">Py</span>
+          <input id="pgFilename" value="playground.py" aria-label="Python filename" maxlength="64">
+          <span class="file-dirty" id="pgDirty" title="Saved">●</span>
+        </div>
+        <div class="ide-runtime" id="pgRuntime">
+          <span class="runtime-dot"></span>
+          <span id="pgRuntimeText">Python loads on first run</span>
+        </div>
+        <div class="ide-file-actions">
+          <label class="ide-tool" for="pgImport" title="Open a local Python file">↑ Import</label>
+          <input id="pgImport" type="file" accept=".py,.txt,text/x-python" hidden>
+          <button class="ide-tool" id="pgDownload" title="Download this file">↓ Download</button>
+        </div>
+      </div>
 
-print("2 ** 32 =", 2 ** 32)
-print("sqrt(2)  =", round(math.sqrt(2), 6))
-print(Counter("pysprint").most_common(2))</textarea>
-    <div class="editor-bar">
-      <button class="btn btn-run" id="pgRun">▶ Run (Ctrl+Enter)</button>
-      <button class="btn btn-ghost btn-sm" id="pgClear">Clear output</button>
-      <span class="editor-hint">stdlib included: math, json, csv, re, datetime, collections…</span>
+      <div class="ide-workspace">
+        <section class="ide-panel editor-panel" aria-label="Code editor">
+          <header class="ide-panel-head">
+            <div><span class="panel-indicator cyan"></span><strong>Editor</strong></div>
+            <span id="pgCodeStats">1 line · 0 characters</span>
+          </header>
+          <div class="editor-surface">
+            <pre class="line-numbers" id="pgLines" aria-hidden="true">1</pre>
+            <textarea id="pgCode" class="code-input playground-code" rows="20" spellcheck="false"
+                      autocapitalize="off" autocomplete="off"
+                      placeholder="# Write Python here, or load a recipe from the left…"
+                      aria-label="Python code editor"></textarea>
+          </div>
+        </section>
+
+        <section class="ide-panel console-panel" aria-label="Program output">
+          <header class="ide-panel-head">
+            <div><span class="panel-indicator mint"></span><strong>Console</strong></div>
+            <div class="console-tools">
+              <button id="pgCopyOut" title="Copy output">Copy</button>
+              <button id="pgClear" title="Clear output">Clear</button>
+            </div>
+          </header>
+          <pre id="pgOut" class="code-output playground-output" aria-live="polite"><span class="console-prompt">›</span> Ready when you are.</pre>
+          <footer class="console-status">
+            <span id="pgRunStatus">No runs yet</span>
+            <span id="pgRunMeta">Fresh process every run</span>
+          </footer>
+        </section>
+      </div>
+
+      <div class="ide-actionbar">
+        <button class="btn btn-run pg-run" id="pgRun">▶ Run Python <kbd>⌘↵</kbd></button>
+        <button class="ide-action" id="pgBlank">＋ New blank</button>
+        <div class="ide-view-tools">
+          <button class="ide-action" id="pgWrap" aria-pressed="false">↔ Wrap</button>
+          <button class="ide-action compact" id="pgFontDown" aria-label="Decrease editor font size">A−</button>
+          <button class="ide-action compact" id="pgFontUp" aria-label="Increase editor font size">A+</button>
+        </div>
+        <span class="save-state" id="pgSaveState">Blank · autosaved</span>
+      </div>
     </div>
-    <pre id="pgOut" class="code-output tall" aria-live="polite">Output appears here…</pre>
   </div>
 
-  <div class="card notice">
-    <h3>Ideas to try</h3>
-    <ul>
-      <li>Generate 10 lottery numbers with <code>random.sample(range(1, 60), 10)</code></li>
-      <li>Pretty-print JSON with <code>json.dumps(data, indent=2)</code></li>
-      <li>Solve today's lesson challenge a second, cleverer way</li>
-    </ul>
+  <div class="playground-lower">
+    <section class="run-history card">
+      <div class="lower-head">
+        <div><span class="eyebrow">Local session</span><h2>Recent runs</h2></div>
+        <button id="pgClearHistory" class="text-button">Clear history</button>
+      </div>
+      <div id="pgHistory" class="history-list">
+        <p class="history-empty">Your five most recent runs will appear here.</p>
+      </div>
+    </section>
+
+    <aside class="lab-guide card">
+      <span class="eyebrow">Good to know</span>
+      <h2>A real interpreter, safely contained.</h2>
+      <ul>
+        <li><strong>Included:</strong> math, json, csv, re, datetime, collections and the Python standard library.</li>
+        <li><strong>Private:</strong> code executes in a fresh browser process and is never sent to the server.</li>
+        <li><strong>Intentional limit:</strong> interactive <code>input()</code> and unrestricted network requests are unavailable.</li>
+      </ul>
+      <a href="{{ url_for('courses') }}" class="text-cta">Learn with guided lessons <span>→</span></a>
+    </aside>
   </div>
 </section>
 {% endblock %}

@@ -1,12 +1,21 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Create your free account — PySprint{% endblock %}
 {% block description %}Join PySprint free: save your progress, earn XP, keep streaks and unlock achievements while you master Python.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
 
 {% block content %}
 <section class="auth-wrap">
+  <aside class="auth-context">
+    <span class="eyebrow">Free learning account</span>
+    <h1>Turn practice into progress.</h1>
+    <p>Save every lesson, project, streak and achievement while the Python itself stays free to learn.</p>
+    <div class="auth-proof"><span>{{ icon('check') }} No credit card</span><span>{{ icon('check') }} Every lesson is free</span><span>{{ icon('check') }} Start in under a minute</span></div>
+  </aside>
   <form class="card auth-card" method="post" novalidate>
-    <h1>Start learning free 🚀</h1>
-    <p class="muted">30 seconds to set up. Free forever.</p>
+    <span class="eyebrow">Create your account</span>
+    <h1>Start learning</h1>
+    <p class="muted">Free forever. Set up in under a minute.</p>
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
     <label>Username
       <input type="text" name="username" required minlength="3" maxlength="24"

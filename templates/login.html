@@ -1,12 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Log in — PySprint{% endblock %}
+{% from "_icons.html" import icon %}
+{% block title %}Log in to PySprint — Continue Learning Python{% endblock %}
 {% block description %}Log in to PySprint to continue your Python journey — your XP, streak and achievements are waiting.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
 
 {% block content %}
 <section class="auth-wrap">
+  <aside class="auth-context">
+    <span class="eyebrow">Welcome back</span>
+    <h1>Keep your momentum.</h1>
+    <p>Your courses, XP, review cards and project progress are waiting exactly where you left them.</p>
+    <div class="auth-proof"><span>{{ icon('check') }} Continue instantly</span><span>{{ icon('check') }} Keep your streak</span><span>{{ icon('check') }} Review what matters</span></div>
+  </aside>
   <form class="card auth-card" method="post" novalidate>
-    <h1>Welcome back 👋</h1>
-    <p class="muted">Log in to keep your streak alive.</p>
+    <span class="eyebrow">Account access</span>
+    <h1>Log in</h1>
+    <p class="muted">Continue your Python path.</p>
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
     <label>Username or email
       <input type="text" name="username" required autocomplete="username" autofocus>

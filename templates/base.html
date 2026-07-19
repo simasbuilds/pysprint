@@ -1,27 +1,38 @@
+{% from "_icons.html" import icon %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}PySprint — Learn Python Interactively{% endblock %}</title>
-  <meta name="description" content="{% block description %}Learn Python for free with interactive lessons, in-browser coding challenges, quizzes, XP and achievements. From absolute beginner to building your own APIs.{% endblock %}">
+  <meta name="description" content="{% filter forceescape %}{% block description %}Learn Python for free with interactive lessons, in-browser coding challenges, quizzes, XP and achievements. From absolute beginner to building your own APIs.{% endblock %}{% endfilter %}">
   <meta name="keywords" content="learn python, python course, interactive python, python for beginners, python API tutorial, coding challenges, free python course">
   <meta name="author" content="simasbuilds">
+  <meta name="application-name" content="PySprint">
+  <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#07111f" media="(prefers-color-scheme: dark)">
+  <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}">
   <link rel="canonical" href="{{ site_url }}{{ request.path }}">
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:locale" content="en_US">
   <meta property="og:site_name" content="PySprint">
-  <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
-  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:title" content="{% filter forceescape %}{% block og_title %}{{ self.title() }}{% endblock %}{% endfilter %}">
+  <meta property="og:description" content="{{ self.description()|striptags|trim|forceescape }}">
   <meta property="og:url" content="{{ site_url }}{{ request.path }}">
+  <meta property="og:image" content="{% block social_image %}{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/pysprint-hero.png') }}{% endblock %}">
+  <meta property="og:image:alt" content="{% filter forceescape %}{% block social_image_alt %}PySprint interactive Python learning workspace{% endblock %}{% endfilter %}">
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{{ self.og_title() }}">
-  <meta name="twitter:description" content="{{ self.description() }}">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
+  <meta name="twitter:title" content="{{ self.og_title()|striptags|trim|forceescape }}">
+  <meta name="twitter:description" content="{{ self.description()|striptags|trim|forceescape }}">
+  <meta name="twitter:image" content="{{ self.social_image() }}">
+  <meta name="twitter:image:alt" content="{{ self.social_image_alt()|striptags|trim|forceescape }}">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.svg') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <script>
     // Apply saved theme before first paint (no flash). Light is the default.
@@ -31,45 +42,122 @@
     })();
   </script>
   {% block head %}{% endblock %}
-  {% block structured_data %}
   <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "WebSite",
-   "name": "PySprint", "url": "{{ site_url }}",
-   "description": "Interactive Python courses with in-browser coding, XP and achievements."}
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "{{ site_url.rstrip('/') }}/#organization",
+        "name": "PySprint",
+        "url": "{{ site_url.rstrip('/') }}/",
+        "logo": "{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/favicon.svg') }}"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "{{ site_url.rstrip('/') }}/#website",
+        "name": "PySprint",
+        "url": "{{ site_url.rstrip('/') }}/",
+        "publisher": {"@id": "{{ site_url.rstrip('/') }}/#organization"},
+        "description": "Free interactive Python courses with in-browser coding, projects, challenges and spaced repetition."
+      },
+      {
+        "@type": "WebPage",
+        "@id": "{{ site_url }}{{ request.path }}#webpage",
+        "url": "{{ site_url }}{{ request.path }}",
+        "name": {{ self.title()|striptags|trim|tojson }},
+        "description": {{ self.description()|striptags|trim|tojson }},
+        "isPartOf": {"@id": "{{ site_url.rstrip('/') }}/#website"},
+        "inLanguage": "en-US"
+      }
+    ]
+  }
   </script>
-  {% endblock %}
+  {% block structured_data %}{% endblock %}
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="read-progress" id="readProgress" aria-hidden="true"></div>
 
+  <div class="announce">
+    <div class="announce-inner">
+      <span><strong>Free lab</strong> Real Python 3. Zero installs. Your code stays in this browser.</span>
+      <a href="{{ url_for('playground') }}">Open the playground <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
   <header class="nav">
     <div class="nav-inner">
       <a href="{{ url_for('home') }}" class="brand" aria-label="PySprint home">
-        <span class="brand-mark">🐍</span><span class="brand-name">Py<em>Sprint</em></span>
+        <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span>
+        <span class="brand-name">Py<em>Sprint</em></span>
+        <span class="brand-tag">LEARN LAB</span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-        <a href="{{ url_for('courses') }}" {% if request.path.startswith('/courses') %}class="active"{% endif %}>Courses</a>
-        <a href="{{ url_for('projects') }}" {% if request.path.startswith('/projects') %}class="active"{% endif %}>Projects</a>
-        <a href="{{ url_for('challenges') }}" {% if request.path.startswith('/challenges') %}class="active"{% endif %}>Challenges</a>
-        <a href="{{ url_for('playground') }}" {% if request.path == '/playground' %}class="active"{% endif %}>Playground</a>
-        <a href="{{ url_for('review') }}" {% if request.path == '/review' %}class="active"{% endif %}>Review</a>
+        <div class="nav-menu-wrap">
+          <button class="nav-menu-trigger {% if request.path.startswith('/courses') or request.path.startswith('/challenges') or request.path == '/review' %}active{% endif %}"
+                  id="learnMenuBtn" data-menu="learnMenu" aria-expanded="false" aria-controls="learnMenu">
+            Learn <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="mega-menu" id="learnMenu" hidden>
+            <div class="mega-intro">
+              <span class="mega-kicker">{{ icon('path') }} Guided learning path</span>
+              <h2>From first line to useful Python.</h2>
+              <p>Six connected courses, live practice, and review that brings concepts back at the right time.</p>
+              <div class="mega-progress"><span style="width: 72%"></span></div>
+              <a class="mega-primary" href="{{ url_for('courses') }}">Explore all six courses →</a>
+            </div>
+            <div class="mega-links">
+              <a href="{{ url_for('courses') }}"><span class="menu-icon">{{ icon('book') }}</span><div><strong>Course path</strong><small>34 focused lessons from syntax to automation</small></div><b>→</b></a>
+              <a href="{{ url_for('challenges') }}"><span class="menu-icon">{{ icon('swords') }}</span><div><strong>Challenge arena</strong><small>Practice with graded, interview-style problems</small></div><b>→</b></a>
+              <a href="{{ url_for('review') }}"><span class="menu-icon">{{ icon('brain') }}</span><div><strong>Smart Review</strong><small>Keep concepts with spaced repetition</small></div><b>→</b></a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-menu-wrap">
+          <button class="nav-menu-trigger {% if request.path.startswith('/projects') or request.path == '/playground' %}active{% endif %}"
+                  id="buildMenuBtn" data-menu="buildMenu" aria-expanded="false" aria-controls="buildMenu">
+            Build <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="mega-menu build-menu" id="buildMenu" hidden>
+            <div class="mega-intro build-intro">
+              <span class="mega-kicker">{{ icon('rocket') }} Applied Python</span>
+              <h2>Turn concepts into working systems.</h2>
+              <p>Start from a guided architecture or open a private blank workspace and make it yours.</p>
+              <a class="mega-primary" href="{{ url_for('projects') }}">See the project workshop →</a>
+            </div>
+            <div class="mega-links build-links">
+              <a href="{{ url_for('projects') }}"><span class="menu-icon">{{ icon('blocks') }}</span><div><strong>Guided projects</strong><small>Ship five useful, portfolio-ready builds</small></div><b>→</b></a>
+              <a href="{{ url_for('playground') }}"><span class="menu-icon">{{ icon('terminal') }}</span><div><strong>Python playground</strong><small>Write, run, import, and download real Python</small></div><b>→</b></a>
+            </div>
+          </div>
+        </div>
+        <a href="{{ url_for('about') }}" {% if request.path == '/about' %}class="active"{% endif %}>How it works</a>
         {% if user %}
           <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}>Dashboard</a>
         {% endif %}
+        <div class="mobile-nav-cta">
+          {% if user %}
+          <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Continue learning →</a>
+          {% else %}
+          <a href="{{ url_for('register') }}" class="btn btn-primary">Start learning free →</a>
+          {% endif %}
+        </div>
       </nav>
       <div class="nav-right">
         {% if user %}
           <div class="nav-stats" title="Level {{ level.level }} — {{ level.title }}">
-            <span class="nav-xp">⚡ {{ user.xp }} XP</span>
-            <span class="nav-streak">🔥 {{ user.streak }}</span>
+            <span class="nav-xp">{{ icon('bolt') }} {{ user.xp }} XP</span>
+            <span class="nav-streak">{{ icon('flame') }} {{ user.streak }}</span>
           </div>
           <a class="btn btn-ghost btn-sm" href="{{ url_for('logout') }}">Log out</a>
         {% else %}
           <a class="btn btn-ghost btn-sm" href="{{ url_for('login') }}">Log in</a>
-          <a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Start free</a>
+          <a class="btn btn-primary btn-sm nav-cta" href="{{ url_for('register') }}">Start learning <span aria-hidden="true">→</span></a>
         {% endif %}
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Switch theme"
+                data-icon-base="{{ url_for('static', filename='images/pysprint-icons.svg') }}">
+          {{ icon('moon', 'theme-icon') }}
+        </button>
         <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -81,10 +169,28 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if request.endpoint not in ('home', 'playground', 'login', 'register', none) %}
+  <section class="global-cta">
+    <div>
+      <span class="eyebrow">Your next ten minutes</span>
+      <h2>Write Python that does something useful.</h2>
+      <p>Start free. No install, no card, no passive video marathon.</p>
+    </div>
+    <div class="global-cta-actions">
+      {% if user %}
+      <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
+      {% else %}
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start learning free →</a>
+      {% endif %}
+      <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Explore the path</a>
+    </div>
+  </section>
+  {% endif %}
+
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="brand-mark">🐍</span> <strong>PySprint</strong>
+        <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span> <strong>PySprint</strong>
         <p>Learn Python by writing Python. Free, interactive, forever.</p>
       </div>
       <div class="footer-col">
@@ -112,7 +218,7 @@
   <!-- Achievement celebration modal -->
   <div id="achieveModal" class="modal" hidden>
     <div class="modal-card achieve-card">
-      <div class="achieve-icon" id="achieveIcon">🏆</div>
+      <div class="achieve-icon" id="achieveIcon">{{ icon('trophy', 'achievement-glyph') }}</div>
       <h3 id="achieveTitle">Achievement unlocked!</h3>
       <p id="achieveDesc"></p>
       <button class="btn btn-primary" id="achieveClose">Nice!</button>

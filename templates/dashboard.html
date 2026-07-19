@@ -1,20 +1,23 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Your Dashboard — PySprint{% endblock %}
 {% block description %}Track your Python learning progress: XP, level, streak, course completion and achievements.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>Welcome back, {{ user.username }} 👋</h1>
+<section class="page-head dashboard-head">
+  <span class="eyebrow">Learning command center</span>
+  <h1>Welcome back, {{ user.username }}.</h1>
   <p>Level {{ level.level }} — <strong>{{ level.title }}</strong>. {{ level.needed - level.into }} XP to the next level.</p>
 </section>
 
 <section class="section">
   <div class="stat-grid">
-    <div class="stat card"><strong>⚡ {{ stats.xp }}</strong><span>Total XP</span></div>
-    <div class="stat card"><strong>🔥 {{ stats.streak }}</strong><span>Day streak</span></div>
-    <div class="stat card"><strong>📚 {{ stats.lessons_done }}/{{ stats.total_lessons }}</strong><span>Lessons</span></div>
-    <div class="stat card"><strong>⚔️ {{ stats.challenges_done }}/10</strong><span>Challenges</span></div>
-    <div class="stat card"><strong>🏗️ {{ stats.projects_done }}/{{ stats.total_projects }}</strong><span>Projects</span></div>
+    <div class="stat card"><strong>{{ icon('bolt') }} {{ stats.xp }}</strong><span>Total XP</span></div>
+    <div class="stat card"><strong>{{ icon('flame') }} {{ stats.streak }}</strong><span>Day streak</span></div>
+    <div class="stat card"><strong>{{ icon('book') }} {{ stats.lessons_done }}/{{ stats.total_lessons }}</strong><span>Lessons</span></div>
+    <div class="stat card"><strong>{{ icon('swords') }} {{ stats.challenges_done }}/10</strong><span>Challenges</span></div>
+    <div class="stat card"><strong>{{ icon('blocks') }} {{ stats.projects_done }}/{{ stats.total_projects }}</strong><span>Projects</span></div>
   </div>
 
   <div class="card level-card">
@@ -29,8 +32,8 @@
   <div class="dash-course-grid">
     {% for cc in course_cards %}
     <a href="{{ url_for('course_detail', slug=cc.course.slug) }}" class="card dash-course" style="--accent: {{ cc.course.color }}">
-      <div class="course-top"><span class="course-icon">{{ cc.course.icon }}</span>
-        {% if cc.pct == 100 %}<span class="done-badge">✓ Complete</span>{% endif %}</div>
+      <div class="course-top"><span class="course-icon">{{ icon(cc.course.icon) }}</span>
+        {% if cc.pct == 100 %}<span class="done-badge">{{ icon('check') }} Complete</span>{% endif %}</div>
       <h3>{{ cc.course.title }}</h3>
       <div class="progress-track"><div class="progress-fill" style="width: {{ cc.pct }}%"></div></div>
       <span class="progress-label">{{ cc.done }}/{{ cc.total }} lessons · {{ cc.pct }}%</span>
@@ -42,7 +45,7 @@
   <div class="achieve-grid">
     {% for a in achievements %}
     <div class="achieve-tile card {% if not a.earned %}locked{% endif %}" title="{{ a.desc }}">
-      <span class="achieve-tile-icon">{{ a.icon }}</span>
+      <span class="achieve-tile-icon">{{ icon(a.icon) }}</span>
       <strong>{{ a.title }}</strong>
       <span class="achieve-tile-desc">{{ a.desc }}</span>
     </div>
@@ -59,8 +62,8 @@
         <tr {% if row.username == user.username %}class="me"{% endif %}>
           <td>{{ loop.index }}</td>
           <td>{{ row.username }}{% if row.username == user.username %} <span class="muted">(you)</span>{% endif %}</td>
-          <td>⚡ {{ row.xp }}</td>
-          <td>🔥 {{ row.streak }}</td>
+          <td>{{ icon('bolt') }} {{ row.xp }}</td>
+          <td>{{ icon('flame') }} {{ row.streak }}</td>
         </tr>
         {% endfor %}
       </tbody>

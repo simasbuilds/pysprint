@@ -1,10 +1,17 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Smart Review — Spaced-Repetition Python Flashcards | PySprint{% endblock %}
 {% block description %}PySprint's built-in study engine: every Python concept as a flashcard, scheduled with spaced repetition so you never forget what you learned.{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LearningResource","name":"PySprint Smart Review","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","learningResourceType":"Spaced-repetition flashcards","inLanguage":"en-US","isAccessibleForFree":true}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>🧠 Smart Review</h1>
+<section class="page-head review-head">
+  <span class="eyebrow">Five minutes a day</span>
+  <h1>Smart Review {{ icon('brain', 'heading-icon') }}</h1>
   <p>Every quiz concept on PySprint, turned into flashcards and scheduled with <strong>spaced repetition</strong> — cards you find hard come back sooner, cards you know come back later. Five minutes a day keeps everything fresh.</p>
 </section>
 
@@ -29,12 +36,12 @@
       </div>
     </div>
     <div class="review-actions" id="reviewActions" hidden>
-      <button class="btn btn-danger" data-grade="0">😵 Again<br><small>&lt; 1 min</small></button>
-      <button class="btn btn-warn" data-grade="1">🤔 Hard<br><small>10 min</small></button>
-      <button class="btn btn-primary" data-grade="2">🙂 Good<br><small>1 day</small></button>
-      <button class="btn btn-success" data-grade="3">😎 Easy<br><small>4 days</small></button>
+      <button class="btn btn-danger" data-grade="0">{{ icon('orbit') }}<span>Again<small>&lt; 1 min</small></span></button>
+      <button class="btn btn-warn" data-grade="1">{{ icon('focus') }}<span>Hard<small>10 min</small></span></button>
+      <button class="btn btn-primary" data-grade="2">{{ icon('check') }}<span>Good<small>1 day</small></span></button>
+      <button class="btn btn-success" data-grade="3">{{ icon('spark') }}<span>Easy<small>4 days</small></span></button>
     </div>
-    <p class="review-done card" id="reviewDone" hidden>🎉 All caught up! Come back later — spaced repetition works best in short daily sessions.</p>
+    <p class="review-done card" id="reviewDone" hidden>{{ icon('trophy') }} All caught up! Come back later — spaced repetition works best in short daily sessions.</p>
   </div>
 </section>
 {% endblock %}

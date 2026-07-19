@@ -1,23 +1,47 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Python Challenge Arena — PySprint{% endblock %}
 {% block description %}Test your Python skills against 10 graded coding challenges — from vowel counters to rate limiters. Earn big XP and climb the leaderboard.{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ItemList","name":"Interactive Python coding challenges","numberOfItems":{{ challenges|length }},"itemListElement":[
+{% for ch in challenges %}{"@type":"ListItem","position":{{ loop.index }},"url":"{{ site_url }}{{ url_for('challenge_detail', slug=ch.slug) }}","name":{{ ch.title|tojson }}}{% if not loop.last %},{% endif %}{% endfor %}
+]}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>⚔️ Challenge Arena</h1>
-  <p>Standalone problems, no hand-holding. Solve them in the browser to bank serious XP. Easy pays 30, Hard pays up to 90.</p>
+<section class="directory-hero arena-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">10 problems · Easy to hard</span>
+    <h1>Pressure-test your <span class="grad">Python instincts.</span></h1>
+    <p>Standalone problems with a blank workspace, instant output checks, optional hints, and XP for every clean solution.</p>
+    <div class="directory-actions">
+      <a href="{{ url_for('challenge_detail', slug='sum-of-evens') }}" class="btn btn-primary btn-lg">Take the first challenge →</a>
+      <a href="#arenaGrid" class="btn btn-ghost btn-lg">See every problem</a>
+    </div>
+  </div>
+  <div class="arena-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}" alt="" width="1588" height="991">
+    <div class="arena-score"><strong>10</strong><span>problems</span></div>
+    <div class="arena-score second"><strong>90</strong><span>max XP</span></div>
+  </div>
 </section>
 
-<section class="section">
+<section class="section" id="arenaGrid">
+  <div class="catalog-head">
+    <div><span class="eyebrow">Challenge catalog</span><h2>Choose your difficulty</h2></div>
+    <p>Start easy to build momentum or jump to hard if you want an interview-style stretch.</p>
+  </div>
   <div class="challenge-grid">
     {% for ch in challenges %}
     <a href="{{ url_for('challenge_detail', slug=ch.slug) }}" class="challenge-card card diff-{{ ch.difficulty|lower }} {% if ch.slug in done %}is-done{% endif %}">
       <div class="challenge-top">
         <span class="diff-badge">{{ ch.difficulty }}</span>
-        {% if ch.slug in done %}<span class="done-badge">✓ Solved</span>{% endif %}
+        {% if ch.slug in done %}<span class="done-badge">{{ icon('check') }} Solved</span>{% endif %}
       </div>
       <h3>{{ ch.title }}</h3>
-      <div class="course-meta"><span>⚡ {{ ch.xp }} XP</span></div>
+      <div class="course-meta"><span>{{ icon('bolt') }} {{ ch.xp }} XP</span></div>
     </a>
     {% endfor %}
   </div>

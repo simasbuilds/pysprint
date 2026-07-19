@@ -20,6 +20,7 @@ from data.challenges import CHALLENGES, get_challenge
 from data.courses import COURSES, get_course, get_lesson, total_lessons
 from data.lesson_extras import get_extras
 from data.projects import PROJECTS, get_project
+from data.use_cases import get_course_use_cases
 from data.walkthroughs import get_walkthrough
 
 load_dotenv()
@@ -137,7 +138,8 @@ def course_detail(slug):
         done = lessons_by_course.get(slug, set())
     total_xp = sum(l["xp"] for l in course["lessons"])
     return render_template("course.html", course=course, done=done,
-                           total_xp=total_xp)
+                           total_xp=total_xp,
+                           use_cases=get_course_use_cases(slug))
 
 
 @app.get("/courses/<slug>/<lesson_slug>")

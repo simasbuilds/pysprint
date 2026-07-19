@@ -8,7 +8,14 @@
   'use strict';
 
   const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+  const ICONS_URL = '/static/images/pysprint-icons.svg';
   let pyodideReady = null;
+
+  function iconMarkup(name) {
+    const safe = /^[a-z0-9-]+$/.test(name) ? name : 'info';
+    return '<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<use href="' + ICONS_URL + '#ps-' + safe + '"></use></svg>';
+  }
 
   function loadPyodideOnce() {
     if (pyodideReady) return pyodideReady;
@@ -79,10 +86,56 @@
     });
   }
 
+  function setupWorkspace(opts) {
+    const code = opts.code;
+    if (!code) return;
+    code.spellcheck = false;
+    code.setAttribute('autocorrect', 'off');
+    code.setAttribute('autocapitalize', 'none');
+    code.setAttribute('autocomplete', 'off');
+    const loadBtn = opts.loadId && document.getElementById(opts.loadId);
+    const blankBtn = opts.blankId && document.getElementById(opts.blankId);
+    const state = opts.stateId && document.getElementById(opts.stateId);
+
+    function setState(message) {
+      if (state) state.textContent = message;
+    }
+
+    function save(message) {
+      try { localStorage.setItem(opts.storageKey, code.value); } catch (_) {}
+      setState(message || (code.value.trim() ? 'Saved on this device' : 'Blank · autosaved'));
+    }
+
+    function replace(next, action) {
+      if (code.value.trim() && code.value !== next &&
+          !window.confirm(action + ' will replace the code currently in this editor. Continue?')) return;
+      code.value = next;
+      save(next.trim() ? 'Starter loaded · autosaved' : 'Blank · autosaved');
+      code.dispatchEvent(new Event('input', { bubbles: true }));
+      code.focus({ preventScroll: true });
+      code.setSelectionRange(code.value.length, code.value.length);
+    }
+
+    let saved = null;
+    try { saved = localStorage.getItem(opts.storageKey); } catch (_) {}
+    code.value = saved !== null ? saved : '';
+    setState(code.value.trim() ? 'Restored · autosaved' : 'Blank · autosaved');
+    code.addEventListener('input', () => save());
+
+    loadBtn && loadBtn.addEventListener('click', () => replace(opts.starter || '', 'Loading the starter'));
+    blankBtn && blankBtn.addEventListener('click', () => replace('', 'Starting blank'));
+  }
+
   async function execInto(codeEl, outEl, btn) {
+    if (!codeEl.value.trim()) {
+      outEl.classList.remove('error');
+      outEl.textContent = 'Your workspace is blank. Write some Python or load the starter, then run it.';
+      codeEl.focus({ preventScroll: true });
+      return { ok: false, output: '' };
+    }
     btn.disabled = true;
     const original = btn.textContent;
-    btn.textContent = '⏳ Running…';
+    btn.textContent = 'Running…';
     outEl.classList.remove('error');
     if (!pyodideReady) outEl.textContent = 'Loading Python engine (first run only, ~5s)…';
     const result = await run(codeEl.value);
@@ -125,6 +178,14 @@
     const solBox = document.getElementById('solutionBox');
     if (!code || !btn) return;
 
+    setupWorkspace({
+      code: code,
+      storageKey: opts.storageKey,
+      starter: opts.starter,
+      loadId: 'challengeLoad',
+      blankId: 'challengeBlank',
+      stateId: 'challengeSaveState',
+    });
     enableTabKey(code);
     hintBtn && hintBtn.addEventListener('click', () => { hintBox.hidden = !hintBox.hidden; });
     solBtn && solBtn.addEventListener('click', () => { solBox.hidden = !solBox.hidden; });
@@ -134,14 +195,14 @@
       resultBox.hidden = false;
       if (result.ok && normalize(result.output) === normalize(opts.expected)) {
         resultBox.className = 'check-result pass';
-        resultBox.innerHTML = '✅ <strong>Correct!</strong> Output matches exactly.';
+        resultBox.innerHTML = iconMarkup('check') + ' <strong>Correct!</strong> Output matches exactly.';
         opts.onPass && opts.onPass();
       } else {
         resultBox.className = 'check-result fail';
         resultBox.innerHTML = result.ok
-          ? '❌ Not quite — your output doesn\'t match.<small>Expected:\n' +
+          ? iconMarkup('warning') + ' Not quite — your output doesn\'t match.<small>Expected:\n' +
             escapeHtml(opts.expected) + '</small>'
-          : '❌ Your code raised an error — read the traceback above, fix it, and run again.';
+          : iconMarkup('warning') + ' Your code raised an error — read the traceback above, fix it, and run again.';
       }
     }
     btn.addEventListener('click', check);
@@ -163,13 +224,13 @@
 
   function reportProgress(url, body, loggedIn, passedMsg) {
     if (!loggedIn) {
-      toast('✅ ' + passedMsg + ' — log in to bank the XP!', 'success');
+      toast(passedMsg + ' — log in to bank the XP!', 'success');
       return;
     }
     postJSON(url, body).then(({ status, data }) => {
       if (status !== 200) return;
       if (data.first_time && data.xp_gained) {
-        toast('⚡ +' + data.xp_gained + ' XP earned!', 'success');
+        toast('+' + data.xp_gained + ' XP earned!', 'success');
       }
       celebrateAchievements(data.new_achievements);
     }).catch(() => {});
@@ -260,15 +321,23 @@
 
       // Example runner
       const exCode = document.getElementById('exampleCode');
+      setupWorkspace({
+        code: exCode,
+        storageKey: 'pysprint-example-' + cfg.course + '-' + cfg.lesson,
+        starter: cfg.example,
+        loadId: 'exampleLoad',
+        blankId: 'exampleBlank',
+        stateId: 'exampleSaveState',
+      });
       PyRunner.wireSimple('exampleRun', 'exampleCode', 'exampleOut');
-      const reset = document.getElementById('exampleReset');
-      reset && reset.addEventListener('click', () => { exCode.value = cfg.example; });
 
       // Challenge (expected output embedded as JSON to survive newlines)
       const spec = JSON.parse(document.getElementById('challengeSpec').textContent);
       let challengePassed = false;
       wireChallenge({
         expected: spec.expected,
+        starter: cfg.starter,
+        storageKey: 'pysprint-challenge-' + cfg.course + '-' + cfg.lesson,
         onPass() {
           challengePassed = true;
           confetti(document.getElementById('challengeResult'));
@@ -307,7 +376,7 @@
       const completeBtn = document.getElementById('completeBtn');
       completeBtn.addEventListener('click', () => {
         if (!challengePassed && !completeBtn.dataset.done) {
-          toast('Pass the challenge first — that\'s where the learning happens! 💪', 'error');
+          toast('Pass the challenge first — that is where the learning happens.', 'error');
           return;
         }
         if (!cfg.loggedIn) {
@@ -319,11 +388,11 @@
           .then(({ status, data }) => {
             if (status !== 200) { toast('Could not save progress.', 'error'); return; }
             if (data.first_time) {
-              toast('⚡ +' + data.xp_gained + ' XP — lesson complete!', 'success');
-              completeBtn.textContent = '✓ Completed';
+              toast('+' + data.xp_gained + ' XP — lesson complete!', 'success');
+              completeBtn.textContent = 'Completed';
               completeBtn.dataset.done = '1';
             } else {
-              toast('Already completed — nice revision session! 🔁', '');
+              toast('Already completed — nice revision session!', '');
             }
             celebrateAchievements(data.new_achievements);
           })
@@ -334,6 +403,8 @@
     initChallenge(cfg) {
       wireChallenge({
         expected: cfg.expected,
+        starter: cfg.starter,
+        storageKey: 'pysprint-arena-' + cfg.challenge,
         onPass() {
           confetti(document.getElementById('challengeResult'));
           reportProgress('/api/complete-challenge', { challenge: cfg.challenge },
@@ -362,7 +433,7 @@
           const isOpen = i <= unlocked;
           card.classList.toggle('locked', !isOpen);
           card.classList.toggle('done', isDone);
-          state.textContent = isDone ? '✅' : (isOpen ? '🔓' : '🔒');
+          state.innerHTML = iconMarkup(isDone ? 'check' : (isOpen ? 'target' : 'lock'));
         }
         bar.style.width = (unlocked / total * 100) + '%';
         count.textContent = unlocked + ' / ' + total + ' steps';
@@ -383,6 +454,14 @@
         const out = document.getElementById('out-' + i);
         const btn = document.getElementById('run-' + i);
         const resultBox = document.getElementById('result-' + i);
+        setupWorkspace({
+          code: code,
+          storageKey: 'pysprint-project-code-' + cfg.project + '-' + i,
+          starter: spec.starters[i],
+          loadId: 'load-' + i,
+          blankId: 'blank-' + i,
+          stateId: 'save-' + i,
+        });
         enableTabKey(code);
 
         const check = async () => {
@@ -390,8 +469,8 @@
           resultBox.hidden = false;
           if (result.ok && normalize(result.output) === normalize(spec.steps[i])) {
             resultBox.className = 'check-result pass';
-            resultBox.innerHTML = '✅ <strong>Step complete!</strong>' +
-              (i + 1 < total ? ' The next step is unlocked.' : ' That was the last one — project shipped! 🎉');
+            resultBox.innerHTML = iconMarkup('check') + ' <strong>Step complete!</strong>' +
+              (i + 1 < total ? ' The next step is unlocked.' : ' That was the last one — project shipped!');
             confetti(resultBox);
             if (i + 1 > unlocked) {
               unlocked = i + 1;
@@ -410,8 +489,8 @@
           } else {
             resultBox.className = 'check-result fail';
             resultBox.innerHTML = result.ok
-              ? '❌ Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
-              : '❌ Your code raised an error — read the traceback above and try again.';
+              ? iconMarkup('warning') + ' Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
+              : iconMarkup('warning') + ' Your code raised an error — read the traceback above and try again.';
           }
         };
         btn.addEventListener('click', check);
@@ -423,14 +502,308 @@
 
     initPlayground() {
       const code = document.getElementById('pgCode');
-      const saved = localStorage.getItem('pysprint-playground');
-      if (saved) code.value = saved;
-      code.addEventListener('input', () => localStorage.setItem('pysprint-playground', code.value));
-      PyRunner.wireSimple('pgRun', 'pgCode', 'pgOut');
+      const out = document.getElementById('pgOut');
+      const runBtn = document.getElementById('pgRun');
+      const runtime = document.getElementById('pgRuntime');
+      const runtimeText = document.getElementById('pgRuntimeText');
+      const runStatus = document.getElementById('pgRunStatus');
+      const runMeta = document.getElementById('pgRunMeta');
+      const lines = document.getElementById('pgLines');
+      const stats = document.getElementById('pgCodeStats');
+      const filename = document.getElementById('pgFilename');
+      const ide = document.querySelector('.playground-ide');
+      const historyEl = document.getElementById('pgHistory');
+      const historyKey = 'pysprint-playground-history';
+      filename.value = localStorage.getItem('pysprint-playground-filename') || 'playground.py';
+
+      setupWorkspace({
+        code: code,
+        storageKey: 'pysprint-playground',
+        blankId: 'pgBlank',
+        stateId: 'pgSaveState',
+      });
+      enableTabKey(code);
+
+      const recipes = {
+        data: `orders = [
+    {"product": "Keyboard", "qty": 2, "price": 45},
+    {"product": "Monitor", "qty": 1, "price": 220},
+    {"product": "Mouse", "qty": 3, "price": 25},
+]
+
+# Calculate total revenue and find the largest order
+revenue = sum(order["qty"] * order["price"] for order in orders)
+largest = max(orders, key=lambda order: order["qty"] * order["price"])
+
+print(f"Revenue: €{revenue}")
+print(f"Largest order: {largest['product']}")
+`,
+        text: `raw_names = ["  ADA lovelace ", "grace  hopper", "  Alan TURING"]
+
+# Normalize whitespace and capitalization
+clean_names = [" ".join(name.split()).title() for name in raw_names]
+
+for name in clean_names:
+    print(name)
+`,
+        api: `import json
+
+response = """{
+    "city": "New York",
+    "temp_c": 27,
+    "conditions": ["sunny", "humid"]
+}"""
+
+weather = json.loads(response)
+conditions = ", ".join(weather["conditions"])
+
+print(f"{weather['city']}: {weather['temp_c']}°C, {conditions}")
+`,
+        automation: `from pathlib import Path
+
+filenames = [
+    "invoice-july.pdf",
+    "team-photo.jpg",
+    "invoice-august.pdf",
+    "logo.png",
+]
+
+# Group filenames by extension, like a file organizer would
+groups = {}
+for name in filenames:
+    extension = Path(name).suffix.lstrip(".")
+    groups.setdefault(extension, []).append(name)
+
+for extension, files in sorted(groups.items()):
+    print(f"{extension.upper()}: {len(files)} file(s)")
+`,
+        debug: `rows = ["Ada,92", "Grace,N/A", "Alan,87", "Linus,95"]
+valid_scores = []
+
+for row in rows:
+    name, raw_score = row.split(",")
+    try:
+        valid_scores.append((name, int(raw_score)))
+    except ValueError:
+        print(f"Skipped invalid score for {name}")
+
+average = sum(score for _, score in valid_scores) / len(valid_scores)
+print(f"Valid records: {len(valid_scores)}")
+print(f"Average: {average:.1f}")
+`,
+      };
+
+      function updateEditorMeta() {
+        const count = code.value.split('\n').length;
+        lines.textContent = Array.from({ length: count }, (_, i) => i + 1).join('\n');
+        stats.textContent = count + (count === 1 ? ' line' : ' lines') +
+          ' · ' + code.value.length + (code.value.length === 1 ? ' character' : ' characters');
+        document.getElementById('pgDirty').title = 'Saved on this device';
+      }
+
+      code.addEventListener('input', updateEditorMeta);
+      code.addEventListener('scroll', () => { lines.scrollTop = code.scrollTop; });
+      updateEditorMeta();
+
+      function replaceCode(next, action) {
+        if (code.value.trim() && code.value !== next &&
+            !window.confirm(action + ' will replace your current code. Continue?')) return false;
+        code.value = next;
+        code.dispatchEvent(new Event('input', { bubbles: true }));
+        code.focus({ preventScroll: true });
+        code.setSelectionRange(0, 0);
+        return true;
+      }
+
+      document.querySelectorAll('[data-recipe]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const recipe = recipes[btn.dataset.recipe];
+          if (!recipe) return;
+          if (!replaceCode(recipe, 'Loading this recipe')) return;
+          document.querySelectorAll('[data-recipe]').forEach(item => item.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      function getHistory() {
+        try { return JSON.parse(localStorage.getItem(historyKey) || '[]'); }
+        catch (_) { return []; }
+      }
+
+      function saveHistory(items) {
+        try { localStorage.setItem(historyKey, JSON.stringify(items.slice(0, 5))); }
+        catch (_) {}
+      }
+
+      function renderHistory() {
+        const history = getHistory();
+        historyEl.textContent = '';
+        if (!history.length) {
+          const empty = document.createElement('p');
+          empty.className = 'history-empty';
+          empty.textContent = 'Your five most recent runs will appear here.';
+          historyEl.appendChild(empty);
+          return;
+        }
+        history.forEach((item, index) => {
+          const row = document.createElement('article');
+          row.className = 'history-item ' + (item.ok ? 'success' : 'failed');
+
+          const state = document.createElement('span');
+          state.className = 'history-state';
+          state.textContent = item.ok ? 'Passed' : 'Needs attention';
+
+          const body = document.createElement('div');
+          const title = document.createElement('strong');
+          title.textContent = item.filename || 'playground.py';
+          const summary = document.createElement('small');
+          const when = new Date(item.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          summary.textContent = (item.ok ? 'Completed' : 'Error') + ' · ' + item.ms + ' ms · ' + when;
+          body.append(title, summary);
+
+          const restore = document.createElement('button');
+          restore.type = 'button';
+          restore.textContent = 'Restore';
+          restore.addEventListener('click', () => {
+            if (replaceCode(item.code, 'Restoring this run')) {
+              filename.value = item.filename || 'playground.py';
+              window.scrollTo({ top: document.querySelector('.playground-ide').offsetTop - 90, behavior: 'smooth' });
+            }
+          });
+
+          row.append(state, body, restore);
+          historyEl.appendChild(row);
+        });
+      }
+
+      async function runPlayground() {
+        if (!code.value.trim()) {
+          out.classList.remove('error');
+          out.textContent = '› Your editor is blank. Write Python or load a recipe, then run it.';
+          code.focus({ preventScroll: true });
+          return;
+        }
+        runBtn.disabled = true;
+        runBtn.innerHTML = '⏳ Running…';
+        runtime.className = 'ide-runtime loading';
+        runtimeText.textContent = pyodideReady ? 'Running your code' : 'Loading Python engine';
+        runStatus.textContent = 'Running…';
+        runMeta.textContent = 'Fresh process started';
+        out.classList.remove('error');
+        out.textContent = pyodideReady ? '› Running…' : '› Loading Python for the first time…';
+
+        const started = performance.now();
+        const result = await run(code.value);
+        const elapsed = Math.max(1, Math.round(performance.now() - started));
+
+        out.textContent = result.output;
+        out.classList.toggle('error', !result.ok);
+        runtime.className = 'ide-runtime ' + (result.ok ? 'ready' : 'failed');
+        runtimeText.textContent = result.ok ? 'Python ready' : 'Run finished with an error';
+        runStatus.textContent = result.ok ? 'Completed successfully' : 'Needs attention';
+        runMeta.textContent = elapsed + ' ms · ' + result.output.split('\n').length + ' output line(s)';
+        runBtn.disabled = false;
+        runBtn.innerHTML = '▶ Run Python <kbd>⌘↵</kbd>';
+
+        const history = getHistory();
+        history.unshift({
+          ok: result.ok,
+          code: code.value,
+          output: result.output.slice(0, 1200),
+          ms: elapsed,
+          at: Date.now(),
+          filename: filename.value,
+        });
+        saveHistory(history);
+        renderHistory();
+      }
+
+      runBtn.addEventListener('click', runPlayground);
+      code.addEventListener('pysprint:run', runPlayground);
+
       const clear = document.getElementById('pgClear');
       clear && clear.addEventListener('click', () => {
-        document.getElementById('pgOut').textContent = 'Output cleared.';
+        out.classList.remove('error');
+        out.textContent = '› Console cleared.';
+        runStatus.textContent = 'No active output';
+        runMeta.textContent = 'Fresh process every run';
       });
+
+      document.getElementById('pgCopyOut').addEventListener('click', (e) => {
+        navigator.clipboard.writeText(out.textContent).then(() => {
+          const original = e.currentTarget.textContent;
+          e.currentTarget.textContent = 'Copied';
+          setTimeout(() => { e.currentTarget.textContent = original; }, 1200);
+        }).catch(() => {});
+      });
+
+      document.getElementById('pgDownload').addEventListener('click', () => {
+        const safeName = (filename.value || 'playground.py')
+          .replace(/[^a-zA-Z0-9._-]/g, '-')
+          .replace(/\.py$/i, '') + '.py';
+        filename.value = safeName;
+        const blob = new Blob([code.value], { type: 'text/x-python;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = safeName;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('pgImport').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (file.size > 1024 * 1024) {
+          toast('Choose a Python file smaller than 1 MB.', 'error');
+          e.target.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (replaceCode(String(reader.result || ''), 'Importing ' + file.name)) {
+            filename.value = file.name.endsWith('.py') ? file.name : file.name + '.py';
+          }
+          e.target.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      filename.addEventListener('blur', () => {
+        let value = filename.value.trim() || 'playground.py';
+        if (!value.endsWith('.py')) value += '.py';
+        filename.value = value;
+        try { localStorage.setItem('pysprint-playground-filename', value); } catch (_) {}
+      });
+
+      let fontSize = Number(localStorage.getItem('pysprint-playground-font') || 15);
+      function applyFontSize() {
+        fontSize = Math.max(12, Math.min(20, fontSize));
+        ide.style.setProperty('--pg-font-size', fontSize + 'px');
+        try { localStorage.setItem('pysprint-playground-font', String(fontSize)); } catch (_) {}
+      }
+      document.getElementById('pgFontDown').addEventListener('click', () => { fontSize--; applyFontSize(); });
+      document.getElementById('pgFontUp').addEventListener('click', () => { fontSize++; applyFontSize(); });
+      applyFontSize();
+
+      const wrapBtn = document.getElementById('pgWrap');
+      const savedWrap = localStorage.getItem('pysprint-playground-wrap');
+      let wraps = savedWrap === null ? true : savedWrap === '1';
+      function applyWrap() {
+        code.wrap = wraps ? 'soft' : 'off';
+        code.classList.toggle('wrap-enabled', wraps);
+        wrapBtn.classList.toggle('active', wraps);
+        wrapBtn.setAttribute('aria-pressed', String(wraps));
+        try { localStorage.setItem('pysprint-playground-wrap', wraps ? '1' : '0'); } catch (_) {}
+      }
+      wrapBtn.addEventListener('click', () => { wraps = !wraps; applyWrap(); });
+      applyWrap();
+
+      document.getElementById('pgClearHistory').addEventListener('click', () => {
+        saveHistory([]);
+        renderHistory();
+      });
+      renderHistory();
     },
   };
 

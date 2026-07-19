@@ -1,15 +1,33 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}About PySprint — How It Works{% endblock %}
 {% block description %}How PySprint teaches Python: interactive lessons, in-browser code execution, spaced repetition and gamified progress. Free and open source by simasbuilds.{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"AboutPage","name":"About PySprint","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","mainEntity":{"@id":"{{ site_url.rstrip('/') }}/#organization"}}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>About PySprint</h1>
-  <p>Free, interactive, and built on how memory actually works.</p>
+<section class="page-head about-head">
+  <span class="eyebrow">Why PySprint exists</span>
+  <h1>Python is learned at the keyboard.</h1>
+  <p>PySprint turns that principle into a complete, free learning system: understand a concept, run it immediately, build with it, then review it before it fades.</p>
+  <div class="page-head-actions">
+    <a class="btn btn-primary" href="{{ url_for('courses') }}">Explore the learning path →</a>
+    <a class="btn btn-ghost" href="{{ url_for('playground') }}">Try the playground</a>
+  </div>
 </section>
 
-<section class="section narrow prose">
-  <div class="card pad">
+<section class="section about-system">
+  <div class="about-principles">
+    <article class="card"><span>{{ icon('terminal') }}</span><strong>Real execution</strong><p>Full Python 3 runs locally in your browser—not a simulated code box.</p></article>
+    <article class="card"><span>{{ icon('target') }}</span><strong>Immediate feedback</strong><p>Every lesson ends with output that is checked while the idea is still fresh.</p></article>
+    <article class="card"><span>{{ icon('brain') }}</span><strong>Durable memory</strong><p>Spaced review resurfaces the right concepts before you forget them.</p></article>
+    <article class="card"><span>{{ icon('rocket') }}</span><strong>Useful outcomes</strong><p>Projects connect syntax to APIs, data workflows, and practical automation.</p></article>
+  </div>
+  <div class="about-story">
+    <div class="card pad prose">
     <h2>The method</h2>
     <p>Research on learning to code is unambiguous: <strong>you learn to program by programming</strong>, not by watching. PySprint is built entirely around that idea:</p>
     <ul>
@@ -24,6 +42,16 @@
 
     <h2>Open source</h2>
     <p>PySprint is built by <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">simasbuilds</a> with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
+    </div>
+    <aside class="about-manifesto">
+      <span class="eyebrow">The promise</span>
+      <blockquote>Less passive content. More working code.</blockquote>
+      <dl>
+        <div><dt>{{ n_lessons }}</dt><dd>interactive lessons</dd></div>
+        <div><dt>{{ n_challenges }}</dt><dd>arena challenges</dd></div>
+        <div><dt>100%</dt><dd>free curriculum</dd></div>
+      </dl>
+    </aside>
   </div>
 </section>
 {% endblock %}

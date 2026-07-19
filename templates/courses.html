@@ -1,14 +1,38 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Python Courses — PySprint{% endblock %}
 {% block description %}Six structured Python courses: Fundamentals, Data Structures, Functions & OOP, Practical Python, APIs, and Automation. Interactive, free, beginner to advanced.{% endblock %}
+{% block social_image %}{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/learning-path.png') }}{% endblock %}
+{% block social_image_alt %}The six-course PySprint learning path from Python fundamentals to automation{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ItemList","name":"Free interactive Python courses","numberOfItems":{{ courses|length }},"itemListElement":[
+{% for c in courses %}{"@type":"ListItem","position":{{ loop.index }},"url":"{{ site_url }}{{ url_for('course_detail', slug=c.slug) }}","name":{{ c.title|tojson }}}{% if not loop.last %},{% endif %}{% endfor %}
+]}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
-  <h1>Courses</h1>
-  <p>A structured path from your first <code>print()</code> to building APIs and automation. Courses build on each other — start at the top if you're new.</p>
+<section class="directory-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">Six courses · one coherent path</span>
+    <h1>Go from curious to <span class="grad">capable with Python.</span></h1>
+    <p>A structured route from your first <code>print()</code> to APIs and automation—with real use cases, live code, and no setup.</p>
+    <div class="directory-actions">
+      <a href="{{ url_for('course_detail', slug='python-fundamentals') }}" class="btn btn-primary btn-lg">Start with Fundamentals →</a>
+      <a href="#courseCatalog" class="btn btn-ghost btn-lg">Compare courses</a>
+    </div>
+  </div>
+  <img src="{{ url_for('static', filename='images/learning-path.png') }}"
+       alt="A visual pathway from Python fundamentals to automation"
+       width="1657" height="949">
 </section>
 
-<section class="section">
+<section class="section" id="courseCatalog">
+  <div class="catalog-head">
+    <div><span class="eyebrow">Course catalog</span><h2>Choose your next capability</h2></div>
+    <p>New to Python? Follow the order. Already coding? Jump directly to the skill you need.</p>
+  </div>
   <div class="filter-chips" role="group" aria-label="Filter by level">
     <button class="chip on" data-level="all">All levels</button>
     <button class="chip" data-level="beginner">Beginner</button>
@@ -18,7 +42,7 @@
   <div class="course-list">
     {% for c in courses %}
     <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-row card" data-level="{{ c.level|lower }}" style="--accent: {{ c.color }}">
-      <span class="course-icon lg">{{ c.icon }}</span>
+      <span class="course-icon lg">{{ icon(c.icon) }}</span>
       <div class="course-row-body">
         <div class="course-row-top">
           <h2>{{ c.title }}</h2>
@@ -26,9 +50,9 @@
         </div>
         <p>{{ c.description }}</p>
         <div class="course-meta">
-          <span>📚 {{ c.lessons|length }} lessons</span>
-          <span>⚡ {{ c.lessons|sum(attribute='xp') }} XP</span>
-          <span>⏱ ~{{ c.lessons|sum(attribute='minutes') }} min</span>
+          <span>{{ icon('book') }} {{ c.lessons|length }} lessons</span>
+          <span>{{ icon('bolt') }} {{ c.lessons|sum(attribute='xp') }} XP</span>
+          <span>{{ icon('clock') }} ~{{ c.lessons|sum(attribute='minutes') }} min</span>
         </div>
         {% if progress.get(c.slug) is not none %}
         <div class="progress-track" role="progressbar" aria-valuenow="{{ progress[c.slug] }}" aria-valuemin="0" aria-valuemax="100">

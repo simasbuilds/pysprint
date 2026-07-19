@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}404 — Page Not Found | PySprint{% endblock %}
 {% block description %}This page could not be found on PySprint.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
 
 {% block content %}
-<section class="auth-wrap">
+<section class="auth-wrap error-wrap">
   <div class="card auth-card center">
     <pre class="code-output">Traceback (most recent call last):
   File "pysprint.py", line 404, in &lt;browse&gt;

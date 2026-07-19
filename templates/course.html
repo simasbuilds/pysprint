@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}{{ course.title }} — Python Course | PySprint{% endblock %}
-{% block description %}{{ course.description }}{% endblock %}
+{% block description %}Master {{ course.title }} with live Python exercises, real-world examples and graded browser challenges. Free, interactive and no setup required.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -17,15 +18,15 @@
 <section class="page-head course-head" style="--accent: {{ course.color }}">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('courses') }}">Courses</a> / <span>{{ course.title }}</span></nav>
   <div class="course-head-row">
-    <span class="course-icon xl">{{ course.icon }}</span>
+    <span class="course-icon xl">{{ icon(course.icon) }}</span>
     <div>
       <h1>{{ course.title }}</h1>
       <p>{{ course.description }}</p>
       <div class="course-meta">
         <span class="level-badge level-{{ course.level|lower }}">{{ course.level }}</span>
-        <span>📚 {{ course.lessons|length }} lessons</span>
-        <span>⚡ {{ total_xp }} XP</span>
-        <span>⏱ ~{{ course.lessons|sum(attribute='minutes') }} min</span>
+        <span>{{ icon('book') }} {{ course.lessons|length }} lessons</span>
+        <span>{{ icon('bolt') }} {{ total_xp }} XP</span>
+        <span>{{ icon('clock') }} ~{{ course.lessons|sum(attribute='minutes') }} min</span>
       </div>
     </div>
   </div>
@@ -37,17 +38,36 @@
   {% endif %}
 </section>
 
-<section class="section">
+<section class="section" style="--accent: {{ course.color }}">
+  {% if use_cases %}
+  <div class="outcomes-head">
+    <span class="eyebrow">Real work, not toy syntax</span>
+    <h2>What this course helps you build</h2>
+    <p>Each lesson connects the Python concept to work you could automate, analyse or ship.</p>
+  </div>
+  <div class="use-case-grid">
+    {% for item in use_cases %}
+    <article class="use-case-card card">
+      <span class="use-case-icon">{{ icon(item.icon) }}</span>
+      <div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.desc }}</p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <h2 class="section-title left">Course roadmap</h2>
+  {% endif %}
   <ol class="lesson-list">
     {% for l in course.lessons %}
     <li>
       <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
          class="lesson-row card {% if l.slug in done %}is-done{% endif %}">
-        <span class="lesson-num">{% if l.slug in done %}✓{% else %}{{ loop.index }}{% endif %}</span>
+        <span class="lesson-num">{% if l.slug in done %}{{ icon('check') }}{% else %}{{ loop.index }}{% endif %}</span>
         <div class="lesson-row-body">
           <h3>{{ l.title }}</h3>
-          <div class="course-meta"><span>⏱ {{ l.minutes }} min</span><span>⚡ {{ l.xp }} XP</span>
-            {% if l.quiz %}<span>❓ {{ l.quiz|length }} quiz</span>{% endif %}
+          <div class="course-meta"><span>{{ icon('clock') }} {{ l.minutes }} min</span><span>{{ icon('bolt') }} {{ l.xp }} XP</span>
+            {% if l.quiz %}<span>{{ icon('quiz') }} {{ l.quiz|length }} quiz</span>{% endif %}
           </div>
         </div>
         <span class="course-row-go">{% if l.slug in done %}Review{% else %}Start{% endif %} →</span>
@@ -57,7 +77,7 @@
   </ol>
   {% if not user %}
   <div class="card notice">
-    <p>💡 You can take every lesson without an account — but <a href="{{ url_for('register') }}">create a free account</a> to save progress, earn XP and unlock achievements.</p>
+    <p>{{ icon('bulb') }} You can take every lesson without an account — but <a href="{{ url_for('register') }}">create a free account</a> to save progress, earn XP and unlock achievements.</p>
   </div>
   {% endif %}
 </section>

@@ -7,7 +7,10 @@
   const themeBtn = document.getElementById('themeToggle');
   function applyThemeIcon() {
     if (!themeBtn) return;
-    themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+    const dark = document.documentElement.dataset.theme === 'dark';
+    const use = themeBtn.querySelector('use');
+    if (use) use.setAttribute('href', themeBtn.dataset.iconBase + '#ps-' + (dark ? 'sun' : 'moon'));
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
   }
   applyThemeIcon();
   if (themeBtn) {
@@ -39,17 +42,56 @@
   // ── mobile nav ──────────────────────────────────────────────────
   const burger = document.getElementById('navBurger');
   const links = document.getElementById('navLinks');
+  const menuButtons = Array.from(document.querySelectorAll('.nav-menu-trigger[data-menu]'));
+
+  function closeMenus(exceptButton) {
+    menuButtons.forEach(button => {
+      if (button === exceptButton) return;
+      const panel = document.getElementById(button.dataset.menu);
+      if (panel) panel.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  menuButtons.forEach(button => {
+    const panel = document.getElementById(button.dataset.menu);
+    if (!panel) return;
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const opening = panel.hidden;
+      closeMenus(button);
+      panel.hidden = !opening;
+      button.setAttribute('aria-expanded', String(opening));
+    });
+    panel.addEventListener('click', e => e.stopPropagation());
+  });
+  document.addEventListener('click', () => closeMenus());
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const openButton = menuButtons.find(button => button.getAttribute('aria-expanded') === 'true');
+    closeMenus();
+    if (openButton) openButton.focus();
+  });
+
   if (burger && links) {
     burger.addEventListener('click', () => {
       const open = links.classList.toggle('open');
       burger.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('nav-open', open);
+      if (!open) closeMenus();
     });
+    links.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      links.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('nav-open');
+      closeMenus();
+    }));
   }
 
   // ── scroll-reveal: cards & rows animate in as they enter view ───
   const revealTargets = document.querySelectorAll(
     '.course-card, .feature, .challenge-card, .course-row, .lesson-row, ' +
-    '.dash-course, .achieve-tile, .stat, .callout');
+    '.dash-course, .achieve-tile, .stat, .callout, .project-card, .feature-slab');
   if ('IntersectionObserver' in window && revealTargets.length) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e, i) => {
@@ -96,7 +138,7 @@
     btn.textContent = 'Copy';
     btn.addEventListener('click', () => {
       navigator.clipboard.writeText(source.value).then(() => {
-        btn.textContent = '✓ Copied';
+        btn.textContent = 'Copied';
         setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
       }).catch(() => {});
     });
@@ -142,7 +184,10 @@
     if (!queue.length) { showing = false; modal.hidden = true; return; }
     showing = true;
     const a = queue.shift();
-    document.getElementById('achieveIcon').textContent = a.icon;
+    const iconName = /^[a-z0-9-]+$/.test(a.icon || '') ? a.icon : 'trophy';
+    const iconUse = document.querySelector('#achieveIcon use');
+    const iconBase = themeBtn ? themeBtn.dataset.iconBase : '/static/images/pysprint-icons.svg';
+    if (iconUse) iconUse.setAttribute('href', iconBase + '#ps-' + iconName);
     document.getElementById('achieveTitle').textContent = a.title;
     document.getElementById('achieveDesc').textContent = a.desc;
     modal.hidden = false;

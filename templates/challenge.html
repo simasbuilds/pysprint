@@ -1,33 +1,48 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}{{ ch.title }} — Python Challenge | PySprint{% endblock %}
 {% block description %}Solve the "{{ ch.title }}" Python challenge ({{ ch.difficulty }}, {{ ch.xp }} XP) right in your browser on PySprint.{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LearningResource","name":{{ ch.title|tojson }},"description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","educationalLevel":{{ ch.difficulty|tojson }},"learningResourceType":"Coding challenge","inLanguage":"en-US","isAccessibleForFree":true}
+</script>
+{% endblock %}
 
 {% block content %}
-<section class="page-head">
+<section class="page-head challenge-head">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('challenges') }}">Arena</a> / <span>{{ ch.title }}</span></nav>
   <div class="course-row-top">
     <h1>{{ ch.title }}</h1>
-    <span class="diff-badge diff-{{ ch.difficulty|lower }}">{{ ch.difficulty }} · ⚡ {{ ch.xp }} XP</span>
+    <span class="diff-badge diff-{{ ch.difficulty|lower }}">{{ ch.difficulty }} · {{ icon('bolt') }} {{ ch.xp }} XP</span>
   </div>
 </section>
 
 <section class="section narrow">
   <div class="card editor-block challenge-block">
     <p class="challenge-prompt">{{ ch.prompt|safe }}</p>
+    <div class="output-target">
+      <span>Target output</span>
+      <pre>{{ ch.expected_output }}</pre>
+    </div>
+    <div class="standalone-save"><span class="save-state" id="challengeSaveState">Blank · autosaved</span></div>
     <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">{{ ch.slug }}.py</span></div>
-    <textarea id="challengeCode" class="code-input" rows="12" spellcheck="false" aria-label="Challenge code editor">{{ ch.starter }}</textarea>
+    <textarea id="challengeCode" class="code-input" rows="12" spellcheck="false" autocapitalize="off" autocomplete="off"
+              placeholder="# Solve the challenge here, or tap “Load starter”…" aria-label="Challenge code editor"></textarea>
     <div class="editor-bar">
       <button class="btn btn-run" id="challengeRun">▶ Run & Check</button>
-      <button class="btn btn-ghost btn-sm" id="hintBtn">💡 Hint</button>
-      <button class="btn btn-ghost btn-sm" id="solutionBtn">👀 Solution</button>
+      <button class="btn btn-ghost btn-sm" id="challengeLoad">↙ Load starter</button>
+      <button class="btn btn-ghost btn-sm" id="challengeBlank">＋ New blank</button>
+      <button class="btn btn-ghost btn-sm" id="hintBtn">{{ icon('bulb') }} Hint</button>
+      <button class="btn btn-ghost btn-sm" id="solutionBtn">{{ icon('eye') }} Solution</button>
     </div>
-    <p id="hintBox" class="hint-box" hidden>💡 {{ ch.hint }}</p>
+    <p id="hintBox" class="hint-box" hidden>{{ icon('bulb') }} {{ ch.hint }}</p>
     <pre id="solutionBox" class="code-output solution-box" hidden>{{ ch.solution }}</pre>
     <pre id="challengeOut" class="code-output" aria-live="polite">Run your code to check it…</pre>
     <div id="challengeResult" class="check-result" hidden></div>
   </div>
   {% if ch.slug in done %}
-  <p class="notice card">✓ You've already solved this one — re-run it any time for practice.</p>
+  <p class="notice card">{{ icon('check') }} You've already solved this one — re-run it any time for practice.</p>
   {% endif %}
 </section>
 {% endblock %}
@@ -38,6 +53,7 @@
   PySprint.initChallenge({
     challenge: {{ ch.slug|tojson }},
     expected: {{ ch.expected_output|tojson }},
+    starter: {{ ch.starter|tojson }},
     loggedIn: {{ 'true' if user else 'false' }}
   });
 </script>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
 {% block description %}Master Python with {{ n_lessons }} interactive lessons across 6 courses — from your first print() to building real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
 
@@ -21,9 +22,9 @@
   </div>
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="pill stagger d1"><span class="pulse-dot"></span> 100% free · No installs · Code in your browser</span>
-      <h1 class="stagger d2">Learn Python by<br><span class="grad">actually writing Python</span></h1>
-      <p class="hero-sub stagger d3">From zero to building <span class="word-rotate" id="wordRotate"><span>real APIs</span></span><br>{{ n_lessons }} interactive lessons, real-life projects, {{ n_challenges }} arena challenges and a spaced-repetition review engine — with real Python running in your browser.</p>
+      <span class="pill stagger d1"><span class="pulse-dot"></span> Real Python · Free forever · Zero setup</span>
+      <h1 class="stagger d2">Learn Python by <span class="grad">building things that work.</span></h1>
+      <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
       <div class="hero-cta stagger d4">
         {% if user %}
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
@@ -32,54 +33,89 @@
         {% endif %}
         <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
       </div>
+      <div class="hero-assurance stagger d4">
+        <span>{{ icon('check') }} Try every lesson without an account</span>
+        <span>{{ icon('lock') }} Code stays on your device</span>
+      </div>
       <div class="hero-stats stagger d5">
-        <div><strong data-count="{{ n_lessons }}">0</strong><span>Interactive lessons</span></div>
-        <div><strong data-count="{{ n_challenges }}">0</strong><span>Coding challenges</span></div>
-        <div><strong data-count="{{ n_achievements }}">0</strong><span>Achievements</span></div>
+        <div><strong data-count="{{ n_lessons }}">{{ n_lessons }}</strong><span>Interactive lessons</span></div>
+        <div><strong data-count="{{ n_challenges }}">{{ n_challenges }}</strong><span>Coding challenges</span></div>
+        <div><strong data-count="5">5</strong><span>Portfolio projects</span></div>
       </div>
     </div>
-    <div class="hero-demo card">
-      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py — try me!</span></div>
-      <textarea id="heroCode" class="code-input" rows="6" spellcheck="false" aria-label="Python code editor">name = "world"
+    <div class="hero-visual stagger d3">
+      <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}"
+           alt="Python code connected to data, APIs, charts and an automation arm"
+           width="1588" height="991" fetchpriority="high">
+      <div class="visual-label label-one"><span></span> No setup required</div>
+      <div class="visual-label label-two">Real CPython · in browser</div>
+      <div class="hero-demo hero-console card">
+        <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py — try it</span></div>
+        <textarea id="heroCode" class="code-input" rows="4" spellcheck="false" aria-label="Python code editor">name = "world"
 for i in range(3):
     print(f"Hello, {name}! ({i + 1})")</textarea>
-      <div class="editor-bar">
-        <button class="btn btn-run" id="heroRun">▶ Run Python</button>
-        <span class="editor-hint">Real Python 3, right here</span>
+        <div class="editor-bar">
+          <button class="btn btn-run" id="heroRun">▶ Run Python</button>
+          <span class="editor-hint">⌘/Ctrl + Enter</span>
+        </div>
+        <pre id="heroOut" class="code-output" aria-live="polite">Click Run to execute ↑</pre>
       </div>
-      <pre id="heroOut" class="code-output" aria-live="polite">Click Run to execute ↑</pre>
     </div>
   </div>
 </section>
 
+<section class="proof-strip" aria-label="Platform benefits">
+  <div><strong>Real Python 3</strong><span>Full CPython via WebAssembly</span></div>
+  <div><strong>Practice first</strong><span>Write code in every lesson</span></div>
+  <div><strong>Keep the skill</strong><span>Built-in spaced repetition</span></div>
+  <div><strong>Own your progress</strong><span>Free learning, optional account</span></div>
+</section>
+
 <section class="section">
-  <h2 class="section-title">A complete path, <span class="grad">beginner to builder</span></h2>
-  <p class="section-sub">Six courses that build on each other. Start with zero experience, finish by designing REST APIs and automating real work.</p>
+  <div class="section-kicker"><span>01</span><p>Structured curriculum</p></div>
+  <div class="path-feature">
+    <img src="{{ url_for('static', filename='images/learning-path.png') }}"
+         alt="Six connected stations progressing from syntax to Python automation"
+         width="1657" height="949" loading="lazy">
+    <div class="path-feature-copy">
+      <span class="eyebrow">A route you can trust</span>
+      <h2>A complete path, <span class="grad">beginner to builder</span></h2>
+      <p>Six courses build on one another. Start with zero experience and finish by designing APIs, processing real data, and automating repetitive work.</p>
+      <div class="path-checks"><span>{{ icon('check') }} 34 focused lessons</span><span>{{ icon('check') }} 5 portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
+      <a href="{{ url_for('courses') }}" class="text-cta">Explore the curriculum <span>→</span></a>
+    </div>
+  </div>
   <div class="course-grid">
     {% for c in courses %}
     <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-card card" style="--accent: {{ c.color }}">
       <div class="course-top">
-        <span class="course-icon">{{ c.icon }}</span>
+        <span class="course-icon">{{ icon(c.icon) }}</span>
         <span class="level-badge level-{{ c.level|lower }}">{{ c.level }}</span>
       </div>
       <h3>{{ c.title }}</h3>
       <p>{{ c.tagline }}</p>
       <div class="course-meta">
         <span>{{ c.lessons|length }} lessons</span>
-        <span>⚡ {{ c.lessons|sum(attribute='xp') }} XP</span>
+        <span>{{ icon('bolt') }} {{ c.lessons|sum(attribute='xp') }} XP</span>
       </div>
     </a>
     {% endfor %}
   </div>
 </section>
 
-<section class="section alt">
-  <h2 class="section-title">How PySprint <span class="grad">works</span></h2>
-  <p class="section-sub">Three moves, repeated until you're dangerous. Watch it happen:</p>
+<section class="section alt method-section">
+  <div class="section-kicker"><span>02</span><p>The practice loop</p></div>
+  <div class="method-head">
+    <div>
+      <span class="eyebrow">Designed for active learning</span>
+      <h2>Understand it. Run it. <span>Keep it.</span></h2>
+    </div>
+    <p>Every concept moves through the same focused loop, so your time goes into writing and remembering Python—not configuring tools.</p>
+  </div>
   <div class="how-grid">
     <div class="how-card card">
       <span class="how-num">1</span>
-      <h3>📖 Learn the concept</h3>
+      <div class="how-card-title"><span class="how-icon">{{ icon('book') }}</span><div><small>Understand</small><h3>Learn the concept</h3></div></div>
       <div class="how-demo how-demo-learn" aria-hidden="true">
         <span class="how-line w80"></span>
         <span class="how-line w60"></span>
@@ -90,38 +126,48 @@ for i in range(3):
     </div>
     <div class="how-card card">
       <span class="how-num">2</span>
-      <h3>⌨️ Code it live</h3>
+      <div class="how-card-title"><span class="how-icon">{{ icon('terminal') }}</span><div><small>Apply</small><h3>Code it live</h3></div></div>
       <div class="how-demo how-demo-code" aria-hidden="true">
         <code class="type-line">print("I am coding")<span class="caret"></span></code>
-        <code class="type-result">✓ Correct! Output matches.</code>
+        <code class="type-result">Correct! Output matches.</code>
       </div>
       <p>Every lesson ends with a graded challenge. Real Python 3 runs in your browser and checks your output the instant you hit Run.</p>
     </div>
     <div class="how-card card">
       <span class="how-num">3</span>
-      <h3>🏆 Level up</h3>
+      <div class="how-card-title"><span class="how-icon">{{ icon('brain') }}</span><div><small>Retain</small><h3>Review at the right time</h3></div></div>
       <div class="how-demo how-demo-xp" aria-hidden="true">
         <div class="how-xp-track"><div class="how-xp-fill"></div></div>
-        <span class="how-badge">⚡ +40 XP</span>
+        <span class="how-badge">{{ icon('check') }} Skill retained</span>
       </div>
-      <p>XP, streaks and achievements track every win — and the Smart Review engine brings each concept back right before you'd forget it.</p>
+      <p>Progress stays visible while Smart Review brings each concept back before it fades, turning short practice into durable skill.</p>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <h2 class="section-title">Build <span class="grad">real software</span>, step by step</h2>
-  <p class="section-sub">Five guided projects modelled on production systems — each one explains how it works in the real world, then you build it stage by graded stage.</p>
+  <div class="section-kicker"><span>03</span><p>Portfolio-grade practice</p></div>
+  <div class="project-showcase">
+    <img src="{{ url_for('static', filename='images/real-projects.png') }}"
+         alt="Python powering budget, security, sales, task and webhook projects"
+         width="1774" height="887" loading="lazy">
+    <div>
+      <span class="eyebrow">From lesson to shipped</span>
+      <h2>Build <span class="grad">real software</span>, step by step</h2>
+      <p>Five guided builds model production systems. Understand the architecture, complete each graded stage, then ship something you can explain.</p>
+      <a href="{{ url_for('projects') }}" class="btn btn-primary">View all projects →</a>
+    </div>
+  </div>
   <div class="project-grid home">
     {% for p in projects %}
     <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card" style="--accent: {{ p.color }}">
       <div class="project-card-top">
-        <span class="project-icon">{{ p.icon }}</span>
+        <span class="project-icon">{{ icon(p.icon) }}</span>
         <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
       </div>
       <h3>{{ p.title }}</h3>
       <p>{{ p.summary }}</p>
-      <div class="course-meta"><span>🧩 {{ p.steps|length }} steps</span><span>⚡ {{ p.xp }} XP</span></div>
+      <div class="course-meta"><span>{{ icon('layers') }} {{ p.steps|length }} steps</span><span>{{ icon('bolt') }} {{ p.xp }} XP</span></div>
       <span class="project-go">Build it →</span>
     </a>
     {% endfor %}
@@ -131,22 +177,25 @@ for i in range(3):
 <section class="section alt">
   <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
   <div class="feature-grid">
-    <div class="feature card"><span class="feature-icon">⚡</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
-    <div class="feature card"><span class="feature-icon">🧠</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
-    <div class="feature card"><span class="feature-icon">🏆</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
-    <div class="feature card"><span class="feature-icon">🎯</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
-    <div class="feature card"><span class="feature-icon">⚔️</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
-    <div class="feature card"><span class="feature-icon">📈</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('terminal') }}</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('brain') }}</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('trophy') }}</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('target') }}</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('swords') }}</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ icon('chart') }}</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
   </div>
 </section>
 
 <section class="section cta-band">
-  <h2>Your first line of Python is 10 seconds away.</h2>
+  <span class="eyebrow">Start before motivation fades</span>
+  <h2>Your first useful line of Python is 10 seconds away.</h2>
+  <p>No installation. No credit card. Just a browser and something worth building.</p>
   {% if user %}
   <a href="{{ url_for('courses') }}" class="btn btn-primary btn-lg">Pick a course →</a>
   {% else %}
   <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create your free account →</a>
   {% endif %}
+  <span class="cta-note">Or <a href="{{ url_for('courses') }}">preview every lesson without signing up</a></span>
 </section>
 {% endblock %}
 
@@ -154,22 +203,5 @@ for i in range(3):
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script>
   PyRunner.wireSimple('heroRun', 'heroCode', 'heroOut');
-
-  // Rotating word in the hero
-  (function () {
-    var words = ['real APIs', 'automation bots', 'data pipelines', 'your own tools', 'real projects'];
-    var el = document.getElementById('wordRotate');
-    if (!el) return;
-    var i = 0;
-    setInterval(function () {
-      i = (i + 1) % words.length;
-      var span = el.querySelector('span');
-      span.classList.add('out');
-      setTimeout(function () {
-        span.textContent = words[i];
-        span.classList.remove('out');
-      }, 260);
-    }, 2600);
-  })();
 </script>
 {% endblock %}
