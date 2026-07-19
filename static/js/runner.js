@@ -175,9 +175,89 @@
     }).catch(() => {});
   }
 
+  // ── confetti (no libraries) ────────────────────────────────────────
+  function confetti(anchor) {
+    const colors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#a78bfa'];
+    const rect = (anchor || document.body).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    for (let i = 0; i < 46; i++) {
+      const p = document.createElement('div');
+      const size = 5 + Math.random() * 7;
+      p.style.cssText =
+        'position:fixed;z-index:99;pointer-events:none;border-radius:2px;' +
+        'left:' + cx + 'px;top:' + cy + 'px;width:' + size + 'px;height:' + size * 0.6 + 'px;' +
+        'background:' + colors[i % colors.length] + ';';
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 90 + Math.random() * 220;
+      p.animate([
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+        { transform: 'translate(' + Math.cos(angle) * dist + 'px,' +
+          (Math.sin(angle) * dist + 160) + 'px) rotate(' + (Math.random() * 720 - 360) + 'deg)', opacity: 0 },
+      ], { duration: 900 + Math.random() * 700, easing: 'cubic-bezier(.16,1,.3,1)' })
+        .onfinish = () => p.remove();
+    }
+  }
+
+  // ── walkthrough player: animated line-by-line execution ────────────
+  function initWalkthrough(example, steps) {
+    const codeEl = document.getElementById('wlCode');
+    const textEl = document.getElementById('wlText');
+    const countEl = document.getElementById('wlCount');
+    const playBtn = document.getElementById('wlPlay');
+    const stepBtn = document.getElementById('wlStep');
+    const restartBtn = document.getElementById('wlRestart');
+    if (!codeEl || !steps || !steps.length) return;
+
+    const lines = example.split('\n');
+    codeEl.innerHTML = lines.map((l, i) =>
+      '<span class="wl-line" data-line="' + (i + 1) + '"><span class="wl-ln">' +
+      (i + 1) + '</span>' + escapeHtml(l || ' ') + '</span>').join('');
+
+    let idx = -1, timer = null;
+
+    function show(i) {
+      idx = i;
+      codeEl.querySelectorAll('.wl-line').forEach(el => el.classList.remove('active'));
+      if (i >= 0 && i < steps.length) {
+        const target = codeEl.querySelector('.wl-line[data-line="' + steps[i].line + '"]');
+        if (target) target.classList.add('active');
+        textEl.textContent = steps[i].text;
+        textEl.classList.remove('wl-fade');
+        void textEl.offsetWidth;           // restart the fade animation
+        textEl.classList.add('wl-fade');
+        countEl.textContent = (i + 1) + ' / ' + steps.length;
+      }
+    }
+
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+      playBtn.textContent = '▶ Play';
+    }
+
+    function advance() {
+      if (idx + 1 >= steps.length) { stop(); return; }
+      show(idx + 1);
+      if (timer && idx + 1 >= steps.length) stop();
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (timer) { stop(); return; }
+      if (idx < 0 || idx + 1 >= steps.length) show(0); else advance();
+      playBtn.textContent = '⏸ Pause';
+      timer = setInterval(advance, 2600);
+    });
+    stepBtn.addEventListener('click', () => { stop(); advance(); });
+    restartBtn.addEventListener('click', () => { stop(); show(0); });
+  }
+
   // ── page initialisers ──────────────────────────────────────────────
   const PySprint = {
     initLesson(cfg) {
+      // Animated walkthrough player (only some lessons have one)
+      if (cfg.walkthrough) initWalkthrough(cfg.example, cfg.walkthrough);
+
       // Example runner
       const exCode = document.getElementById('exampleCode');
       PyRunner.wireSimple('exampleRun', 'exampleCode', 'exampleOut');
@@ -189,7 +269,10 @@
       let challengePassed = false;
       wireChallenge({
         expected: spec.expected,
-        onPass() { challengePassed = true; },
+        onPass() {
+          challengePassed = true;
+          confetti(document.getElementById('challengeResult'));
+        },
       });
 
       // Quiz
@@ -252,10 +335,90 @@
       wireChallenge({
         expected: cfg.expected,
         onPass() {
+          confetti(document.getElementById('challengeResult'));
           reportProgress('/api/complete-challenge', { challenge: cfg.challenge },
             cfg.loggedIn, 'Challenge solved');
         },
       });
+    },
+
+    // ── real-life project stepper ────────────────────────────────────
+    initProject(cfg) {
+      const spec = JSON.parse(document.getElementById('projectSpec').textContent);
+      const total = spec.steps.length;
+      const saveKey = 'pysprint-project-' + cfg.project;
+      let unlocked = cfg.completed ? total
+        : Math.min(parseInt(localStorage.getItem(saveKey) || '0', 10), total);
+
+      const bar = document.getElementById('stepBar');
+      const count = document.getElementById('stepCount');
+      const finish = document.getElementById('projectFinish');
+
+      function render() {
+        for (let i = 0; i < total; i++) {
+          const card = document.getElementById('step-' + i);
+          const state = document.getElementById('state-' + i);
+          const isDone = i < unlocked;
+          const isOpen = i <= unlocked;
+          card.classList.toggle('locked', !isOpen);
+          card.classList.toggle('done', isDone);
+          state.textContent = isDone ? '✅' : (isOpen ? '🔓' : '🔒');
+        }
+        bar.style.width = (unlocked / total * 100) + '%';
+        count.textContent = unlocked + ' / ' + total + ' steps';
+        if (finish) finish.hidden = unlocked < total;
+      }
+
+      // hint / solution toggles
+      document.querySelectorAll('[data-toggle]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const el = document.getElementById(btn.dataset.toggle);
+          if (el) el.hidden = !el.hidden;
+        });
+      });
+
+      // wire each step's editor
+      for (let i = 0; i < total; i++) {
+        const code = document.getElementById('code-' + i);
+        const out = document.getElementById('out-' + i);
+        const btn = document.getElementById('run-' + i);
+        const resultBox = document.getElementById('result-' + i);
+        enableTabKey(code);
+
+        const check = async () => {
+          const result = await execInto(code, out, btn);
+          resultBox.hidden = false;
+          if (result.ok && normalize(result.output) === normalize(spec.steps[i])) {
+            resultBox.className = 'check-result pass';
+            resultBox.innerHTML = '✅ <strong>Step complete!</strong>' +
+              (i + 1 < total ? ' The next step is unlocked.' : ' That was the last one — project shipped! 🎉');
+            confetti(resultBox);
+            if (i + 1 > unlocked) {
+              unlocked = i + 1;
+              localStorage.setItem(saveKey, String(unlocked));
+              render();
+              if (i + 1 < total) {
+                const nextCard = document.getElementById('step-' + (i + 1));
+                nextCard.classList.add('just-unlocked');
+                setTimeout(() => nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+              }
+            }
+            if (unlocked >= total) {
+              reportProgress('/api/complete-project', { project: cfg.project },
+                cfg.loggedIn, 'Project shipped');
+            }
+          } else {
+            resultBox.className = 'check-result fail';
+            resultBox.innerHTML = result.ok
+              ? '❌ Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
+              : '❌ Your code raised an error — read the traceback above and try again.';
+          }
+        };
+        btn.addEventListener('click', check);
+        code.addEventListener('pysprint:run', check);
+      }
+
+      render();
     },
 
     initPlayground() {

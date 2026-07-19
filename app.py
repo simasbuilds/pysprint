@@ -19,6 +19,8 @@ from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.courses import COURSES, get_course, get_lesson, total_lessons
 from data.lesson_extras import get_extras
+from data.projects import PROJECTS, get_project
+from data.walkthroughs import get_walkthrough
 
 load_dotenv()
 
@@ -59,6 +61,9 @@ def level_info(xp):
             "needed": XP_PER_LEVEL, "pct": round(into / XP_PER_LEVEL * 100)}
 
 
+ARENA_SLUGS = {c["slug"] for c in CHALLENGES}
+
+
 def user_stats(user):
     lessons_by_course, challenges = db.get_progress(user["id"])
     courses_done = {c["slug"] for c in COURSES
@@ -67,7 +72,9 @@ def user_stats(user):
     return {
         "lessons_done": sum(len(v) for v in lessons_by_course.values()),
         "courses_done": courses_done,
-        "challenges_done": len(challenges),
+        "challenges_done": len(challenges & ARENA_SLUGS),
+        "projects_done": len({s for s in challenges if s.startswith("project:")}),
+        "total_projects": len(PROJECTS),
         "xp": user["xp"],
         "streak": user["streak"],
         "total_lessons": total_lessons(),
@@ -100,6 +107,7 @@ def inject_globals():
 @app.get("/")
 def home():
     return render_template("index.html", courses=COURSES,
+                           projects=PROJECTS,
                            n_lessons=total_lessons(),
                            n_challenges=len(CHALLENGES),
                            n_achievements=len(ACHIEVEMENTS))
@@ -149,7 +157,31 @@ def lesson(slug, lesson_slug):
         next=lessons[idx + 1] if idx + 1 < len(lessons) else None,
         done=done, n_lessons=len(lessons),
         extras=get_extras(slug, lesson_slug),
+        walkthrough=get_walkthrough(slug, lesson_slug),
     )
+
+
+@app.get("/projects")
+def projects():
+    user = current_user()
+    done = set()
+    if user:
+        _, challenges = db.get_progress(user["id"])
+        done = {s[len("project:"):] for s in challenges if s.startswith("project:")}
+    return render_template("projects.html", projects=PROJECTS, done=done)
+
+
+@app.get("/projects/<slug>")
+def project_detail(slug):
+    project = get_project(slug)
+    if not project:
+        abort(404)
+    user = current_user()
+    completed = False
+    if user:
+        _, challenges = db.get_progress(user["id"])
+        completed = f"project:{slug}" in challenges
+    return render_template("project.html", project=project, completed=completed)
 
 
 @app.get("/challenges")
@@ -324,6 +356,28 @@ def api_complete_challenge():
     })
 
 
+@app.post("/api/complete-project")
+@login_required
+def api_complete_project():
+    payload = request.get_json(silent=True) or {}
+    project = get_project(payload.get("project", ""))
+    if not project:
+        return jsonify({"error": "unknown_project"}), 400
+    user = current_user()
+    first_time = db.complete_challenge(user["id"], f"project:{project['slug']}")
+    xp_gained = project["xp"] if first_time else 0
+    if first_time:
+        db.add_xp(user["id"], xp_gained)
+    streak = db.touch_streak(user["id"])
+    new_achievements = award_new_achievements(db.get_user(user["id"]))
+    fresh = db.get_user(user["id"])
+    return jsonify({
+        "ok": True, "first_time": first_time, "xp_gained": xp_gained,
+        "xp": fresh["xp"], "streak": streak, "level": level_info(fresh["xp"]),
+        "new_achievements": new_achievements,
+    })
+
+
 @app.get("/api/me")
 def api_me():
     user = current_user()
@@ -340,8 +394,11 @@ def api_me():
 def sitemap():
     base = app.config["SITE_URL"].rstrip("/")
     today = date.today().isoformat()
-    urls = [("", "1.0"), ("/courses", "0.9"), ("/challenges", "0.8"),
+    urls = [("", "1.0"), ("/courses", "0.9"), ("/projects", "0.9"),
+            ("/challenges", "0.8"),
             ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5")]
+    for p in PROJECTS:
+        urls.append((f"/projects/{p['slug']}", "0.7"))
     for c in COURSES:
         urls.append((f"/courses/{c['slug']}", "0.8"))
         for l in c["lessons"]:

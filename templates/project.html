@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — Real-Life Python Project | PySprint{% endblock %}
+{% block description %}{{ project.summary }}{% endblock %}
+
+{% block content %}
+<section class="page-head" style="--accent: {{ project.color }}">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('projects') }}">Projects</a> / <span>{{ project.title }}</span></nav>
+  <div class="course-head-row">
+    <span class="course-icon xl">{{ project.icon }}</span>
+    <div>
+      <h1>{{ project.title }}</h1>
+      <p>{{ project.summary }}</p>
+      <div class="course-meta">
+        <span class="level-badge level-{{ project.level|lower }}">{{ project.level }}</span>
+        <span>🧩 {{ project.steps|length }} steps</span>
+        <span>⚡ {{ project.xp }} XP</span>
+        <span>⏱ ~{{ project.minutes }} min</span>
+        {% if completed %}<span class="done-badge">✓ Shipped</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section narrow">
+  <div class="card pad how-works-card" style="--accent: {{ project.color }}">
+    <h2>🧠 How it works in the real world</h2>
+    {{ project.how_it_works|safe }}
+  </div>
+
+  <div class="project-progress card">
+    <div class="level-row"><span>Build progress</span><span id="stepCount">0 / {{ project.steps|length }} steps</span></div>
+    <div class="progress-track lg"><div class="progress-fill" id="stepBar" style="width: 0%"></div></div>
+  </div>
+
+  <div class="steps" id="steps">
+    {% for step in project.steps %}
+    <div class="step-card card" id="step-{{ loop.index0 }}" data-idx="{{ loop.index0 }}" style="--accent: {{ project.color }}">
+      <div class="step-head">
+        <span class="step-num">{{ loop.index }}</span>
+        <h3>{{ step.title }}</h3>
+        <span class="step-state" id="state-{{ loop.index0 }}">🔒</span>
+      </div>
+      <div class="step-body">
+        <p class="challenge-prompt">{{ step.prompt|safe }}</p>
+        <div class="editor-wrap">
+          <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">step_{{ loop.index }}.py</span></div>
+          <textarea id="code-{{ loop.index0 }}" class="code-input" rows="10" spellcheck="false" aria-label="Step {{ loop.index }} code editor">{{ step.starter }}</textarea>
+          <div class="editor-bar">
+            <button class="btn btn-run" id="run-{{ loop.index0 }}">▶ Run & Check</button>
+            <button class="btn btn-ghost btn-sm" data-toggle="hint-{{ loop.index0 }}">💡 Hint</button>
+            <button class="btn btn-ghost btn-sm" data-toggle="sol-{{ loop.index0 }}">👀 Solution</button>
+          </div>
+          <p id="hint-{{ loop.index0 }}" class="hint-box" hidden>💡 {{ step.hint }}</p>
+          <pre id="sol-{{ loop.index0 }}" class="code-output solution-box" hidden>{{ step.solution }}</pre>
+          <pre id="out-{{ loop.index0 }}" class="code-output" aria-live="polite">Run your code to check this step…</pre>
+          <div id="result-{{ loop.index0 }}" class="check-result" hidden></div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card pad project-finish" id="projectFinish" hidden>
+    <span class="finish-icon">🎉</span>
+    <h2>Project shipped!</h2>
+    <p>You just built a complete, working <strong>{{ project.title|lower }}</strong> — the same architecture running in production software. <a href="{{ url_for('projects') }}">Pick your next build →</a></p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script id="projectSpec" type="application/json">{{ {"steps": project.steps|map(attribute="expected_output")|list}|tojson }}</script>
+<script>
+  PySprint.initProject({
+    project: {{ project.slug|tojson }},
+    loggedIn: {{ 'true' if user else 'false' }},
+    completed: {{ 'true' if completed else 'false' }}
+  });
+</script>
+{% endblock %}

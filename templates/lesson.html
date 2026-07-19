@@ -51,6 +51,24 @@
     </section>
     {% endif %}
 
+    {% if walkthrough %}
+    <section class="card walkthrough" id="walkthrough">
+      <h2 class="block-title">🎬 Watch how it runs <span class="muted">— line by line</span></h2>
+      <div class="wl-body">
+        <pre class="wl-code" id="wlCode" aria-label="Code being explained"></pre>
+        <div class="wl-explain">
+          <p id="wlText">Press play to watch Python execute this code, one line at a time.</p>
+          <div class="wl-controls">
+            <button class="btn btn-primary btn-sm" id="wlPlay">▶ Play</button>
+            <button class="btn btn-ghost btn-sm" id="wlStep">⏭ Step</button>
+            <button class="btn btn-ghost btn-sm" id="wlRestart">↺ Restart</button>
+            <span class="wl-count" id="wlCount"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
     <section class="card editor-block">
       <h2 class="block-title">💻 Try it — live example</h2>
       <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">example.py</span></div>
@@ -132,6 +150,7 @@
     lesson: {{ lesson.slug|tojson }},
     starter: {{ lesson.challenge.starter|tojson }},
     example: {{ lesson.example|tojson }},
+    walkthrough: {{ walkthrough|tojson if walkthrough else 'null' }},
     loggedIn: {{ 'true' if user else 'false' }}
   });
 </script>

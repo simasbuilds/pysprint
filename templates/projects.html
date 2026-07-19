@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Real-Life Python Projects — PySprint{% endblock %}
+{% block description %}Build 5 real-world Python projects step by step: budget analyzer, password auditor, to-do app with persistence, sales report generator and a webhook processor.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>🏗️ Real-Life Projects</h1>
+  <p>Guided builds of the software you actually use — each explained first (<em>how it works in the real world</em>), then constructed step by graded step. Finish one and you've shipped something real.</p>
+</section>
+
+<section class="section">
+  <div class="project-grid">
+    {% for p in projects %}
+    <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card {% if p.slug in done %}is-done{% endif %}" style="--accent: {{ p.color }}">
+      <div class="project-card-top">
+        <span class="project-icon">{{ p.icon }}</span>
+        <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
+      </div>
+      <h2>{{ p.title }}</h2>
+      <p>{{ p.summary }}</p>
+      <div class="course-meta">
+        <span>🧩 {{ p.steps|length }} steps</span>
+        <span>⚡ {{ p.xp }} XP</span>
+        <span>⏱ ~{{ p.minutes }} min</span>
+        {% if p.slug in done %}<span class="done-badge">✓ Shipped</span>{% endif %}
+      </div>
+      <span class="project-go">Build it →</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

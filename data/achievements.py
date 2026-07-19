@@ -57,6 +57,13 @@ ACHIEVEMENTS = [
      "desc": "Earn 2,000 XP.",
      "check": lambda s: s["xp"] >= 2000},
 
+    {"id": "builder", "icon": "🏗️", "title": "First Build",
+     "desc": "Complete your first real-life project.",
+     "check": lambda s: s.get("projects_done", 0) >= 1},
+    {"id": "shipper", "icon": "🚢", "title": "Shipper",
+     "desc": "Complete every real-life project.",
+     "check": lambda s: s.get("projects_done", 0) >= s.get("total_projects", 99)},
+
     {"id": "streak-3", "icon": "📅", "title": "Habit Forming",
      "desc": "Learn 3 days in a row.",
      "check": lambda s: s["streak"] >= 3},

@@ -23,7 +23,7 @@
     <div class="hero-copy">
       <span class="pill stagger d1"><span class="pulse-dot"></span> 100% free · No installs · Code in your browser</span>
       <h1 class="stagger d2">Learn Python by<br><span class="grad">actually writing Python</span></h1>
-      <p class="hero-sub stagger d3">{{ n_lessons }} interactive lessons, {{ n_challenges }} arena challenges and a spaced-repetition review engine. Every lesson runs real Python in your browser — type, run, and level up from your very first line of code to building APIs.</p>
+      <p class="hero-sub stagger d3">From zero to building <span class="word-rotate" id="wordRotate"><span>real APIs</span></span><br>{{ n_lessons }} interactive lessons, real-life projects, {{ n_challenges }} arena challenges and a spaced-repetition review engine — with real Python running in your browser.</p>
       <div class="hero-cta stagger d4">
         {% if user %}
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
@@ -74,6 +74,61 @@ for i in range(3):
 </section>
 
 <section class="section alt">
+  <h2 class="section-title">How PySprint <span class="grad">works</span></h2>
+  <p class="section-sub">Three moves, repeated until you're dangerous. Watch it happen:</p>
+  <div class="how-grid">
+    <div class="how-card card">
+      <span class="how-num">1</span>
+      <h3>📖 Learn the concept</h3>
+      <div class="how-demo how-demo-learn" aria-hidden="true">
+        <span class="how-line w80"></span>
+        <span class="how-line w60"></span>
+        <span class="how-line w90"></span>
+        <span class="how-line w40 shimmer"></span>
+      </div>
+      <p>Short, focused lessons — a few bullets of hard facts, a runnable example and an animated line-by-line walkthrough of how Python executes it.</p>
+    </div>
+    <div class="how-card card">
+      <span class="how-num">2</span>
+      <h3>⌨️ Code it live</h3>
+      <div class="how-demo how-demo-code" aria-hidden="true">
+        <code class="type-line">print("I am coding")<span class="caret"></span></code>
+        <code class="type-result">✓ Correct! Output matches.</code>
+      </div>
+      <p>Every lesson ends with a graded challenge. Real Python 3 runs in your browser and checks your output the instant you hit Run.</p>
+    </div>
+    <div class="how-card card">
+      <span class="how-num">3</span>
+      <h3>🏆 Level up</h3>
+      <div class="how-demo how-demo-xp" aria-hidden="true">
+        <div class="how-xp-track"><div class="how-xp-fill"></div></div>
+        <span class="how-badge">⚡ +40 XP</span>
+      </div>
+      <p>XP, streaks and achievements track every win — and the Smart Review engine brings each concept back right before you'd forget it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Build <span class="grad">real software</span>, step by step</h2>
+  <p class="section-sub">Five guided projects modelled on production systems — each one explains how it works in the real world, then you build it stage by graded stage.</p>
+  <div class="project-grid home">
+    {% for p in projects %}
+    <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card" style="--accent: {{ p.color }}">
+      <div class="project-card-top">
+        <span class="project-icon">{{ p.icon }}</span>
+        <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
+      </div>
+      <h3>{{ p.title }}</h3>
+      <p>{{ p.summary }}</p>
+      <div class="course-meta"><span>🧩 {{ p.steps|length }} steps</span><span>⚡ {{ p.xp }} XP</span></div>
+      <span class="project-go">Build it →</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section alt">
   <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
   <div class="feature-grid">
     <div class="feature card"><span class="feature-icon">⚡</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
@@ -99,5 +154,22 @@ for i in range(3):
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script>
   PyRunner.wireSimple('heroRun', 'heroCode', 'heroOut');
+
+  // Rotating word in the hero
+  (function () {
+    var words = ['real APIs', 'automation bots', 'data pipelines', 'your own tools', 'real projects'];
+    var el = document.getElementById('wordRotate');
+    if (!el) return;
+    var i = 0;
+    setInterval(function () {
+      i = (i + 1) % words.length;
+      var span = el.querySelector('span');
+      span.classList.add('out');
+      setTimeout(function () {
+        span.textContent = words[i];
+        span.classList.remove('out');
+      }, 260);
+    }, 2600);
+  })();
 </script>
 {% endblock %}

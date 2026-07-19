@@ -50,6 +50,7 @@
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="{{ url_for('courses') }}" {% if request.path.startswith('/courses') %}class="active"{% endif %}>Courses</a>
+        <a href="{{ url_for('projects') }}" {% if request.path.startswith('/projects') %}class="active"{% endif %}>Projects</a>
         <a href="{{ url_for('challenges') }}" {% if request.path.startswith('/challenges') %}class="active"{% endif %}>Challenges</a>
         <a href="{{ url_for('playground') }}" {% if request.path == '/playground' %}class="active"{% endif %}>Playground</a>
         <a href="{{ url_for('review') }}" {% if request.path == '/review' %}class="active"{% endif %}>Review</a>
@@ -89,6 +90,7 @@
       <div class="footer-col">
         <h4>Learn</h4>
         <a href="{{ url_for('courses') }}">All courses</a>
+        <a href="{{ url_for('projects') }}">Real-life projects</a>
         <a href="{{ url_for('challenges') }}">Challenge arena</a>
         <a href="{{ url_for('playground') }}">Playground</a>
         <a href="{{ url_for('review') }}">Flashcard review</a>
