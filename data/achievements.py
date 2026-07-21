@@ -36,6 +36,9 @@ ACHIEVEMENTS = [
     {"id": "automator", "icon": "automation", "title": "The Automator",
      "desc": "Finish the Automation & Real-World Python course.",
      "check": lambda s: "automation" in s["courses_done"]},
+    {"id": "python-expert", "icon": "crown", "title": "Python Expert",
+     "desc": "Finish the Expert Python course.",
+     "check": lambda s: "expert-python" in s["courses_done"]},
 
     {"id": "challenger", "icon": "swords", "title": "Challenger",
      "desc": "Solve your first arena challenge.",

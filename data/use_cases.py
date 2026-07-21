@@ -65,6 +65,16 @@ COURSE_USE_CASES = {
         {"icon": "calendar", "title": "Deadline planner",
          "desc": "Calculate due dates, overdue work and human-readable schedules."},
     ],
+    "expert-python": [
+        {"icon": "database", "title": "Streaming data pipeline",
+         "desc": "Chain generators to process files bigger than memory, one record at a time."},
+        {"icon": "shield", "title": "Retry & caching layers",
+         "desc": "Wrap flaky API calls with decorators that retry, time and memoize them."},
+        {"icon": "bank", "title": "Safe transactions",
+         "desc": "Guarantee commit-or-rollback cleanup with your own context managers."},
+        {"icon": "blocks", "title": "A tiny framework",
+         "desc": "Use dunders, dataclasses and type hints to design APIs that feel native."},
+    ],
 }
 
 

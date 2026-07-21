@@ -141,6 +141,9 @@
     const result = await run(codeEl.value);
     outEl.textContent = result.output;
     if (!result.ok) outEl.classList.add('error');
+    outEl.classList.remove('flash');
+    void outEl.offsetWidth;              // restart the highlight animation
+    outEl.classList.add('flash');
     btn.disabled = false;
     btn.textContent = original;
     return result;
@@ -340,7 +343,9 @@
         storageKey: 'pysprint-challenge-' + cfg.course + '-' + cfg.lesson,
         onPass() {
           challengePassed = true;
-          confetti(document.getElementById('challengeResult'));
+          const resultBox = document.getElementById('challengeResult');
+          confetti(resultBox);
+          if (window.xpFly) xpFly(resultBox, cfg.xp ? '+' + cfg.xp + ' XP unlocked' : 'Challenge passed!');
         },
       });
 
@@ -389,6 +394,8 @@
             if (status !== 200) { toast('Could not save progress.', 'error'); return; }
             if (data.first_time) {
               toast('+' + data.xp_gained + ' XP — lesson complete!', 'success');
+              if (window.xpFly) xpFly(completeBtn, '+' + data.xp_gained + ' XP');
+              confetti(completeBtn);
               completeBtn.textContent = 'Completed';
               completeBtn.dataset.done = '1';
             } else {
@@ -406,7 +413,9 @@
         starter: cfg.starter,
         storageKey: 'pysprint-arena-' + cfg.challenge,
         onPass() {
-          confetti(document.getElementById('challengeResult'));
+          const resultBox = document.getElementById('challengeResult');
+          confetti(resultBox);
+          if (window.xpFly) xpFly(resultBox, cfg.xp ? '+' + cfg.xp + ' XP unlocked' : 'Challenge solved!');
           reportProgress('/api/complete-challenge', { challenge: cfg.challenge },
             cfg.loggedIn, 'Challenge solved');
         },

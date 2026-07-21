@@ -100,6 +100,8 @@ def inject_globals():
         "level": level_info(user["xp"]) if user else None,
         "site_url": app.config["SITE_URL"],
         "now_year": datetime.now(timezone.utc).year,
+        "n_lessons": total_lessons(),
+        "n_courses": len(COURSES),
     }
 
 

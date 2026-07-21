@@ -328,6 +328,62 @@ LESSON_EXTRAS = {
         ],
         "pro_tip": "Add argparse and your script becomes a real CLI tool: python analyze.py access.log --since 12:00. That jump — from script to tool a teammate can run — is what gets automation adopted.",
     },
+
+    # ── expert-python ────────────────────────────────────────────────
+    ("expert-python", "generators"): {
+        "real_world": "Generators are how Python streams anything bigger than RAM: Django querysets, csv.reader, database cursors and every line-by-line log processor are lazy iterators. Data engineers chain generators into pipelines that crunch terabytes on a laptop.",
+        "pitfalls": [
+            "A generator is <strong>exhausted</strong> after one pass — looping over it a second time silently yields nothing. Recreate it or store the results if you need them twice.",
+            "Calling a generator function doesn't run any of its code: <code>countdown(3)</code> returns a generator object; the body only runs when you iterate.",
+            "Using <code>len()</code> on a generator → TypeError. A lazy stream has no length until it's consumed.",
+        ],
+        "pro_tip": "yield from delegates to another iterable in one line: def walk(tree): yield from tree.left; yield tree.value; yield from tree.right. It's the secret to elegant recursive generators.",
+    },
+    ("expert-python", "decorators"): {
+        "real_world": "Open any production codebase and the decorators pile up: @app.route in Flask, @pytest.fixture, @login_required, @retry, @celery.task. Whole frameworks are decorator-driven because they add behaviour without touching business logic.",
+        "pitfalls": [
+            "Forgetting to <code>return wrapper</code> from the decorator — the decorated function becomes <code>None</code> and every call raises TypeError.",
+            "Forgetting to return the inner function's result from the wrapper — the wrapped function suddenly returns None everywhere.",
+            "Losing the function's name and docstring: wrap the wrapper with <code>@functools.wraps(func)</code> so introspection and debugging still work.",
+        ],
+        "pro_tip": "A decorator that takes arguments, like @retry(times=3), is a function that returns a decorator — three nested defs. Write the plain decorator first, then wrap it once more for the arguments.",
+    },
+    ("expert-python", "context-managers"): {
+        "real_world": "Database transactions (commit/rollback), file handles, thread locks, temporary directories, test mocks (unittest.mock.patch) and even changing directories — professional code wraps every setup/teardown pair in with so cleanup survives exceptions.",
+        "pitfalls": [
+            "Returning <code>True</code> from <code>__exit__</code> without meaning to — that <em>swallows</em> the exception and the caller never learns something failed.",
+            "Doing risky work in <code>__init__</code> instead of <code>__enter__</code> — resources should be acquired when the with block starts, not when the object is created.",
+            "Forgetting that <code>as</code> binds <code>__enter__</code>'s return value — return <code>self</code> unless you have a better handle to give.",
+        ],
+        "pro_tip": "One with statement can manage several resources: with open(a) as f, open(b) as g:. And contextlib.suppress(FileNotFoundError) replaces a try/except/pass in one readable line.",
+    },
+    ("expert-python", "data-model"): {
+        "real_world": "pathlib overloads / to join paths, NumPy overloads every operator for arrays, Django models compare by value — Python's most loved libraries feel native precisely because they implement the data model instead of inventing method names.",
+        "pitfalls": [
+            "Defining <code>__eq__</code> without thinking about <code>__hash__</code> — Python sets <code>__hash__</code> to None, and your objects can no longer live in sets or dict keys. Implement both or use @dataclass(frozen=True).",
+            "Returning a plain tuple from <code>__add__</code> instead of a new instance of your class — addition should stay closed over the type.",
+            "Writing <code>__repr__</code> that hides information: aim for eval-able output like Vector(4, 6), not '&lt;Vector object&gt;'.",
+        ],
+        "pro_tip": "Implement __repr__ on every class you write, first thing. Debugging a list of '<Order object at 0x7f...>' is misery; a list of Order(id=7, total=99.5) reads itself.",
+    },
+    ("expert-python", "functional-tools"): {
+        "real_world": "@lru_cache turns expensive API lookups and recursive algorithms into O(1) repeats — it's a one-line performance patch used all over production code. itertools powers scheduling (cycle), pagination (islice), and combinatorics in testing and pricing engines.",
+        "pitfalls": [
+            "Caching a function with <strong>mutable</strong> or unhashable arguments — @lru_cache needs hashable args and will TypeError on lists.",
+            "Using reduce where sum(), max() or a comprehension is clearer — reduce is for genuinely custom folds, not a badge of honour.",
+            "Printing an itertools result and seeing <code>&lt;itertools.combinations object&gt;</code> — iterators must be consumed (list(), a loop) to see their values.",
+        ],
+        "pro_tip": "functools.partial shines with callbacks and key functions: sorted(rows, key=partial(score, weights=w)). It's cleaner than a lambda when you're just pinning arguments.",
+    },
+    ("expert-python", "modern-python"): {
+        "real_world": "Type hints are mandatory in most professional Python teams — mypy/pyright run in CI at Google, Meta, Stripe and Dropbox. Dataclasses (and their cousin pydantic) define API payloads, configs and domain models in nearly every modern service.",
+        "pitfalls": [
+            "Mutable default fields: <code>tags: list = []</code> raises ValueError in a dataclass — use <code>field(default_factory=list)</code>.",
+            "Assuming hints validate at runtime: <code>age: int = \"forty\"</code> runs happily. Enforcement needs mypy or a validation library like pydantic.",
+            "Ordering fields wrong: fields with defaults must come after fields without, exactly like function parameters.",
+        ],
+        "pro_tip": "@dataclass(frozen=True, slots=True) gives you an immutable, hashable, memory-lean record type — the closest Python gets to a value type, perfect for keys, coordinates and money.",
+    },
 }
 
 

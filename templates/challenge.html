@@ -52,6 +52,7 @@
 <script>
   PySprint.initChallenge({
     challenge: {{ ch.slug|tojson }},
+    xp: {{ ch.xp }},
     expected: {{ ch.expected_output|tojson }},
     starter: {{ ch.starter|tojson }},
     loggedIn: {{ 'true' if user else 'false' }}

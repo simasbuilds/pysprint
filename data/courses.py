@@ -1158,6 +1158,213 @@ def add_book():
             },
         ],
     },
+
+    # ══════════════════════════════════════════════════════════════════
+    # COURSE 7 — EXPERT PYTHON
+    # ══════════════════════════════════════════════════════════════════
+    {
+        "slug": "expert-python",
+        "title": "Expert Python",
+        "tagline": "Generators, decorators, dunders — the Python that professionals write.",
+        "level": "Advanced",
+        "color": "#a78bfa",
+        "icon": "crown",
+        "description": "The course that turns working Python into elegant Python. Master lazy iteration with generators, wrap behaviour with decorators, manage resources with context managers, hook into the data model with dunder methods, and wield functools, itertools, type hints and dataclasses like a senior engineer.",
+        "lessons": [
+            {
+                "slug": "generators",
+                "title": "Generators & Lazy Iteration",
+                "minutes": 16, "xp": 40,
+                "content": """
+<p>A <strong>generator</strong> is a function that produces values one at a time instead of building a whole list in memory. Swap <code>return</code> for <code>yield</code> and Python gives you a <em>pausable</em> function:</p>
+<ul>
+<li><code>yield value</code> — hands one value to the caller and <strong>freezes</strong> the function right there, local variables intact</li>
+<li><code>next(gen)</code> — resumes execution until the next <code>yield</code></li>
+<li>A <code>for</code> loop calls <code>next()</code> for you until the generator is exhausted</li>
+</ul>
+<p>This is <strong>lazy evaluation</strong>: values are computed only when asked for. A generator over a 10&nbsp;GB log file uses a few kilobytes of memory, because only one line exists at a time.</p>
+<p>Generator <em>expressions</em> look like list comprehensions with round brackets: <code>(n * n for n in range(10**9))</code> is created instantly — nothing is computed until you iterate.</p>
+""",
+                "example": 'def fibonacci():\n    a, b = 0, 1\n    while True:          # an INFINITE sequence - impossible with a list\n        yield a\n        a, b = b, a + b\n\nfib = fibonacci()\nfor _ in range(8):\n    print(next(fib), end=" ")\nprint()\n\nsquares = (n * n for n in range(1_000_000))  # nothing computed yet\nprint(next(squares), next(squares), next(squares))',
+                "challenge": {
+                    "prompt": "Write a generator function <code>countdown(n)</code> that yields the numbers from <code>n</code> down to <code>1</code>. Loop over <code>countdown(3)</code> printing each value on its own line, then print <code>Liftoff!</code>.",
+                    "starter": "def countdown(n):\n    # yield n, n-1, ... 1\n    pass\n\n# loop over countdown(3), then print Liftoff!\n",
+                    "expected_output": "3\n2\n1\nLiftoff!",
+                    "hint": "Use a while loop inside the generator: while n > 0: yield n; n -= 1. Then: for value in countdown(3): print(value).",
+                    "solution": 'def countdown(n):\n    while n > 0:\n        yield n\n        n -= 1\n\nfor value in countdown(3):\n    print(value)\nprint("Liftoff!")',
+                },
+                "quiz": [
+                    {"q": "What makes a function a generator?",
+                     "options": ["Calling it with next()", "Containing at least one yield", "Returning a list", "The @generator decorator"],
+                     "answer": 1, "explain": "Any function containing yield becomes a generator function — calling it returns a generator object without running the body."},
+                    {"q": "Why can a generator represent an infinite sequence?",
+                     "options": ["It can't — Python would crash", "Values are produced one at a time, only when requested", "It compresses the values", "Python allocates infinite memory lazily"],
+                     "answer": 1, "explain": "Laziness is the trick: only the current value exists. The caller decides when to stop asking."},
+                ],
+            },
+            {
+                "slug": "decorators",
+                "title": "Closures & Decorators",
+                "minutes": 18, "xp": 45,
+                "content": """
+<p>In Python, functions are values: you can pass them around, store them and return them. A <strong>closure</strong> is an inner function that remembers variables from the function that created it — even after that outer function has finished.</p>
+<p>A <strong>decorator</strong> uses closures to wrap extra behaviour around a function without touching its body:</p>
+<ul>
+<li><code>@decorator</code> above a <code>def</code> is pure sugar for <code>func = decorator(func)</code></li>
+<li>The decorator returns a <code>wrapper</code> function that runs code <em>before and after</em> calling the original</li>
+<li><code>*args, **kwargs</code> in the wrapper lets it wrap any signature</li>
+</ul>
+<p>This is how <code>@app.get(...)</code> in Flask, <code>@lru_cache</code>, <code>@dataclass</code> and pytest fixtures all work — decorators are the backbone of professional Python APIs.</p>
+""",
+                "example": 'def log_calls(func):\n    def wrapper(*args, **kwargs):\n        print(f"-> calling {func.__name__}{args}")\n        result = func(*args, **kwargs)\n        print(f"<- {func.__name__} returned {result!r}")\n        return result\n    return wrapper\n\n@log_calls\ndef add(a, b):\n    return a + b\n\nadd(2, 3)',
+                "challenge": {
+                    "prompt": "Write a decorator <code>shout</code> that uppercases whatever string the wrapped function returns. Apply it to <code>greet(name)</code>, which returns <code>f\"hello, {name}\"</code>, then print <code>greet(\"ada\")</code> and <code>greet(\"grace\")</code>.",
+                    "starter": 'def shout(func):\n    # return a wrapper that uppercases func\'s result\n    pass\n\n@shout\ndef greet(name):\n    return f"hello, {name}"\n\n# print greet("ada") and greet("grace")\n',
+                    "expected_output": "HELLO, ADA\nHELLO, GRACE",
+                    "hint": "The wrapper calls func(*args, **kwargs), then returns result.upper(). Don't forget to return the wrapper from shout.",
+                    "solution": 'def shout(func):\n    def wrapper(*args, **kwargs):\n        return func(*args, **kwargs).upper()\n    return wrapper\n\n@shout\ndef greet(name):\n    return f"hello, {name}"\n\nprint(greet("ada"))\nprint(greet("grace"))',
+                },
+                "quiz": [
+                    {"q": "@timer above def slow(): is equivalent to…",
+                     "options": ["slow = timer(slow)", "timer(slow())", "slow.timer()", "timer.slow()"],
+                     "answer": 0, "explain": "Decorator syntax replaces the function with whatever the decorator returns: slow = timer(slow)."},
+                    {"q": "Why do wrappers use (*args, **kwargs)?",
+                     "options": ["It's required syntax", "So one wrapper can forward any combination of arguments", "It makes calls faster", "To rename the arguments"],
+                     "answer": 1, "explain": "*args/**kwargs capture whatever the caller passes and forward it unchanged, so the decorator works on any function."},
+                ],
+            },
+            {
+                "slug": "context-managers",
+                "title": "Context Managers & the with Statement",
+                "minutes": 15, "xp": 40,
+                "content": """
+<p>Every time you write <code>with open(...) as f:</code> you're using a <strong>context manager</strong> — an object that promises to <em>set something up</em> on entry and <em>clean it up</em> on exit, even if the body raises an exception.</p>
+<p>The protocol is two dunder methods:</p>
+<ul>
+<li><code>__enter__(self)</code> — runs at the start of the <code>with</code> block; its return value is bound by <code>as</code></li>
+<li><code>__exit__(self, exc_type, exc, tb)</code> — <strong>always</strong> runs at the end, exception or not</li>
+</ul>
+<p>Files, database transactions, locks, temporary directories, mocked tests — anything with a setup/teardown pair belongs in a context manager. The <code>contextlib.contextmanager</code> decorator lets you write one as a generator: code before <code>yield</code> is the entry, code after is the exit.</p>
+""",
+                "example": 'from contextlib import contextmanager\n\n@contextmanager\ndef transaction(name):\n    print(f"BEGIN {name}")\n    try:\n        yield\n        print(f"COMMIT {name}")\n    except Exception as error:\n        print(f"ROLLBACK {name}: {error}")\n\nwith transaction("transfer"):\n    print("moving funds...")\n\nwith transaction("bad-transfer"):\n    raise ValueError("insufficient balance")',
+                "challenge": {
+                    "prompt": "Write a class <code>Tag</code> whose constructor takes a tag name. As a context manager it prints <code>&lt;b&gt;</code> on enter and <code>&lt;/b&gt;</code> on exit (for name <code>\"b\"</code>). Use <code>with Tag(\"b\"):</code> around a line printing <code>bold text</code>.",
+                    "starter": 'class Tag:\n    def __init__(self, name):\n        self.name = name\n\n    # add __enter__ and __exit__\n\nwith Tag("b"):\n    print("bold text")\n',
+                    "expected_output": "<b>\nbold text\n</b>",
+                    "hint": "__enter__ prints f\"<{self.name}>\" and returns self; __exit__(self, exc_type, exc, tb) prints f\"</{self.name}>\".",
+                    "solution": 'class Tag:\n    def __init__(self, name):\n        self.name = name\n\n    def __enter__(self):\n        print(f"<{self.name}>")\n        return self\n\n    def __exit__(self, exc_type, exc, tb):\n        print(f"</{self.name}>")\n        return False\n\nwith Tag("b"):\n    print("bold text")',
+                },
+                "quiz": [
+                    {"q": "When does __exit__ run?",
+                     "options": ["Only if the block succeeds", "Only if the block raises", "Always — success or exception", "Only when you call it"],
+                     "answer": 2, "explain": "That guarantee is the whole point: cleanup always happens, like finally."},
+                    {"q": "In a @contextmanager generator, what does the code before yield represent?",
+                     "options": ["The cleanup phase", "The setup phase (__enter__)", "Error handling", "It never runs"],
+                     "answer": 1, "explain": "Everything before yield runs on entry; everything after yield runs on exit."},
+                ],
+            },
+            {
+                "slug": "data-model",
+                "title": "Dunder Methods & the Python Data Model",
+                "minutes": 18, "xp": 45,
+                "content": """
+<p>Why does <code>len(\"abc\")</code> work? Because <code>str</code> implements <code>__len__</code>. Python's operators and built-ins are a thin layer over <strong>dunder (double-underscore) methods</strong> — implement them and your own classes plug straight into the language:</p>
+<ul>
+<li><code>__repr__</code> — how the object prints (aim for something a developer could paste back into code)</li>
+<li><code>__add__</code> — powers <code>a + b</code></li>
+<li><code>__eq__</code> — powers <code>==</code> (by default Python compares identity, not value!)</li>
+<li><code>__len__</code>, <code>__getitem__</code>, <code>__contains__</code> — make objects sliceable, iterable and <code>in</code>-testable</li>
+</ul>
+<p>This is called the <strong>data model</strong>, and it's the most Pythonic idea in the language: instead of inventing <code>.equals()</code> or <code>.plus()</code> methods, you teach your objects to speak Python's native vocabulary.</p>
+""",
+                "example": 'class Playlist:\n    def __init__(self, *songs):\n        self.songs = list(songs)\n\n    def __len__(self):\n        return len(self.songs)\n\n    def __getitem__(self, index):\n        return self.songs[index]\n\nmix = Playlist("Blue Monday", "Around the World", "One More Time")\nprint(len(mix))\nprint(mix[0])\nfor song in mix:          # __getitem__ makes it iterable too!\n    print("-", song)',
+                "challenge": {
+                    "prompt": "Build a <code>Vector</code> class with <code>x</code> and <code>y</code>. Implement <code>__repr__</code> returning <code>Vector(x, y)</code>, <code>__add__</code> for coordinate-wise addition, and <code>__eq__</code> for value equality. Print <code>Vector(1, 2) + Vector(3, 4)</code>, then print <code>Vector(1, 2) == Vector(1, 2)</code>.",
+                    "starter": "class Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n    # add __repr__, __add__, __eq__\n\nprint(Vector(1, 2) + Vector(3, 4))\nprint(Vector(1, 2) == Vector(1, 2))\n",
+                    "expected_output": "Vector(4, 6)\nTrue",
+                    "hint": "__repr__ returns f\"Vector({self.x}, {self.y})\"; __add__ returns Vector(self.x + other.x, self.y + other.y); __eq__ compares both coordinates.",
+                    "solution": 'class Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n    def __repr__(self):\n        return f"Vector({self.x}, {self.y})"\n\n    def __add__(self, other):\n        return Vector(self.x + other.x, self.y + other.y)\n\n    def __eq__(self, other):\n        return self.x == other.x and self.y == other.y\n\nprint(Vector(1, 2) + Vector(3, 4))\nprint(Vector(1, 2) == Vector(1, 2))',
+                },
+                "quiz": [
+                    {"q": "Without __eq__, what does obj1 == obj2 compare?",
+                     "options": ["All attributes", "Their identity (are they the same object?)", "Their string forms", "It raises TypeError"],
+                     "answer": 1, "explain": "The default __eq__ is identity — two equal-looking objects compare False unless you define value equality."},
+                    {"q": "Which dunder does a + b call?",
+                     "options": ["a.__plus__(b)", "a.__add__(b)", "a.__sum__(b)", "add(a, b)"],
+                     "answer": 1, "explain": "Operators map to dunders: + is __add__ (with __radd__ as the right-hand fallback)."},
+                ],
+            },
+            {
+                "slug": "functional-tools",
+                "title": "Functional Power Tools: functools & itertools",
+                "minutes": 16, "xp": 45,
+                "content": """
+<p>Two standard-library modules hold the tools that make expert Python so compact:</p>
+<p><strong>functools</strong> — tools that operate on functions:</p>
+<ul>
+<li><code>@lru_cache</code> — memoize a function in one line; exponential recursions become instant</li>
+<li><code>reduce(f, seq)</code> — fold a sequence into a single value: <code>reduce(lambda a, b: a * b, [1, 2, 3, 4])</code> → 24</li>
+<li><code>partial(f, x)</code> — pre-fill some arguments, get a new function back</li>
+</ul>
+<p><strong>itertools</strong> — an iterator algebra:</p>
+<ul>
+<li><code>combinations(\"ABC\", 2)</code> — every unordered pair</li>
+<li><code>chain(a, b)</code> — one stream from many iterables</li>
+<li><code>count()</code>, <code>cycle()</code>, <code>islice()</code> — infinite streams, safely sliced</li>
+</ul>
+<p>Everything in itertools is lazy — these tools compose into data pipelines that process millions of items in constant memory.</p>
+""",
+                "example": 'from functools import lru_cache\n\n@lru_cache(maxsize=None)\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\n\nprint(fib(80))       # instant - would take years without the cache\n\nfrom itertools import islice, count\nevens = (n for n in count() if n % 2 == 0)   # infinite stream\nprint(list(islice(evens, 5)))                 # safely take 5',
+                "challenge": {
+                    "prompt": "Use <code>functools.reduce</code> to print the product of the numbers 1–5. Then use <code>itertools.combinations</code> on the string <code>\"ABC\"</code> to print every 2-letter combination joined as a string, one per line.",
+                    "starter": "from functools import reduce\nfrom itertools import combinations\n\n# product of 1..5 with reduce\n\n# every 2-letter combination of \"ABC\", one per line\n",
+                    "expected_output": "120\nAB\nAC\nBC",
+                    "hint": "reduce(lambda a, b: a * b, range(1, 6)) gives the product. combinations(\"ABC\", 2) yields tuples — join each with \"\".join(pair).",
+                    "solution": 'from functools import reduce\nfrom itertools import combinations\n\nprint(reduce(lambda a, b: a * b, range(1, 6)))\nfor pair in combinations("ABC", 2):\n    print("".join(pair))',
+                },
+                "quiz": [
+                    {"q": "What does @lru_cache do?",
+                     "options": ["Limits recursion depth", "Stores results so repeated calls with the same arguments return instantly", "Compresses return values", "Runs the function in parallel"],
+                     "answer": 1, "explain": "It memoizes: each unique argument set is computed once, then served from cache."},
+                    {"q": "Why is itertools memory-efficient?",
+                     "options": ["It uses C arrays", "Everything is lazy — items are produced one at a time on demand", "It compresses lists", "It isn't"],
+                     "answer": 1, "explain": "itertools returns iterators, not lists — only the current item exists in memory."},
+                ],
+            },
+            {
+                "slug": "modern-python",
+                "title": "Type Hints, Dataclasses & Modern Python",
+                "minutes": 18, "xp": 50,
+                "content": """
+<p>Modern professional Python is <em>annotated</em> and <em>declarative</em>. Two features define the style:</p>
+<p><strong>Type hints</strong> document what a function expects and returns — <code>def price(qty: int, unit: float) -&gt; float:</code>. Python doesn't enforce them at runtime, but editors autocomplete with them and tools like <code>mypy</code> catch bugs before the code runs. Every major codebase now requires them.</p>
+<p><strong>Dataclasses</strong> kill boilerplate. Add <code>@dataclass</code> to a class of annotated fields and Python generates <code>__init__</code>, <code>__repr__</code> and <code>__eq__</code> for you:</p>
+<ul>
+<li>Fields can have defaults; mutable defaults use <code>field(default_factory=list)</code></li>
+<li><code>frozen=True</code> makes instances immutable (hashable, safe to share)</li>
+<li>They compose beautifully with type hints, sorting and serialization</li>
+</ul>
+<p>This lesson caps the course: generators, decorators, dunders and dataclasses are the vocabulary of every senior Python code review.</p>
+""",
+                "example": 'from dataclasses import dataclass, field\n\n@dataclass\nclass Task:\n    title: str\n    done: bool = False\n    tags: list[str] = field(default_factory=list)\n\nfirst = Task("Ship the release", tags=["work"])\nprint(first)                                    # readable repr, free\nprint(first == Task("Ship the release", tags=["work"]))  # value equality, free',
+                "challenge": {
+                    "prompt": "Define a <code>@dataclass Book</code> with fields <code>title: str</code> and <code>pages: int</code>. Create <code>Book(\"Fluent Python\", 792)</code> and <code>Book(\"Clean Code\", 464)</code> in a list, sort the list by page count, and print each as <code>title (pages)</code>.",
+                    "starter": 'from dataclasses import dataclass\n\n# define Book, build the list, sort by pages, print "title (pages)"\n',
+                    "expected_output": "Clean Code (464)\nFluent Python (792)",
+                    "hint": "sorted(shelf, key=lambda book: book.pages) sorts ascending. Print with f\"{book.title} ({book.pages})\".",
+                    "solution": 'from dataclasses import dataclass\n\n@dataclass\nclass Book:\n    title: str\n    pages: int\n\nshelf = [Book("Fluent Python", 792), Book("Clean Code", 464)]\nfor book in sorted(shelf, key=lambda book: book.pages):\n    print(f"{book.title} ({book.pages})")',
+                },
+                "quiz": [
+                    {"q": "What does Python do with type hints at runtime?",
+                     "options": ["Raises TypeError on mismatch", "Converts values to the hinted type", "Essentially nothing — they're for tools and readers", "Slows the program down significantly"],
+                     "answer": 2, "explain": "Hints are metadata. Enforcement comes from external tools like mypy and pyright, not the interpreter."},
+                    {"q": "Which methods does @dataclass generate from the field annotations?",
+                     "options": ["__init__, __repr__, __eq__", "__add__ and __sub__", "__enter__ and __exit__", "Only __init__"],
+                     "answer": 0, "explain": "The big three of boilerplate — constructor, readable repr and value equality — are generated automatically."},
+                ],
+            },
+        ],
+    },
 ]
 
 

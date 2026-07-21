@@ -2102,3 +2102,186 @@ body {
   .about-principles { grid-template-columns: 1fr; }
   .about-principles article { min-height: 0; }
 }
+
+/* ═══════════════════ v8: motion & learning-science system ═════════ */
+
+/* Page entrance — every navigation feels intentional. */
+@media (prefers-reduced-motion: no-preference) {
+  main { animation: pageIn .55s cubic-bezier(.16, 1, .3, 1) both; }
+}
+@keyframes pageIn { from { opacity: 0; transform: translateY(16px); } }
+
+/* Directional scroll reveals (assigned via data-reveal or by main.js). */
+.reveal-left { opacity: 0; transform: translateX(-36px); }
+.reveal-right { opacity: 0; transform: translateX(36px); }
+.reveal-scale { opacity: 0; transform: scale(.94); }
+.reveal-left, .reveal-right, .reveal-scale {
+  transition: opacity .65s ease, transform .65s cubic-bezier(.16, 1, .3, 1);
+}
+.reveal-left.in, .reveal-right.in, .reveal-scale.in { opacity: 1; transform: none; }
+
+/* Progress bars fill from zero when they scroll into view. */
+.progress-fill { transition: width .9s cubic-bezier(.16, 1, .3, 1); }
+
+/* Cursor spotlight — cards glow softly toward the pointer. */
+@media (pointer: fine) {
+  .course-card, .project-card, .challenge-card, .feature, .dash-course,
+  .use-case-card, .achieve-tile, .learn-card, .how-card { position: relative; }
+  .course-card::before, .project-card::before, .challenge-card::before,
+  .feature::before, .dash-course::before, .use-case-card::before,
+  .achieve-tile::before, .learn-card::before, .how-card::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    opacity: 0; transition: opacity .35s; pointer-events: none;
+    background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      color-mix(in srgb, var(--accent, var(--brand-1)) 10%, transparent), transparent 70%);
+  }
+  .course-card:hover::before, .project-card:hover::before, .challenge-card:hover::before,
+  .feature:hover::before, .dash-course:hover::before, .use-case-card:hover::before,
+  .achieve-tile:hover::before, .learn-card:hover::before, .how-card:hover::before { opacity: 1; }
+}
+
+/* Button ripple on press. */
+.btn-ripple {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  background: currentColor; opacity: .25; transform: scale(0);
+  animation: ripple .6s ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(3); opacity: 0; } }
+
+/* XP fly-up — rewards float away from the action that earned them. */
+.xp-fly {
+  position: fixed; z-index: 96; pointer-events: none; white-space: nowrap;
+  font: 800 .95rem var(--display); color: var(--brand-1);
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--brand-1) 35%, var(--border));
+  padding: .35rem .85rem; border-radius: 99px; box-shadow: var(--shadow-lg);
+  animation: xpFlyUp 1.5s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+@keyframes xpFlyUp {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(.7); }
+  14% { opacity: 1; transform: translate(-50%, -14px) scale(1.06); }
+  100% { opacity: 0; transform: translate(-50%, -110px) scale(1); }
+}
+
+/* Live nav stats. */
+.nav-xp .ui-icon { color: var(--brand-1); }
+.nav-streak .ui-icon {
+  color: var(--warn); transform-origin: 50% 85%;
+  animation: flamePulse 2.6s ease-in-out infinite;
+}
+@keyframes flamePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.22); } }
+
+/* Mega menus glide open. */
+@media (prefers-reduced-motion: no-preference) {
+  .mega-menu:not([hidden]) { animation: menuIn .28s cubic-bezier(.16, 1, .3, 1); }
+}
+@keyframes menuIn { from { opacity: 0; transform: translateY(-10px) scale(.985); } }
+
+/* Quiz feedback with feeling. */
+.quiz-opt.correct { animation: optPop .38s cubic-bezier(.2, 1.6, .4, 1); }
+.quiz-opt.wrong { animation: optShake .4s ease; }
+@keyframes optPop { 0% { transform: scale(.97); } 55% { transform: scale(1.015); } 100% { transform: none; } }
+@keyframes optShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); }
+}
+
+/* Fresh console output flashes so learners notice the change. */
+.code-output.flash { animation: outFlash .55s ease; }
+@keyframes outFlash { from { box-shadow: inset 0 0 0 2px rgba(45, 212, 191, .55); } }
+
+/* Flashcards flip and deal like real cards. */
+@media (prefers-reduced-motion: no-preference) {
+  .flashcard.flipping { animation: cardFlip .48s cubic-bezier(.4, 0, .2, 1); }
+  .flashcard.deal { animation: cardDeal .45s cubic-bezier(.16, 1, .3, 1); }
+}
+@keyframes cardFlip {
+  0% { transform: perspective(900px) rotateY(0); }
+  50% { transform: perspective(900px) rotateY(90deg); }
+  100% { transform: perspective(900px) rotateY(0); }
+}
+@keyframes cardDeal { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+
+/* ── the study loop strip (lesson pages) ─────────────────────────── */
+.study-loop {
+  display: flex; align-items: center; flex-wrap: wrap; gap: .45rem;
+  padding: .8rem 1.1rem; border-radius: 14px;
+}
+.study-loop > strong {
+  display: inline-flex; align-items: center; gap: .45rem; margin-right: .4rem;
+  color: var(--text-dim); font-size: .72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .09em;
+}
+.study-loop > strong .ui-icon { color: var(--accent, var(--brand-1)); }
+.loop-step {
+  --i: 0;
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .3rem .7rem; border: 1px solid var(--border); border-radius: 99px;
+  background: var(--surface-2); color: var(--text-dim);
+  font-size: .74rem; font-weight: 800;
+  animation: loopGlow 7.2s ease infinite;
+  animation-delay: calc(var(--i) * 1.2s);
+}
+.loop-step .ui-icon { color: var(--accent, var(--brand-1)); }
+.loop-sep { color: var(--text-dim); opacity: .5; font-weight: 800; font-size: .8rem; }
+@keyframes loopGlow {
+  0%, 16.6%, 100% { border-color: var(--border); color: var(--text-dim); transform: none; }
+  6% {
+    border-color: color-mix(in srgb, var(--accent, var(--brand-1)) 55%, var(--border));
+    color: var(--accent, var(--brand-1)); transform: translateY(-2px);
+  }
+}
+
+/* ── "learn how to learn" cards (home) ───────────────────────────── */
+.learn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; margin-top: 2.25rem; }
+.learn-card {
+  position: relative; overflow: hidden; padding: 1.5rem 1.4rem;
+  display: flex; flex-direction: column; gap: .55rem;
+}
+.learn-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.learn-num {
+  position: absolute; top: -.4rem; right: .7rem; z-index: 0; user-select: none;
+  font: 800 3.6rem var(--display); letter-spacing: -.06em;
+  color: color-mix(in srgb, var(--brand-1) 10%, transparent);
+}
+.learn-card h3 { font-size: 1.04rem; position: relative; z-index: 1; }
+.learn-card > p { color: var(--text-dim); font-size: .88rem; line-height: 1.6; flex: 1; position: relative; z-index: 1; }
+.learn-icon {
+  width: 46px; height: 46px; display: grid; place-items: center;
+  color: var(--brand-1); background: var(--tint-1); border-radius: 12px; margin-bottom: .3rem;
+}
+.learn-icon .ui-icon { width: 24px; height: 24px; }
+.learn-do {
+  display: flex; align-items: flex-start; gap: .45rem; margin-top: auto;
+  padding: .5rem .7rem; border-radius: 10px;
+  color: var(--brand-1); background: var(--tint-1);
+  font-size: .76rem; font-weight: 700; line-height: 1.45;
+}
+.learn-do .ui-icon { flex-shrink: 0; margin-top: .15em; color: var(--brand-2); }
+
+/* ── study method timeline (about) ───────────────────────────────── */
+.method-steps { display: flex; flex-direction: column; gap: .8rem; margin-top: 1.75rem; }
+.method-step {
+  display: grid; grid-template-columns: 46px 1fr; gap: 1.1rem; align-items: start;
+  padding: 1.25rem 1.4rem;
+}
+.method-step-num {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--brand-grad); color: #fff;
+  font-weight: 900; font-size: 1.05rem;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-1) 30%, transparent);
+}
+.method-step h3 { font-size: 1.02rem; margin-bottom: .3rem; }
+.method-step p { color: var(--text-dim); font-size: .9rem; line-height: 1.65; }
+.method-step p code { font-size: .84em; }
+
+@media (max-width: 1024px) {
+  .learn-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .learn-grid { grid-template-columns: 1fr; }
+  .study-loop { padding: .7rem .85rem; }
+  .study-loop > strong { width: 100%; margin: 0; }
+  .loop-sep { display: none; }
+  .method-step { padding: 1rem; grid-template-columns: 38px 1fr; gap: .8rem; }
+  .method-step-num { width: 36px; height: 36px; font-size: .9rem; }
+}

@@ -33,6 +33,17 @@
       <div class="course-meta"><span>{{ icon('clock') }} {{ lesson.minutes }} min</span><span>{{ icon('bolt') }} {{ lesson.xp }} XP</span></div>
     </header>
 
+    <div class="card study-loop" role="note" aria-label="How to study this lesson"
+         title="The loop that makes Python stick: read the idea, predict what the code prints before running it, run it, change something and run again, pass the challenge without the solution, then let Smart Review bring it back tomorrow.">
+      <strong>{{ icon('brain') }} Study loop</strong>
+      <span class="loop-step" style="--i:0">{{ icon('book') }} Read</span><span class="loop-sep" aria-hidden="true">→</span>
+      <span class="loop-step" style="--i:1">{{ icon('bulb') }} Predict</span><span class="loop-sep" aria-hidden="true">→</span>
+      <span class="loop-step" style="--i:2">{{ icon('play') }} Run</span><span class="loop-sep" aria-hidden="true">→</span>
+      <span class="loop-step" style="--i:3">{{ icon('tools') }} Tweak</span><span class="loop-sep" aria-hidden="true">→</span>
+      <span class="loop-step" style="--i:4">{{ icon('target') }} Prove</span><span class="loop-sep" aria-hidden="true">→</span>
+      <span class="loop-step" style="--i:5">{{ icon('brain') }} Review</span>
+    </div>
+
     <details class="mobile-course-nav card">
       <summary>Lesson {{ idx + 1 }} of {{ n_lessons }} · View course roadmap</summary>
       <nav class="side-lessons" aria-label="Course lessons">
@@ -190,6 +201,7 @@
   PySprint.initLesson({
     course: {{ course.slug|tojson }},
     lesson: {{ lesson.slug|tojson }},
+    xp: {{ lesson.xp }},
     starter: {{ lesson.challenge.starter|tojson }},
     example: {{ lesson.example|tojson }},
     walkthrough: {{ walkthrough|tojson if walkthrough else 'null' }},

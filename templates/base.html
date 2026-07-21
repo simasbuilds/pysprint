@@ -101,13 +101,13 @@
           <div class="mega-menu" id="learnMenu" hidden>
             <div class="mega-intro">
               <span class="mega-kicker">{{ icon('path') }} Guided learning path</span>
-              <h2>From first line to useful Python.</h2>
-              <p>Six connected courses, live practice, and review that brings concepts back at the right time.</p>
+              <h2>From first line to expert Python.</h2>
+              <p>{{ n_courses }} connected courses, live practice, and review that brings concepts back at the right time.</p>
               <div class="mega-progress"><span style="width: 72%"></span></div>
-              <a class="mega-primary" href="{{ url_for('courses') }}">Explore all six courses →</a>
+              <a class="mega-primary" href="{{ url_for('courses') }}">Explore all {{ n_courses }} courses →</a>
             </div>
             <div class="mega-links">
-              <a href="{{ url_for('courses') }}"><span class="menu-icon">{{ icon('book') }}</span><div><strong>Course path</strong><small>34 focused lessons from syntax to automation</small></div><b>→</b></a>
+              <a href="{{ url_for('courses') }}"><span class="menu-icon">{{ icon('book') }}</span><div><strong>Course path</strong><small>{{ n_lessons }} focused lessons from syntax to expert Python</small></div><b>→</b></a>
               <a href="{{ url_for('challenges') }}"><span class="menu-icon">{{ icon('swords') }}</span><div><strong>Challenge arena</strong><small>Practice with graded, interview-style problems</small></div><b>→</b></a>
               <a href="{{ url_for('review') }}"><span class="menu-icon">{{ icon('brain') }}</span><div><strong>Smart Review</strong><small>Keep concepts with spaced repetition</small></div><b>→</b></a>
             </div>

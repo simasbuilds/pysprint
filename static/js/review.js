@@ -88,6 +88,9 @@
     }
     doneMsg.hidden = true;
     flashcard.style.display = '';
+    flashcard.classList.remove('deal', 'flipping');
+    void flashcard.offsetWidth;              // restart the deal animation
+    flashcard.classList.add('deal');
     current = queue[Math.floor(Math.random() * Math.min(queue.length, 5))];
     elCourse.textContent = current.course;
     elQ.textContent = current.q;
@@ -98,9 +101,15 @@
   function flip() {
     if (!current || flipped) return;
     flipped = true;
-    front.hidden = true;
-    back.hidden = false;
-    actions.hidden = false;
+    flashcard.classList.remove('deal');
+    flashcard.classList.add('flipping');
+    // Swap the faces at the animation's midpoint (90° — edge-on).
+    setTimeout(() => {
+      front.hidden = true;
+      back.hidden = false;
+      actions.hidden = false;
+    }, 220);
+    setTimeout(() => flashcard.classList.remove('flipping'), 500);
   }
 
   flashcard.addEventListener('click', flip);

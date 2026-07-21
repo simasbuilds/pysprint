@@ -38,7 +38,7 @@
     </ul>
 
     <h2>The path</h2>
-    <p>{{ n_lessons }} lessons across six courses take you from <code>print("Hello")</code> to designing REST APIs and writing automation scripts — plus {{ n_challenges }} arena challenges including genuine interview classics.</p>
+    <p>{{ n_lessons }} lessons across {{ n_courses }} courses take you from <code>print("Hello")</code> through REST APIs and automation all the way to expert Python — generators, decorators, context managers and the data model — plus {{ n_challenges }} arena challenges including genuine interview classics.</p>
 
     <h2>Open source</h2>
     <p>PySprint is built by <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">simasbuilds</a> with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
@@ -52,6 +52,51 @@
         <div><dt>100%</dt><dd>free curriculum</dd></div>
       </dl>
     </aside>
+  </div>
+</section>
+
+<section class="section narrow">
+  <div class="outcomes-head">
+    <span class="eyebrow">The study method</span>
+    <h2>How to work through a lesson</h2>
+    <p>Motivation gets you to the page; method gets the Python into your head. Run every lesson through this loop and you will not need to "relearn the basics" ever again.</p>
+  </div>
+  <div class="method-steps">
+    <article class="method-step card">
+      <span class="method-step-num">1</span>
+      <div>
+        <h3>Read the idea once — then move</h3>
+        <p>Lessons are deliberately short. Don't reread until it "feels" understood; understanding comes from the keyboard, not the paragraph. One pass, then straight to the code.</p>
+      </div>
+    </article>
+    <article class="method-step card">
+      <span class="method-step-num">2</span>
+      <div>
+        <h3>Predict the output before every Run</h3>
+        <p>Look at the example and commit to a guess — out loud or in your notes. This is <strong>active recall</strong>, the single highest-leverage habit in learning research. A wrong prediction teaches more than a right reread.</p>
+      </div>
+    </article>
+    <article class="method-step card">
+      <span class="method-step-num">3</span>
+      <div>
+        <h3>Tweak it until it breaks</h3>
+        <p>Change a value. Rename a variable. Delete a line. Every traceback you cause on purpose is one you'll recognise calmly when it happens by accident. Each run starts a fresh Python process, so nothing can actually go wrong.</p>
+      </div>
+    </article>
+    <article class="method-step card">
+      <span class="method-step-num">4</span>
+      <div>
+        <h3>Pass the challenge honestly</h3>
+        <p>The struggle <em>is</em> the workout. Take a hint before the solution, and if you do read the solution, close it and retype the idea from memory — copying output-shaped pixels teaches nothing.</p>
+      </div>
+    </article>
+    <article class="method-step card">
+      <span class="method-step-num">5</span>
+      <div>
+        <h3>Come back tomorrow for five minutes</h3>
+        <p>Finish your session by opening <a href="{{ url_for('review') }}">Smart Review</a> the next day. Five minutes of spaced repetition protects hours of learning — it's the difference between "I did that course once" and "I know Python".</p>
+      </div>
+    </article>
   </div>
 </section>
 {% endblock %}

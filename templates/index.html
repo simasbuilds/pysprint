@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
 {% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
-{% block description %}Master Python with {{ n_lessons }} interactive lessons across 6 courses — from your first print() to building real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
+{% block description %}Master Python with {{ n_lessons }} interactive lessons across {{ n_courses }} courses — from your first print() to decorators, generators and real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -23,7 +23,7 @@
   <div class="hero-inner">
     <div class="hero-copy">
       <span class="pill stagger d1"><span class="pulse-dot"></span> Real Python · Free forever · Zero setup</span>
-      <h1 class="stagger d2">Learn Python by <span class="grad">building things that work.</span></h1>
+      <h1 class="stagger d2">Learn Python by building <span class="word-rotate" data-words='["things that work.","real APIs.","data tools.","automations.","expert habits."]'><span class="grad">things that work.</span></span></h1>
       <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
       <div class="hero-cta stagger d4">
         {% if user %}
@@ -75,13 +75,13 @@ for i in range(3):
   <div class="section-kicker"><span>01</span><p>Structured curriculum</p></div>
   <div class="path-feature">
     <img src="{{ url_for('static', filename='images/learning-path.png') }}"
-         alt="Six connected stations progressing from syntax to Python automation"
-         width="1657" height="949" loading="lazy">
-    <div class="path-feature-copy">
+         alt="Connected stations progressing from syntax to expert Python"
+         width="1657" height="949" loading="lazy" data-reveal="left">
+    <div class="path-feature-copy" data-reveal="right">
       <span class="eyebrow">A route you can trust</span>
-      <h2>A complete path, <span class="grad">beginner to builder</span></h2>
-      <p>Six courses build on one another. Start with zero experience and finish by designing APIs, processing real data, and automating repetitive work.</p>
-      <div class="path-checks"><span>{{ icon('check') }} 34 focused lessons</span><span>{{ icon('check') }} 5 portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
+      <h2>A complete path, <span class="grad">beginner to expert</span></h2>
+      <p>{{ n_courses }} courses build on one another. Start with zero experience and finish by designing APIs, automating real work, and writing the generators, decorators and dataclasses that professionals write.</p>
+      <div class="path-checks"><span>{{ icon('check') }} {{ n_lessons }} focused lessons</span><span>{{ icon('check') }} 5 portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
       <a href="{{ url_for('courses') }}" class="text-cta">Explore the curriculum <span>→</span></a>
     </div>
   </div>
@@ -150,8 +150,8 @@ for i in range(3):
   <div class="project-showcase">
     <img src="{{ url_for('static', filename='images/real-projects.png') }}"
          alt="Python powering budget, security, sales, task and webhook projects"
-         width="1774" height="887" loading="lazy">
-    <div>
+         width="1774" height="887" loading="lazy" data-reveal="left">
+    <div data-reveal="right">
       <span class="eyebrow">From lesson to shipped</span>
       <h2>Build <span class="grad">real software</span>, step by step</h2>
       <p>Five guided builds model production systems. Understand the architecture, complete each graded stage, then ship something you can explain.</p>
@@ -171,6 +171,47 @@ for i in range(3):
       <span class="project-go">Build it →</span>
     </a>
     {% endfor %}
+  </div>
+</section>
+
+<section class="section learn-section">
+  <div class="section-kicker"><span>04</span><p>Learning science</p></div>
+  <div class="catalog-head">
+    <div>
+      <span class="eyebrow">How to actually learn Python</span>
+      <h2>Four habits separate people who <span class="grad">finish</span> from people who restart.</h2>
+    </div>
+    <p>Every mechanic on PySprint exists to enforce one of these evidence-backed habits. Steal them — they work everywhere, not just here.</p>
+  </div>
+  <div class="learn-grid">
+    <div class="learn-card card">
+      <span class="learn-num" aria-hidden="true">01</span>
+      <span class="learn-icon">{{ icon('calendar') }}</span>
+      <h3>Show up daily, briefly</h3>
+      <p>Twenty minutes a day beats a four-hour Sunday. Spacing practice across days is one of the most replicated results in memory research.</p>
+      <span class="learn-do">{{ icon('check') }} Here: streaks reward one honest lesson a day.</span>
+    </div>
+    <div class="learn-card card">
+      <span class="learn-num" aria-hidden="true">02</span>
+      <span class="learn-icon">{{ icon('bulb') }}</span>
+      <h3>Predict before you run</h3>
+      <p>Say the output out loud <em>before</em> hitting Run. Right or wrong, the act of retrieving is what writes the concept into long-term memory — rereading doesn't.</p>
+      <span class="learn-do">{{ icon('check') }} Here: every lesson has a live editor built for guessing first.</span>
+    </div>
+    <div class="learn-card card">
+      <span class="learn-num" aria-hidden="true">03</span>
+      <span class="learn-icon">{{ icon('warning') }}</span>
+      <h3>Break things on purpose</h3>
+      <p>Change a value, delete a line, misspell a name — then read the traceback. Programmers aren't people who avoid errors; they're people errors don't scare.</p>
+      <span class="learn-do">{{ icon('check') }} Here: a fresh Python process every run means nothing can truly break.</span>
+    </div>
+    <div class="learn-card card">
+      <span class="learn-num" aria-hidden="true">04</span>
+      <span class="learn-icon">{{ icon('brain') }}</span>
+      <h3>Review before you forget</h3>
+      <p>Knowledge decays on a schedule, and reviewing right before the dip resets the curve for weeks. That's spaced repetition — the closest thing learning has to a cheat code.</p>
+      <span class="learn-do">{{ icon('check') }} Here: Smart Review reschedules every concept automatically.</span>
+    </div>
   </div>
 </section>
 
