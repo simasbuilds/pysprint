@@ -329,6 +329,147 @@ LESSON_EXTRAS = {
         "pro_tip": "Add argparse and your script becomes a real CLI tool: python analyze.py access.log --since 12:00. That jump — from script to tool a teammate can run — is what gets automation adopted.",
     },
 
+    # ── python-games ─────────────────────────────────────────────────
+    ("python-games", "guessing-game"): {
+        "real_world": "The check-and-respond loop you just built is the event loop inside every interactive program: games, chat apps, even web servers do exactly this — receive input, branch, respond, repeat.",
+        "pitfalls": [
+            "Getting the branch order wrong so a case can never be reached — test all three paths (low, high, equal).",
+            "Using <code>=</code> where you mean <code>==</code> inside a condition — assignment vs comparison.",
+            "Forgetting to indent the if/elif/else inside the for loop, so only the last guess is checked.",
+        ],
+        "pro_tip": "When logic misbehaves, print the state each turn: print(guess, 'vs', secret). Watching values flow through a loop fixes most bugs faster than staring at the code.",
+    },
+    ("python-games", "dice-luck"): {
+        "real_world": "Seeded randomness runs the world's simulations: game worlds (a Minecraft world is a seed), scientific Monte-Carlo models, and every automated test of 'random' behaviour. Reproducible luck is a professional tool.",
+        "pitfalls": [
+            "Calling random.seed() inside the loop — that restarts the sequence and every 'roll' becomes identical.",
+            "Expecting randint(1, 6) to exclude 6 — unlike range(), it includes both endpoints.",
+            "Rolling one die and doubling it: <code>2 * randint(1, 6)</code> can never produce 7 and has completely different odds from two real dice.",
+        ],
+        "pro_tip": "random.choice(list) and random.shuffle(list) cover most game needs without index math — picking a random enemy is one readable line.",
+    },
+    ("python-games", "ascii-art"): {
+        "real_world": "Progress bars, terminal dashboards, board-game grids and even the loading spinners in CLI tools are all 'draw with loops'. htop and git's progress output are professional ASCII art.",
+        "pitfalls": [
+            "Off-by-one ranges: range(1, 5) gives four rows, not five — check your endpoints against the shape.",
+            "Forgetting the third argument of range() for counting down: range(3, 0, -1), not range(3, 0).",
+            "Building one giant string when a print-per-row loop is clearer and easier to debug.",
+        ],
+        "pro_tip": "Center shapes with str.center(): print((\"*\" * i).center(9)) turns your triangle into a pyramid — width math handled for you.",
+    },
+    ("python-games", "word-games"): {
+        "real_world": "Normalise-then-compare powers case-insensitive logins, search engines, duplicate detection and spell checkers. DNA analysis uses the same reversal tricks on genetic sequences.",
+        "pitfalls": [
+            "Comparing without normalising case first — 'Level' != 'level' to Python.",
+            "Confusing word.reverse() (doesn't exist for strings) with the slice word[::-1].",
+            "Testing the original word instead of the cleaned one after lowering it — clean, then use the clean value everywhere.",
+        ],
+        "pro_tip": "For phrase palindromes ('Never odd or even'), strip non-letters first: clean = \"\".join(ch for ch in text.lower() if ch.isalpha()). One comprehension makes the test bulletproof.",
+    },
+    ("python-games", "adventure-game"): {
+        "real_world": "Data-driven design — world as data, engine as code — is how real games ship: level editors write data files, the engine stays unchanged. It's also how CMSs, chatbots and workflow tools scale content without new code.",
+        "pitfalls": [
+            "A typo between a path entry and a room key → KeyError. Keys must match exactly, including case.",
+            "Putting story text in the loop instead of the dict — then every new room needs new code, defeating the design.",
+            "Printing the final message inside the loop (indented) so it repeats after every room.",
+        ],
+        "pro_tip": "Give each room a dict of exits — \"hall\": {\"desc\": ..., \"exits\": {\"north\": \"library\"}} — and your walk can become a real free-roaming game with about ten more lines.",
+    },
+
+    # ── algorithms ───────────────────────────────────────────────────
+    ("algorithms", "decomposition"): {
+        "real_world": "Ticket breakdowns, pseudocode in design docs, TODO-comment skeletons — decomposition is the daily bread of professional programming. Interviewers score the way you split the problem before they score your syntax.",
+        "pitfalls": [
+            "Starting to type before you can say the steps out loud — blank-editor paralysis is a planning gap, not a skill gap.",
+            "Steps that are too big ('process the data') — a good step maps to one or two lines of code.",
+            "Skipping the 'what comes out?' question and coding toward the wrong output format.",
+        ],
+        "pro_tip": "If a step feels hard to code, decompose that step again. Recursion isn't only for functions — it's how you plan.",
+    },
+    ("algorithms", "searching"): {
+        "real_world": "Database indexes, autocomplete, DNS resolution and git bisect all live on binary search. 'Can I halve this?' is the question behind almost every system that answers instantly at scale.",
+        "pitfalls": [
+            "Running binary search on unsorted data — it silently returns nonsense rather than erroring.",
+            "Writing while low < high instead of low <= high and missing the last candidate.",
+            "Forgetting the +1/-1 when moving low or high, which loops forever on some targets.",
+        ],
+        "pro_tip": "Python ships binary search as the bisect module: bisect.bisect_left(sorted_list, target) — use it in real code, write it by hand in interviews.",
+    },
+    ("algorithms", "sorting"): {
+        "real_world": "Every table header you've ever clicked runs a key-based sort. Timsort — invented for Python — now also sorts Java and Android. The tuple-key trick handles real reporting: department, then salary, then name.",
+        "pitfalls": [
+            "Confusing sorted(items) (returns a new list) with items.sort() (in place, returns None) — printing the result of .sort() gives None.",
+            "Sorting strings expecting numeric order: \"10\" < \"9\" alphabetically. Convert first or use key=int.",
+            "Reaching for cmp-style comparison logic — Python only does key functions, which are simpler anyway.",
+        ],
+        "pro_tip": "Sort descending on one field and ascending on another by negating numbers: key=lambda r: (-r[\"score\"], r[\"name\"]).",
+    },
+    ("algorithms", "recursion"): {
+        "real_world": "File-tree walkers, JSON serialisers, comment threads, org charts, compilers — anything nested is naturally recursive. os.walk and json.dumps are recursion you already use.",
+        "pitfalls": [
+            "No reachable base case → RecursionError at ~1000 frames.",
+            "Forgetting <code>return</code> on the recursive call: <code>digit_sum(n // 10)</code> computes the value and throws it away — you need <code>return n % 10 + digit_sum(...)</code>.",
+            "Recursing on the same input instead of a smaller one — shrinkage is what guarantees termination.",
+        ],
+        "pro_tip": "Trust the recursive call. Verify the base case, verify one step, and stop mentally unrolling five levels — that discipline is what makes recursion easy.",
+    },
+    ("algorithms", "counting-steps"): {
+        "real_world": "Big-O is the shared language of code review and system design: 'this endpoint is O(n²) on cart size' is a complete bug report. It predicts at design time what profilers confirm in production.",
+        "pitfalls": [
+            "Judging speed by lines of code — one nested loop outweighs fifty straight-line statements.",
+            "Hiding a loop inside a loop accidentally: <code>if x in big_list</code> inside a for is O(n²) in disguise. Use a set.",
+            "Optimising an O(n) function when the real cost is an O(n²) block elsewhere — count first, optimise second.",
+        ],
+        "pro_tip": "Memorise three growth feelings: log n (barely notices data), n (scales linearly), n² (fine at 100, dead at 100,000). Most day-to-day performance calls need nothing more.",
+    },
+
+    # ── data-analysis ────────────────────────────────────────────────
+    ("data-analysis", "describing-data"): {
+        "real_world": "'Median household income', 'average response time', 'most common error' — every metrics dashboard and news statistic is these three functions. Choosing mean vs median honestly is half of data literacy.",
+        "pitfalls": [
+            "Reporting the mean of skewed data (salaries, house prices, response times) — one outlier misleads everyone downstream.",
+            "Calling mode() on data with no repeats — in older Pythons it raised; modern statistics.mode returns the first value, which may surprise you.",
+            "Doing sum(x)/len(x) on an empty list → ZeroDivisionError. Guard empty datasets before describing them.",
+        ],
+        "pro_tip": "statistics.quantiles(data, n=4) gives quartiles — the p25/p50/p75 shape of your data. Engineers report p95 latency, not the average, for exactly the outlier reasons above.",
+    },
+    ("data-analysis", "cleaning-data"): {
+        "real_world": "Analysts genuinely spend most of their time here: exported CSVs with stray spaces, 'N/A', euro signs and thousands separators. Robust cleaning is why senior analysts' numbers are trusted.",
+        "pitfalls": [
+            "Cleaning while iterating the same list you're modifying — build a new clean list instead.",
+            "int(\"3.5\") raises ValueError — parse decimals with float() first if decimals are possible.",
+            "Silently dropping bad rows without counting them — in real work, the skip count is itself a data-quality metric.",
+        ],
+        "pro_tip": "Normalise aggressively before converting: value.strip().lower().replace(\",\", \"\").removeprefix(\"€\") handles most European CSV horrors in one chain.",
+    },
+    ("data-analysis", "grouping-data"): {
+        "real_world": "GROUP BY in SQL, groupby() in pandas, pivot tables in Excel — the dict accumulator is the same operation with the curtain pulled back. Understanding it here means those tools become syntax, not magic.",
+        "pitfalls": [
+            "totals[key] += value without initialising → KeyError on the first sighting of each key. Use .get(key, 0) or defaultdict.",
+            "Assuming dict iteration order is sorted — it's insertion order. Sort explicitly when reporting.",
+            "Accumulating floats and being surprised by 0.30000000000000004 — round at display time, not during accumulation.",
+        ],
+        "pro_tip": "from collections import defaultdict; totals = defaultdict(float) removes the .get dance entirely: totals[key] += value just works.",
+    },
+    ("data-analysis", "rankings"): {
+        "real_world": "Top-N queries power every leaderboard, 'best sellers' shelf, alerting system ('5 slowest endpoints') and recommendation panel. It's among the most-run query shapes in industry.",
+        "pitfalls": [
+            "Sorting the dict instead of its .items() — you'll rank keys alphabetically and wonder where the numbers went.",
+            "Forgetting reverse=True and shipping a bottom-3 as your top-3.",
+            "Slicing before sorting — [:3] on unsorted items is just the first three, not the best three.",
+        ],
+        "pro_tip": "For huge datasets, heapq.nlargest(3, units.items(), key=lambda p: p[1]) finds the podium without fully sorting a million rows.",
+    },
+    ("data-analysis", "insight-report"): {
+        "real_world": "This is the nightly job at thousands of companies: parse yesterday's transactions, skip the garbage, total by region, email the summary. You've written the core of a BI pipeline in ~15 lines.",
+        "pitfalls": [
+            "Counting a row as valid before it survives conversion — increment inside the try, after int() succeeds.",
+            "row.split(\",\") assuming exactly two fields — a stray comma shifts everything; in real work check the field count.",
+            "Reporting totals but not the denominator — '490 revenue' means little without 'from 5 valid rows of 6'.",
+        ],
+        "pro_tip": "Structure real pipelines as three functions — parse(rows), aggregate(records), report(totals) — so each stage is testable alone. The csv module then replaces your split(\",\") for free.",
+    },
+
     # ── expert-python ────────────────────────────────────────────────
     ("expert-python", "generators"): {
         "real_world": "Generators are how Python streams anything bigger than RAM: Django querysets, csv.reader, database cursors and every line-by-line log processor are lazy iterators. Data engineers chain generators into pipelines that crunch terabytes on a laptop.",

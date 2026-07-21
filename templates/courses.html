@@ -33,6 +33,14 @@
     <div><span class="eyebrow">Course catalog</span><h2>Choose your next capability</h2></div>
     <p>New to Python? Follow the order. Already coding? Jump directly to the skill you need.</p>
   </div>
+  <a class="card starter-callout" href="{{ url_for('lesson', slug='python-fundamentals', lesson_slug='hello-python') }}">
+    <span class="starter-callout-icon">{{ icon('spark') }}</span>
+    <div>
+      <strong>Never written a line of code before?</strong>
+      <small>Skip the decisions — open “Hello, Python!” and you'll run your first real program in about a minute. No account needed.</small>
+    </div>
+    <b aria-hidden="true">→</b>
+  </a>
   <div class="filter-chips" role="group" aria-label="Filter by level">
     <button class="chip on" data-level="all">All levels</button>
     <button class="chip" data-level="beginner">Beginner</button>

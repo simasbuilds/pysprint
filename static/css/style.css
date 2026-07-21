@@ -2285,3 +2285,21 @@ body {
   .method-step { padding: 1rem; grid-template-columns: 38px 1fr; gap: .8rem; }
   .method-step-num { width: 36px; height: 36px; font-size: .9rem; }
 }
+
+/* ── "never coded before?" fast-start callout ────────────────────── */
+.starter-callout {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 1.5rem 0 .25rem; padding: 1.1rem 1.35rem;
+  color: var(--text); border-left: 4px solid var(--brand-2);
+  background: linear-gradient(100deg, var(--tint-2), transparent 55%), var(--surface);
+}
+.starter-callout:hover { text-decoration: none; transform: translateX(4px); box-shadow: var(--shadow-lg); }
+.starter-callout-icon {
+  width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center;
+  color: var(--brand-2); background: var(--tint-2); border-radius: 12px;
+}
+.starter-callout-icon .ui-icon { width: 24px; height: 24px; }
+.starter-callout strong { display: block; font-size: .98rem; }
+.starter-callout small { color: var(--text-dim); font-size: .82rem; line-height: 1.45; }
+.starter-callout > b { margin-left: auto; color: var(--brand-2); font-size: 1.2rem; transition: transform .15s; }
+.starter-callout:hover > b { transform: translateX(4px); }

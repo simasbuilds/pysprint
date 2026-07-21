@@ -28,6 +28,9 @@ load_dotenv()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 app.config["SITE_URL"] = os.environ.get("SITE_URL", "http://127.0.0.1:5000")
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
 
 db.init_db()
 
@@ -41,6 +44,13 @@ LEVEL_TITLES = ["Newcomer", "Explorer", "Apprentice", "Coder", "Builder",
 def current_user():
     uid = session.get("user_id")
     return db.get_user(uid) if uid else None
+
+
+def safe_next(target):
+    """Only allow same-site relative redirect targets (no open redirects)."""
+    if target and target.startswith("/") and not target.startswith(("//", "/\\")):
+        return target
+    return None
 
 
 def login_required(fn):
@@ -74,6 +84,7 @@ def user_stats(user):
         "lessons_done": sum(len(v) for v in lessons_by_course.values()),
         "courses_done": courses_done,
         "challenges_done": len(challenges & ARENA_SLUGS),
+        "total_challenges": len(CHALLENGES),
         "projects_done": len({s for s in challenges if s.startswith("project:")}),
         "total_projects": len(PROJECTS),
         "xp": user["xp"],
@@ -302,7 +313,7 @@ def login():
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
             session.permanent = True
-            return redirect(request.args.get("next") or url_for("dashboard"))
+            return redirect(safe_next(request.args.get("next")) or url_for("dashboard"))
         error = "Invalid credentials — check your username and password."
     return render_template("login.html", error=error)
 

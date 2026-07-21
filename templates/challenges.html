@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
 {% block title %}Python Challenge Arena — PySprint{% endblock %}
-{% block description %}Test your Python skills against 10 graded coding challenges — from vowel counters to rate limiters. Earn big XP and climb the leaderboard.{% endblock %}
+{% block description %}Test your Python skills against {{ challenges|length }} graded coding challenges — from vowel counters to rate limiters. Earn big XP and climb the leaderboard.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ItemList","name":"Interactive Python coding challenges","numberOfItems":{{ challenges|length }},"itemListElement":[
@@ -13,7 +13,7 @@
 {% block content %}
 <section class="directory-hero arena-hero">
   <div class="directory-copy">
-    <span class="eyebrow">10 problems · Easy to hard</span>
+    <span class="eyebrow">{{ challenges|length }} problems · Easy to hard</span>
     <h1>Pressure-test your <span class="grad">Python instincts.</span></h1>
     <p>Standalone problems with a blank workspace, instant output checks, optional hints, and XP for every clean solution.</p>
     <div class="directory-actions">
@@ -23,8 +23,8 @@
   </div>
   <div class="arena-visual" aria-hidden="true">
     <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}" alt="" width="1588" height="991">
-    <div class="arena-score"><strong>10</strong><span>problems</span></div>
-    <div class="arena-score second"><strong>90</strong><span>max XP</span></div>
+    <div class="arena-score"><strong>{{ challenges|length }}</strong><span>problems</span></div>
+    <div class="arena-score second"><strong>{{ challenges|sum(attribute='xp') }}</strong><span>max XP</span></div>
   </div>
 </section>
 

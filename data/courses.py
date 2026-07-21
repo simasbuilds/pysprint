@@ -241,6 +241,173 @@ COURSES = [
     },
 
     # ══════════════════════════════════════════════════════════════════
+    # COURSE — PLAYFUL PYTHON: GAMES & PUZZLES
+    # ══════════════════════════════════════════════════════════════════
+    {
+        "slug": "python-games",
+        "title": "Playful Python: Games & Puzzles",
+        "tagline": "Learn logic the fun way — build tiny games from your very first week.",
+        "level": "Beginner",
+        "color": "#f59e0b",
+        "icon": "gamepad",
+        "description": "The most fun way to cement the basics. Build a guessing game, roll (reproducible) dice, draw ASCII art, play word games and ship a tiny text adventure — while quietly mastering conditionals, loops, strings and dictionaries.",
+        "lessons": [
+            {
+                "slug": "guessing-game",
+                "title": "The Guessing Game: Your First Game Logic",
+                "minutes": 10, "xp": 25,
+                "content": """
+<p>Almost every game is the same three-beat loop: the player acts, the game <strong>checks</strong>, the game <strong>responds</strong>. You already know enough Python to build that:</p>
+<ul>
+<li><code>if guess &lt; secret:</code> — the check</li>
+<li><code>print("Too low!")</code> — the response</li>
+<li>A <code>for</code> loop — one turn per guess</li>
+</ul>
+<p>Real games read the player's input live; here we simulate a player with a list of guesses so the game runs the same way every time. Everything else — the logic — is identical to the real thing.</p>
+<p>Notice the order matters: check <em>too low</em>, then <em>too high</em>, and let <code>else</code> handle the win. When you can predict which branch runs for any guess, you think like a game programmer.</p>
+""",
+                "example": 'secret = 7\nguess = 5\n\nif guess < secret:\n    print("Too low!")\nelif guess > secret:\n    print("Too high!")\nelse:\n    print("You got it!")',
+                "challenge": {
+                    "prompt": "The secret number is <code>7</code>. A player guesses <code>3</code>, then <code>9</code>, then <code>7</code>. Loop over the guesses and print <code>Too low!</code>, <code>Too high!</code> or <code>You got it!</code> for each one.",
+                    "starter": "secret = 7\nguesses = [3, 9, 7]\n\n# loop over guesses and respond to each one\n",
+                    "expected_output": "Too low!\nToo high!\nYou got it!",
+                    "hint": "for guess in guesses: then the same if / elif / else from the example, indented inside the loop.",
+                    "solution": 'secret = 7\nguesses = [3, 9, 7]\n\nfor guess in guesses:\n    if guess < secret:\n        print("Too low!")\n    elif guess > secret:\n        print("Too high!")\n    else:\n        print("You got it!")',
+                },
+                "quiz": [
+                    {"q": "In if guess < secret: ... elif guess > secret: ... else: ..., when does else run?",
+                     "options": ["Never", "When the guess equals the secret", "When the guess is too low", "Always"],
+                     "answer": 1, "explain": "If it's neither lower nor higher, the only possibility left is equal — that's the win."},
+                    {"q": "Why simulate the player with a list of guesses here?",
+                     "options": ["Python has no input", "So the program runs the same way every time and can be checked", "Lists are faster", "It's the only way to loop"],
+                     "answer": 1, "explain": "Deterministic input makes the game testable — the same trick professionals use in automated game tests."},
+                ],
+            },
+            {
+                "slug": "dice-luck",
+                "title": "Dice, Luck & random (with a Seed)",
+                "minutes": 12, "xp": 25,
+                "content": """
+<p>Games need luck, and Python's <code>random</code> module provides it: <code>random.randint(1, 6)</code> is a die roll. But there's a professional secret hiding here:</p>
+<p><strong><code>random.seed(n)</code> makes randomness repeatable.</strong> Seed the generator and the "random" sequence is exactly the same every run. That sounds like cheating — it's actually how games are tested, how Minecraft shares worlds (a world <em>is</em> a seed), and how scientists make simulations reproducible.</p>
+<ul>
+<li><code>random.randint(a, b)</code> — whole number from a to b, inclusive</li>
+<li><code>random.choice(items)</code> — pick one item from a list</li>
+<li><code>random.seed(n)</code> — same seed → same sequence, every time</li>
+</ul>
+""",
+                "example": 'import random\n\nrandom.seed(42)          # same seed = same "luck" every run\nfor _ in range(3):\n    print("You rolled", random.randint(1, 6))\n\nprint(random.choice(["goblin", "dragon", "slime"]), "appears!")',
+                "challenge": {
+                    "prompt": "Seed the generator with <code>random.seed(1)</code>, then roll two dice three times. For each round print <code>Roll N: A + B = total</code> (roll both dice with <code>randint(1, 6)</code>, first die first).",
+                    "starter": "import random\n\nrandom.seed(1)\n# roll two dice, three times, printing each round\n",
+                    "expected_output": "Roll 1: 2 + 5 = 7\nRoll 2: 1 + 3 = 4\nRoll 3: 1 + 4 = 5",
+                    "hint": "for i in range(1, 4): roll a = randint(1, 6) then b = randint(1, 6), then print(f\"Roll {i}: {a} + {b} = {a + b}\").",
+                    "solution": 'import random\n\nrandom.seed(1)\nfor i in range(1, 4):\n    a = random.randint(1, 6)\n    b = random.randint(1, 6)\n    print(f"Roll {i}: {a} + {b} = {a + b}")',
+                },
+                "quiz": [
+                    {"q": "What does random.seed(1) guarantee?",
+                     "options": ["Rolls of only 1", "The same sequence of random numbers every run", "Fairer dice", "Faster random numbers"],
+                     "answer": 1, "explain": "Seeding fixes the starting point of the generator — identical sequence, every run. Great for tests and shareable game worlds."},
+                    {"q": "random.randint(1, 6) can return…",
+                     "options": ["1 to 5", "0 to 6", "1 to 6, including both ends", "2 to 6"],
+                     "answer": 2, "explain": "Unusually for Python, randint includes both endpoints — perfect for dice."},
+                ],
+            },
+            {
+                "slug": "ascii-art",
+                "title": "Draw with Loops: ASCII Art",
+                "minutes": 10, "xp": 25,
+                "content": """
+<p>Multiplying a string repeats it: <code>"*" * 4</code> is <code>"****"</code>. Combine that with a loop counter and you can <em>draw</em>:</p>
+<ul>
+<li><code>range(1, 5)</code> counts 1, 2, 3, 4 — a growing shape</li>
+<li><code>range(3, 0, -1)</code> counts 3, 2, 1 — a shrinking one (the third number is the step)</li>
+<li><code>print("*" * i)</code> turns the count into a row</li>
+</ul>
+<p>This is the gym where loops become intuition. When you can look at a shape and <em>see</em> the loop that draws it, iteration has clicked — and that's the exact skill behind rendering game boards, progress bars and terminal dashboards.</p>
+""",
+                "example": '# A growing triangle\nfor i in range(1, 5):\n    print("*" * i)\n\n# A brick wall\nfor row in range(3):\n    print("# " * 5)',
+                "challenge": {
+                    "prompt": "Draw an arrow: a triangle growing from 1 to 4 stars, then shrinking from 3 back to 1 (each row on its own line).",
+                    "starter": "# grow 1 -> 4, then shrink 3 -> 1\n",
+                    "expected_output": "*\n**\n***\n****\n***\n**\n*",
+                    "hint": "Two loops: range(1, 5) growing, then range(3, 0, -1) shrinking. Each prints \"*\" * i.",
+                    "solution": 'for i in range(1, 5):\n    print("*" * i)\nfor i in range(3, 0, -1):\n    print("*" * i)',
+                },
+                "quiz": [
+                    {"q": "What does \"ha\" * 3 produce?",
+                     "options": ["An error", "hahaha", "ha3", "ha ha ha"],
+                     "answer": 1, "explain": "Multiplying a string by an int repeats it back-to-back."},
+                    {"q": "What does range(3, 0, -1) generate?",
+                     "options": ["3, 2, 1", "3, 2, 1, 0", "0, 1, 2, 3", "An empty range"],
+                     "answer": 0, "explain": "Start 3, stop before 0, stepping by -1: 3, 2, 1."},
+                ],
+            },
+            {
+                "slug": "word-games",
+                "title": "Word Games: Palindromes & Flips",
+                "minutes": 12, "xp": 30,
+                "content": """
+<p>Strings hide a whole toy box. The star trick is <strong>slicing with a negative step</strong>: <code>word[::-1]</code> reads the string backwards.</p>
+<p>A <strong>palindrome</strong> reads the same both ways ("racecar"). The test writes itself — but real words have capital letters, so normalise first:</p>
+<ul>
+<li><code>word.lower()</code> — level the playing field</li>
+<li><code>word[::-1]</code> — the reversed string</li>
+<li><code>clean == clean[::-1]</code> — the palindrome test</li>
+</ul>
+<p>This normalise-then-compare pattern is everywhere in real code: case-insensitive logins, search matching, de-duplicating names. You're learning it with toys; you'll use it at work.</p>
+""",
+                "example": 'word = "Racecar"\nclean = word.lower()\nprint(clean[::-1])                 # backwards\nprint(clean == clean[::-1])        # palindrome?',
+                "challenge": {
+                    "prompt": "For each word in <code>[\"Level\", \"python\", \"Racecar\"]</code>, print <code>word -&gt; palindrome!</code> if it reads the same backwards (ignoring case), otherwise <code>word -&gt; not a palindrome</code>. Keep the word's original capitalisation in the output.",
+                    "starter": 'words = ["Level", "python", "Racecar"]\n\n# test each word, ignoring case\n',
+                    "expected_output": "Level -> palindrome!\npython -> not a palindrome\nRacecar -> palindrome!",
+                    "hint": "clean = word.lower(), then compare clean == clean[::-1]. Print with f\"{word} -> ...\".",
+                    "solution": 'words = ["Level", "python", "Racecar"]\n\nfor word in words:\n    clean = word.lower()\n    if clean == clean[::-1]:\n        print(f"{word} -> palindrome!")\n    else:\n        print(f"{word} -> not a palindrome")',
+                },
+                "quiz": [
+                    {"q": "What does \"python\"[::-1] evaluate to?",
+                     "options": ["python", "nohtyp", "p", "An error"],
+                     "answer": 1, "explain": "A slice with step -1 walks the string backwards."},
+                    {"q": "Why call .lower() before the palindrome test?",
+                     "options": ["It's required by slicing", "So 'Level' matches 'level' — comparisons are case-sensitive", "It removes spaces", "It reverses the string"],
+                     "answer": 1, "explain": "\"L\" != \"l\" in Python. Normalising case first makes the comparison fair."},
+                ],
+            },
+            {
+                "slug": "adventure-game",
+                "title": "Capstone: Tiny Text Adventure",
+                "minutes": 15, "xp": 40,
+                "content": """
+<p>Time to ship a game. Every text adventure — from 1977's Zork to modern interactive fiction — is built on one idea: <strong>the world is a dictionary</strong>.</p>
+<ul>
+<li>Keys are room names: <code>"hall"</code>, <code>"library"</code>, <code>"vault"</code></li>
+<li>Values are what the player sees there</li>
+<li>The player's journey is just a list of keys to visit</li>
+</ul>
+<p>Walk the path with a loop, look each room up with <code>rooms[name]</code>, and narrate. That's the whole engine. Want more rooms, items, or monsters? Add keys. The <em>data</em> grows; the <em>code</em> stays the same — that separation of data from logic is one of the biggest ideas in software, and you're about to use it.</p>
+""",
+                "example": 'rooms = {\n    "cave": "Drip. Drip. Something glitters ahead.",\n    "chamber": "A chest! It creaks open...",\n}\n\nfor name in ["cave", "chamber"]:\n    print(f"You enter the {name}.")\n    print(rooms[name])',
+                "challenge": {
+                    "prompt": "Using the rooms and path in the starter, print <code>You enter the {room}.</code> followed by the room's description for each stop on the path — then print <code>Quest complete!</code> at the end.",
+                    "starter": 'rooms = {\n    "hall": "A dusty hall. Doors lead north and east.",\n    "library": "Shelves of ancient Python books.",\n    "vault": "The vault! Treasure: 100 XP.",\n}\npath = ["hall", "library", "vault"]\n\n# walk the path, narrating each room\n',
+                    "expected_output": "You enter the hall.\nA dusty hall. Doors lead north and east.\nYou enter the library.\nShelves of ancient Python books.\nYou enter the vault.\nThe vault! Treasure: 100 XP.\nQuest complete!",
+                    "hint": "for name in path: print the f-string, then print(rooms[name]). The final print goes after the loop (unindented).",
+                    "solution": 'rooms = {\n    "hall": "A dusty hall. Doors lead north and east.",\n    "library": "Shelves of ancient Python books.",\n    "vault": "The vault! Treasure: 100 XP.",\n}\npath = ["hall", "library", "vault"]\n\nfor name in path:\n    print(f"You enter the {name}.")\n    print(rooms[name])\nprint("Quest complete!")',
+                },
+                "quiz": [
+                    {"q": "In this game, what does rooms[\"vault\"] do?",
+                     "options": ["Creates a new room", "Looks up the vault's description by its key", "Deletes the vault", "Returns the room number"],
+                     "answer": 1, "explain": "Square brackets on a dict fetch the value stored under that key."},
+                    {"q": "Why is separating the world (data) from the walk (logic) powerful?",
+                     "options": ["It runs faster", "You can grow the game by adding data without changing the code", "Python requires it", "It uses less memory"],
+                     "answer": 1, "explain": "Ten more rooms is just ten more dict entries — the loop already handles them. Data-driven design scales."},
+                ],
+            },
+        ],
+    },
+
+    # ══════════════════════════════════════════════════════════════════
     # COURSE 2 — DATA STRUCTURES
     # ══════════════════════════════════════════════════════════════════
     {
@@ -627,6 +794,174 @@ COURSES = [
                     {"q": "Which dunder controls what print(obj) displays?",
                      "options": ["__print__", "__str__", "__show__", "__display__"],
                      "answer": 1, "explain": "__str__ returns the human-readable representation used by print()."},
+                ],
+            },
+        ],
+    },
+
+    # ══════════════════════════════════════════════════════════════════
+    # COURSE — THINK LIKE A PROGRAMMER (ALGORITHMS)
+    # ══════════════════════════════════════════════════════════════════
+    {
+        "slug": "algorithms",
+        "title": "Think Like a Programmer",
+        "tagline": "Decomposition, searching, sorting and recursion — the thinking behind the code.",
+        "level": "Intermediate",
+        "color": "#f43f5e",
+        "icon": "search",
+        "description": "Syntax gets you started; algorithmic thinking gets you hired. Learn to break problems into steps, search and sort like the standard library does, wield recursion without fear, and build an intuition for why some code is fast and some is hopeless.",
+        "lessons": [
+            {
+                "slug": "decomposition",
+                "title": "Break Problems Down Before You Code",
+                "minutes": 12, "xp": 30,
+                "content": """
+<p>Staring at a blank editor isn't a coding problem — it's a <strong>decomposition</strong> problem. Professionals never solve "the task"; they solve a chain of tiny steps:</p>
+<ul>
+<li><strong>What comes in?</strong> (a list of numbers)</li>
+<li><strong>What goes out?</strong> (a count, a total, an average)</li>
+<li><strong>What are the steps between?</strong> — each one small enough to be one or two lines</li>
+</ul>
+<p>Write the steps as comments first, then turn each comment into code. This "comment skeleton" technique feels almost too simple, and it is exactly how experienced developers start anything unfamiliar. A problem you can list, you can code.</p>
+""",
+                "example": "# Task: report on quiz scores\nscores = [80, 95, 60]\n\n# step 1: how many scores?\ncount = len(scores)\n# step 2: what's the total?\ntotal = sum(scores)\n# step 3: average = total / count\nprint(count, total, total / count)",
+                "challenge": {
+                    "prompt": "Decompose and solve: for <code>nums = [4, 8, 15, 16, 23, 42]</code>, print the count of numbers, then the total, then the average — one per line.",
+                    "starter": "nums = [4, 8, 15, 16, 23, 42]\n\n# step 1: count\n# step 2: total\n# step 3: average = total / count\n",
+                    "expected_output": "6\n108\n18.0",
+                    "hint": "len(nums), sum(nums), and their division. Print each on its own line.",
+                    "solution": "nums = [4, 8, 15, 16, 23, 42]\n\ncount = len(nums)\ntotal = sum(nums)\nprint(count)\nprint(total)\nprint(total / count)",
+                },
+                "quiz": [
+                    {"q": "What's the first question to ask about any programming task?",
+                     "options": ["Which library to import", "What goes in and what should come out", "How to make it fast", "What to name the file"],
+                     "answer": 1, "explain": "Inputs and outputs frame the problem; the algorithm is just the path between them."},
+                    {"q": "Why write steps as comments before coding?",
+                     "options": ["Comments run faster", "Each comment becomes a small, obvious piece of code to write", "Python requires comments", "To pass code review"],
+                     "answer": 1, "explain": "The comment skeleton turns one scary problem into five trivial ones."},
+                ],
+            },
+            {
+                "slug": "searching",
+                "title": "Searching: Linear vs Binary",
+                "minutes": 15, "xp": 35,
+                "content": """
+<p>How do you find one value among a hundred? Two classic answers:</p>
+<p><strong>Linear search</strong> — check every item front to back. Simple, works on anything, needs up to <em>n</em> checks.</p>
+<p><strong>Binary search</strong> — needs <strong>sorted</strong> data, and it's a superpower: look at the middle, decide which half the target is in, throw the other half away. Repeat.</p>
+<ul>
+<li>100 items → at most 7 checks</li>
+<li>1,000,000 items → at most 20 checks</li>
+<li>Each step: <code>mid = (low + high) // 2</code>, then move <code>low</code> or <code>high</code></li>
+</ul>
+<p>Halving beats scanning by absurd margins, and "can I halve this?" is one of the most valuable questions in all of programming — it's how databases find rows and how <code>git bisect</code> finds the commit that broke everything.</p>
+""",
+                "example": '# Linear: check everything\nnames = ["ada", "alan", "grace", "linus"]\nfor i, name in enumerate(names):\n    if name == "grace":\n        print("found at position", i)\n\n# Binary halves the range each step: 100 -> 50 -> 25 -> 13 -> 7 -> 4 -> 2 -> 1\nn = 100\nsteps = 0\nwhile n >= 1:\n    n //= 2\n    steps += 1\nprint(steps, "halvings")',
+                "challenge": {
+                    "prompt": "Binary-search for <code>87</code> in <code>list(range(1, 101))</code>, counting the loop passes. Print <code>Found 87 in N steps</code>, then <code>Linear search: M steps</code> where M is how many checks a front-to-back scan would need (position + 1).",
+                    "starter": "numbers = list(range(1, 101))\ntarget = 87\n\nlow, high = 0, len(numbers) - 1\nsteps = 0\n# while low <= high: check the middle, halve the range, count steps\n",
+                    "expected_output": "Found 87 in 7 steps\nLinear search: 87 steps",
+                    "hint": "mid = (low + high) // 2. If numbers[mid] == target print and break; if it's smaller, low = mid + 1; otherwise high = mid - 1. Linear steps: numbers.index(target) + 1.",
+                    "solution": 'numbers = list(range(1, 101))\ntarget = 87\n\nlow, high = 0, len(numbers) - 1\nsteps = 0\nwhile low <= high:\n    steps += 1\n    mid = (low + high) // 2\n    if numbers[mid] == target:\n        print(f"Found {target} in {steps} steps")\n        break\n    elif numbers[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1\nprint(f"Linear search: {numbers.index(target) + 1} steps")',
+                },
+                "quiz": [
+                    {"q": "What does binary search require that linear search doesn't?",
+                     "options": ["A bigger list", "Sorted data", "A dictionary", "Recursion"],
+                     "answer": 1, "explain": "Throwing half away only works if you know which half the target must be in — that's what sorted order gives you."},
+                    {"q": "Roughly how many checks does binary search need for 1,000,000 items?",
+                     "options": ["~500,000", "~1,000", "~20", "~2"],
+                     "answer": 2, "explain": "Each check halves the range: 2^20 ≈ 1,000,000, so about 20 checks."},
+                ],
+            },
+            {
+                "slug": "sorting",
+                "title": "Sorting: sorted(), Keys & Custom Order",
+                "minutes": 14, "xp": 35,
+                "content": """
+<p>You'll rarely write a sorting algorithm — Python's <code>sorted()</code> (Timsort, invented for Python, adopted by Java and Android) is world-class. The real skill is <strong>telling it what order means</strong>:</p>
+<ul>
+<li><code>sorted(words)</code> — alphabetical</li>
+<li><code>sorted(words, key=len)</code> — by length; the key function is called on each item and the results are compared instead</li>
+<li><code>sorted(words, key=lambda w: (len(w), w))</code> — by length, <em>ties broken alphabetically</em> — tuples compare position by position</li>
+<li><code>reverse=True</code> — flip any of the above</li>
+</ul>
+<p>The tuple-key trick is the professional move: 'sort by department, then salary descending, then name' is one line in Python.</p>
+""",
+                "example": 'words = ["fig", "banana", "kiwi"]\nprint(sorted(words))                # alphabetical\nprint(sorted(words, key=len))       # shortest first\nprint(sorted(words, key=len, reverse=True))',
+                "challenge": {
+                    "prompt": "For <code>words = [\"banana\", \"fig\", \"cherry\", \"kiwi\", \"apple\"]</code>: first print them sorted alphabetically, joined by <code>\", \"</code>. Then print them sorted by length with alphabetical tie-breaks, joined the same way.",
+                    "starter": 'words = ["banana", "fig", "cherry", "kiwi", "apple"]\n\n# line 1: alphabetical\n# line 2: by (length, word)\n',
+                    "expected_output": "apple, banana, cherry, fig, kiwi\nfig, kiwi, apple, banana, cherry",
+                    "hint": "\", \".join(sorted(words)) for line one; key=lambda w: (len(w), w) for line two.",
+                    "solution": 'words = ["banana", "fig", "cherry", "kiwi", "apple"]\n\nprint(", ".join(sorted(words)))\nprint(", ".join(sorted(words, key=lambda w: (len(w), w))))',
+                },
+                "quiz": [
+                    {"q": "What does the key argument of sorted() do?",
+                     "options": ["Encrypts the list", "Transforms each item into the value actually compared", "Removes duplicates", "Speeds up sorting"],
+                     "answer": 1, "explain": "sorted compares key(item) instead of item — sort by anything you can compute."},
+                    {"q": "How do tuples like (len(w), w) compare?",
+                     "options": ["By total size", "Position by position — later positions break earlier ties", "Randomly", "They can't be compared"],
+                     "answer": 1, "explain": "First elements are compared first; only ties fall through to the next element — perfect for multi-level sorts."},
+                ],
+            },
+            {
+                "slug": "recursion",
+                "title": "Recursion: Functions That Call Themselves",
+                "minutes": 16, "xp": 40,
+                "content": """
+<p>A recursive function solves a problem by solving a <em>smaller copy</em> of the same problem. Every correct one has exactly two parts:</p>
+<ul>
+<li><strong>Base case</strong> — an input so small the answer is immediate: <code>if n &lt; 10: return n</code></li>
+<li><strong>Recursive step</strong> — shrink the input and delegate: <code>return n % 10 + digit_sum(n // 10)</code></li>
+</ul>
+<p>The mental model: <em>trust the recursive call</em>. Don't trace every level — assume <code>digit_sum(198)</code> already works, and just add the last digit. If the base case is right and each step genuinely shrinks the input, the whole thing is right.</p>
+<p>Recursion is the natural language of nested things: folders inside folders, JSON inside JSON, comments replying to comments.</p>
+""",
+                "example": 'def countdown(n):\n    if n == 0:              # base case\n        print("Liftoff!")\n        return\n    print(n)\n    countdown(n - 1)        # smaller copy of the same problem\n\ncountdown(3)',
+                "challenge": {
+                    "prompt": "Write a recursive <code>digit_sum(n)</code> that adds up the digits of a non-negative number (digit_sum(1984) → 1+9+8+4 = 22). Print <code>digit_sum(1984)</code> and <code>digit_sum(7)</code>.",
+                    "starter": "def digit_sum(n):\n    # base case: n < 10\n    # recursive step: last digit + digit_sum(rest)\n    pass\n\nprint(digit_sum(1984))\nprint(digit_sum(7))\n",
+                    "expected_output": "22\n7",
+                    "hint": "n % 10 is the last digit; n // 10 is the number without it. Base case: if n < 10: return n.",
+                    "solution": "def digit_sum(n):\n    if n < 10:\n        return n\n    return n % 10 + digit_sum(n // 10)\n\nprint(digit_sum(1984))\nprint(digit_sum(7))",
+                },
+                "quiz": [
+                    {"q": "What happens to a recursive function with no (reachable) base case?",
+                     "options": ["It returns None", "It loops forever until Python raises RecursionError", "It returns 0", "Python refuses to define it"],
+                     "answer": 1, "explain": "Every call spawns another; Python gives up at the recursion limit with RecursionError."},
+                    {"q": "In digit_sum, why must the recursive call use n // 10?",
+                     "options": ["It's faster", "The input must genuinely shrink toward the base case", "// is required in recursion", "To avoid floats"],
+                     "answer": 1, "explain": "Progress toward the base case is what guarantees the recursion ends."},
+                ],
+            },
+            {
+                "slug": "counting-steps",
+                "title": "Capstone: Counting Steps & Big-O Intuition",
+                "minutes": 15, "xp": 45,
+                "content": """
+<p>Why does one script finish instantly and another hang forever on the same data? Count the <strong>steps</strong>, not the lines:</p>
+<ul>
+<li>One loop over n items → about <strong>n</strong> steps — double the data, double the time</li>
+<li>A loop <em>inside</em> a loop → <strong>n × n</strong> steps — double the data, <em>quadruple</em> the time</li>
+<li>Halving like binary search → <strong>log n</strong> steps — a million items feels like twenty</li>
+</ul>
+<p>Engineers write these as O(n), O(n²) and O(log n) — "Big-O" — but the notation is just shorthand for the growth you can now measure yourself. The instinct to ask <em>"how does this grow when the data grows?"</em> is the single most interview-tested skill in programming, and you can build it with two counters.</p>
+""",
+                "example": "items = list(range(8))\nops = 0\nfor a in items:          # one loop: n steps\n    ops += 1\nprint(ops)\n\nops = 0\nfor a in items:          # nested loops: n * n steps\n    for b in items:\n        ops += 1\nprint(ops)",
+                "challenge": {
+                    "prompt": "For 20 items, count the operations a single loop performs, then the operations a nested (loop-in-loop) pass performs. Print both counts, then print <code>Nested loops grow fast!</code>",
+                    "starter": "items = list(range(20))\n\n# count single-loop ops, then nested-loop ops\n",
+                    "expected_output": "20\n400\nNested loops grow fast!",
+                    "hint": "Increment a counter inside each loop body. The nested version increments inside the inner loop.",
+                    "solution": 'items = list(range(20))\n\nops = 0\nfor a in items:\n    ops += 1\nprint(ops)\n\nops = 0\nfor a in items:\n    for b in items:\n        ops += 1\nprint(ops)\nprint("Nested loops grow fast!")',
+                },
+                "quiz": [
+                    {"q": "Data doubles from 1,000 to 2,000 items. Roughly what happens to an O(n²) algorithm's runtime?",
+                     "options": ["Doubles", "Quadruples", "Stays the same", "Halves"],
+                     "answer": 1, "explain": "n² growth: (2n)² = 4n². Nested loops punish growing data brutally."},
+                    {"q": "Which growth pattern does binary search have?",
+                     "options": ["O(n)", "O(n²)", "O(log n)", "O(1)"],
+                     "answer": 2, "explain": "Halving the range each step means even huge inputs need few steps — logarithmic growth."},
                 ],
             },
         ],
@@ -1154,6 +1489,172 @@ def add_book():
                     {"q": "Counter(paths).most_common(1) returns…",
                      "options": ["The most common item", "A list with one (item, count) tuple", "A dict", "An int"],
                      "answer": 1, "explain": "most_common returns a list of tuples — index [0][0] for the item itself."},
+                ],
+            },
+        ],
+    },
+
+    # ══════════════════════════════════════════════════════════════════
+    # COURSE — DATA ANALYSIS ESSENTIALS
+    # ══════════════════════════════════════════════════════════════════
+    {
+        "slug": "data-analysis",
+        "title": "Data Analysis Essentials",
+        "tagline": "Turn messy numbers into answers: stats, cleaning, grouping and rankings.",
+        "level": "Intermediate",
+        "color": "#10b981",
+        "icon": "chart",
+        "description": "The everyday superpower. Describe datasets with real statistics, clean the messy values every spreadsheet hides, group and total by category, rank the top performers, and ship an insight report — pure Python, the same moves you'd later make in pandas.",
+        "lessons": [
+            {
+                "slug": "describing-data",
+                "title": "Describing Data: Mean, Median & Mode",
+                "minutes": 12, "xp": 30,
+                "content": """
+<p>Before charts, before machine learning, analysis starts with three questions — and Python's built-in <code>statistics</code> module answers all of them:</p>
+<ul>
+<li><code>mean(data)</code> — the average. Honest for balanced data, easily dragged around by one extreme value</li>
+<li><code>median(data)</code> — the middle value. Robust: one billionaire in the room changes the mean salary wildly, the median barely</li>
+<li><code>mode(data)</code> — the most common value. The only one that also works on words and categories</li>
+</ul>
+<p>Knowing <em>which</em> to reach for is the analysis skill: report medians for incomes and house prices, means for balanced measurements, modes for "what's most popular?".</p>
+""",
+                "example": 'import statistics\n\nprices = [12, 15, 11, 14, 250]      # one luxury outlier\nprint(statistics.mean(prices))       # dragged to 60.4\nprint(statistics.median(prices))     # still honest: 14\nprint(statistics.mode(["tea", "coffee", "tea"]))',
+                "challenge": {
+                    "prompt": "For <code>scores = [72, 88, 95, 64, 88, 79]</code> print three lines: the mean shown with 1 decimal place, the median, and the mode.",
+                    "starter": "import statistics\n\nscores = [72, 88, 95, 64, 88, 79]\n# mean (formatted to 1 decimal place), median, mode\n",
+                    "expected_output": "81.0\n83.5\n88",
+                    "hint": "print(f\"{statistics.mean(scores):.1f}\") formats to one decimal place, then statistics.median(scores), then statistics.mode(scores).",
+                    "solution": 'import statistics\n\nscores = [72, 88, 95, 64, 88, 79]\nprint(f"{statistics.mean(scores):.1f}")\nprint(statistics.median(scores))\nprint(statistics.mode(scores))',
+                },
+                "quiz": [
+                    {"q": "House prices in a street: eight around €300k, one at €5M. Which average should you report?",
+                     "options": ["Mean — it uses all the data", "Median — it resists the outlier", "Mode", "Sum"],
+                     "answer": 1, "explain": "The mansion drags the mean far above what a typical house costs; the median stays representative."},
+                    {"q": "Which statistic works on non-numeric data like [\"red\", \"blue\", \"red\"]?",
+                     "options": ["mean", "median", "mode", "None of them"],
+                     "answer": 2, "explain": "Mode just counts frequency — no arithmetic needed, so categories are fine."},
+                ],
+            },
+            {
+                "slug": "cleaning-data",
+                "title": "Cleaning Messy Data",
+                "minutes": 14, "xp": 35,
+                "content": """
+<p>Real datasets arrive filthy: stray spaces, empty cells, <code>"n/a"</code>, numbers stored as text. Analysts joke that the job is 80% cleaning — and the pattern is always the same funnel:</p>
+<ul>
+<li><code>value.strip()</code> — cut the whitespace first</li>
+<li>Skip empties early: <code>if not value: continue</code></li>
+<li>Convert inside a safety net: <code>try: int(value) except ValueError: skip</code></li>
+</ul>
+<p>The golden rule: <strong>never let one bad value kill the whole run</strong>. Quarantine what you can't parse, keep what you can, and (in real jobs) count what you skipped — a spike in bad rows is itself a finding.</p>
+""",
+                "example": 'raw = [" 19 ", "", "twenty", "21"]\nclean = []\nfor value in raw:\n    value = value.strip()\n    if not value:\n        continue\n    try:\n        clean.append(int(value))\n    except ValueError:\n        print("skipped:", value)\nprint(clean)',
+                "challenge": {
+                    "prompt": "Clean <code>raw = [\" 42 \", \"17\", \"oops\", \"\", \"23 \", \"n/a\", \"8\"]</code> into a list of ints, silently skipping anything that isn't a number. Print the clean list, then its sum.",
+                    "starter": 'raw = [" 42 ", "17", "oops", "", "23 ", "n/a", "8"]\nclean = []\n# strip, skip, convert with try/except\n',
+                    "expected_output": "[42, 17, 23, 8]\n90",
+                    "hint": "Loop, strip each value, try int(value) and append; except ValueError: pass. Empty strings raise ValueError too, so the try handles them.",
+                    "solution": 'raw = [" 42 ", "17", "oops", "", "23 ", "n/a", "8"]\nclean = []\nfor value in raw:\n    try:\n        clean.append(int(value.strip()))\n    except ValueError:\n        pass\nprint(clean)\nprint(sum(clean))',
+                },
+                "quiz": [
+                    {"q": "What does \" 42 \".strip() return?",
+                     "options": ["\" 42 \"", "\"42\"", "42", "An error"],
+                     "answer": 1, "explain": "strip() removes leading/trailing whitespace but returns a string — converting is a separate step."},
+                    {"q": "Why wrap int(value) in try/except when cleaning?",
+                     "options": ["It's faster", "So one unparseable value doesn't crash the whole run", "int() requires it", "To convert floats"],
+                     "answer": 1, "explain": "Bad values are expected in real data; the pipeline must survive them."},
+                ],
+            },
+            {
+                "slug": "grouping-data",
+                "title": "Grouping: Totals by Category",
+                "minutes": 14, "xp": 35,
+                "content": """
+<p>"Revenue <em>by product</em>", "signups <em>by country</em>", "errors <em>by endpoint</em>" — the words <strong>by category</strong> always mean the same code: accumulate into a dictionary.</p>
+<ul>
+<li><code>totals[key] = totals.get(key, 0) + value</code> — the one-line accumulator: start at 0 if the key is new, add if it exists</li>
+<li>Loop the pairs once; the dict grows itself</li>
+<li><code>sorted(totals.items())</code> — report in a stable, readable order</li>
+</ul>
+<p>This is the pure-Python version of SQL's <code>GROUP BY</code> and pandas' <code>groupby()</code> — learn the pattern here and those tools will feel obvious later.</p>
+""",
+                "example": 'visits = ["home", "shop", "home", "blog", "home"]\ncounts = {}\nfor page in visits:\n    counts[page] = counts.get(page, 0) + 1\nfor page, n in sorted(counts.items()):\n    print(page, n)',
+                "challenge": {
+                    "prompt": "Total the sales per product in <code>sales = [(\"coffee\", 3.5), (\"tea\", 2.0), (\"coffee\", 4.0), (\"cake\", 3.0), (\"tea\", 2.5)]</code> and print one line per product in alphabetical order, formatted <code>product: total</code>.",
+                    "starter": 'sales = [("coffee", 3.5), ("tea", 2.0), ("coffee", 4.0), ("cake", 3.0), ("tea", 2.5)]\ntotals = {}\n# accumulate, then print sorted\n',
+                    "expected_output": "cake: 3.0\ncoffee: 7.5\ntea: 4.5",
+                    "hint": "for product, amount in sales: totals[product] = totals.get(product, 0) + amount. Then loop sorted(totals.items()).",
+                    "solution": 'sales = [("coffee", 3.5), ("tea", 2.0), ("coffee", 4.0), ("cake", 3.0), ("tea", 2.5)]\ntotals = {}\nfor product, amount in sales:\n    totals[product] = totals.get(product, 0) + amount\nfor product, total in sorted(totals.items()):\n    print(f"{product}: {total}")',
+                },
+                "quiz": [
+                    {"q": "What does totals.get(key, 0) return when the key is missing?",
+                     "options": ["It raises KeyError", "0 — the fallback you provided", "None", "An empty dict"],
+                     "answer": 1, "explain": "get with a default never crashes — perfect for 'start at zero' accumulation."},
+                    {"q": "This grouping pattern is the pure-Python equivalent of…",
+                     "options": ["SQL's GROUP BY", "a web framework", "list slicing", "regular expressions"],
+                     "answer": 0, "explain": "GROUP BY, pandas groupby, spreadsheet pivot tables — all the same idea: accumulate by key."},
+                ],
+            },
+            {
+                "slug": "rankings",
+                "title": "Rankings: Top-N with sorted & max",
+                "minutes": 13, "xp": 35,
+                "content": """
+<p>Every dashboard has a leaderboard: best sellers, slowest pages, biggest customers. In Python a ranking is three moves:</p>
+<ul>
+<li><code>items.items()</code> — get (name, number) pairs out of a dict</li>
+<li><code>sorted(..., key=lambda pair: pair[1], reverse=True)</code> — order by the number, biggest first</li>
+<li><code>[:3]</code> — slice the podium</li>
+</ul>
+<p>Need just the single winner? <code>max(data, key=data.get)</code> reads almost like English. And <code>enumerate(top, start=1)</code> numbers your report lines without a manual counter.</p>
+""",
+                "example": 'speeds = {"/home": 120, "/shop": 340, "/api": 45}\nslowest = max(speeds, key=speeds.get)\nprint("Slowest:", slowest)\n\nfor rank, (page, ms) in enumerate(\n        sorted(speeds.items(), key=lambda p: p[1], reverse=True), start=1):\n    print(rank, page, ms)',
+                "challenge": {
+                    "prompt": "From <code>units = {\"laptop\": 12, \"mouse\": 41, \"monitor\": 9, \"keyboard\": 25, \"webcam\": 17}</code>, print the top 3 sellers as <code>1. mouse (41 sold)</code>, <code>2. keyboard (25 sold)</code>, <code>3. webcam (17 sold)</code>.",
+                    "starter": 'units = {"laptop": 12, "mouse": 41, "monitor": 9, "keyboard": 25, "webcam": 17}\n\n# sort by units sold (descending), take 3, print with ranks\n',
+                    "expected_output": "1. mouse (41 sold)\n2. keyboard (25 sold)\n3. webcam (17 sold)",
+                    "hint": "top = sorted(units.items(), key=lambda p: p[1], reverse=True)[:3], then enumerate(top, start=1).",
+                    "solution": 'units = {"laptop": 12, "mouse": 41, "monitor": 9, "keyboard": 25, "webcam": 17}\n\ntop = sorted(units.items(), key=lambda pair: pair[1], reverse=True)[:3]\nfor rank, (product, sold) in enumerate(top, start=1):\n    print(f"{rank}. {product} ({sold} sold)")',
+                },
+                "quiz": [
+                    {"q": "What does max(units, key=units.get) return?",
+                     "options": ["The largest value", "The key with the largest value", "A (key, value) tuple", "An error"],
+                     "answer": 1, "explain": "max iterates the dict's keys and compares units.get(key) — so you get the winning key."},
+                    {"q": "What does enumerate(top, start=1) add to the loop?",
+                     "options": ["Sorting", "A rank counter starting at 1 alongside each item", "Reversal", "Filtering"],
+                     "answer": 1, "explain": "enumerate pairs each item with a rising index — start=1 makes it human-friendly for rankings."},
+                ],
+            },
+            {
+                "slug": "insight-report",
+                "title": "Capstone: From Raw Rows to Insight Report",
+                "minutes": 18, "xp": 45,
+                "content": """
+<p>Time to run the full pipeline every analyst runs, whatever the tool:</p>
+<ul>
+<li><strong>Parse</strong> — split each <code>"region,amount"</code> row into fields</li>
+<li><strong>Clean</strong> — convert amounts, quarantine garbage with try/except</li>
+<li><strong>Aggregate</strong> — total by region with the dict accumulator</li>
+<li><strong>Report</strong> — row count, grand total, top region</li>
+</ul>
+<p>Parse → clean → aggregate → report is the same skeleton whether the data is 6 rows in a list or 6 billion in a warehouse; only the tools scale up. Ship this and you've done real analysis — the kind that answers an actual business question.</p>
+""",
+                "example": 'row = "north,120"\nregion, amount = row.split(",")\nprint(region, int(amount))',
+                "challenge": {
+                    "prompt": "Analyse <code>rows = [\"north,120\", \"south,95\", \"north,80\", \"west,x\", \"east,150\", \"south,45\"]</code>, skipping rows whose amount isn't a number. Print three lines: the number of valid rows, the grand total, and the region with the highest total.",
+                    "starter": 'rows = ["north,120", "south,95", "north,80", "west,x", "east,150", "south,45"]\ntotals = {}\nvalid = 0\n# parse, clean, aggregate - then report\n',
+                    "expected_output": "5\n490\nnorth",
+                    "hint": "Split each row on \",\"; int() the amount inside try/except; accumulate totals and count valid rows. Top region: max(totals, key=totals.get).",
+                    "solution": 'rows = ["north,120", "south,95", "north,80", "west,x", "east,150", "south,45"]\ntotals = {}\nvalid = 0\nfor row in rows:\n    region, raw_amount = row.split(",")\n    try:\n        amount = int(raw_amount)\n    except ValueError:\n        continue\n    valid += 1\n    totals[region] = totals.get(region, 0) + amount\nprint(valid)\nprint(sum(totals.values()))\nprint(max(totals, key=totals.get))',
+                },
+                "quiz": [
+                    {"q": "Put the analysis pipeline in order:",
+                     "options": ["report → parse → clean → aggregate", "parse → clean → aggregate → report", "aggregate → parse → report → clean", "clean → report → parse → aggregate"],
+                     "answer": 1, "explain": "You can't clean what you haven't parsed, or total what you haven't cleaned. The funnel narrows toward the answer."},
+                    {"q": "Why 'continue' on a bad row instead of letting it crash?",
+                     "options": ["continue is faster", "Real datasets always contain garbage; the report must still ship", "Python requires it", "To keep the row for later"],
+                     "answer": 1, "explain": "Skipping (and in real work, counting) bad rows keeps one typo from killing the whole report."},
                 ],
             },
         ],

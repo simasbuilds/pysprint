@@ -23,7 +23,7 @@
   <div class="hero-inner">
     <div class="hero-copy">
       <span class="pill stagger d1"><span class="pulse-dot"></span> Real Python · Free forever · Zero setup</span>
-      <h1 class="stagger d2">Learn Python by building <span class="word-rotate" data-words='["things that work.","real APIs.","data tools.","automations.","expert habits."]'><span class="grad">things that work.</span></span></h1>
+      <h1 class="stagger d2">Learn Python by building <span class="word-rotate" data-words='["real things.","games.","APIs.","data tools.","habits."]'><span class="grad">real things.</span></span></h1>
       <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
       <div class="hero-cta stagger d4">
         {% if user %}
@@ -40,7 +40,7 @@
       <div class="hero-stats stagger d5">
         <div><strong data-count="{{ n_lessons }}">{{ n_lessons }}</strong><span>Interactive lessons</span></div>
         <div><strong data-count="{{ n_challenges }}">{{ n_challenges }}</strong><span>Coding challenges</span></div>
-        <div><strong data-count="5">5</strong><span>Portfolio projects</span></div>
+        <div><strong data-count="{{ projects|length }}">{{ projects|length }}</strong><span>Portfolio projects</span></div>
       </div>
     </div>
     <div class="hero-visual stagger d3">

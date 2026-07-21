@@ -68,7 +68,31 @@
     // Pyodide errors embed the full Python traceback; trim JS noise.
     const text = String(e.message || e);
     const i = text.indexOf('Traceback');
-    return i >= 0 ? text.slice(i) : text;
+    const trace = i >= 0 ? text.slice(i) : text;
+    const hint = friendlyErrorHint(trace);
+    return hint ? trace + '\n\n\u{1F4A1} In plain English: ' + hint : trace;
+  }
+
+  // Plain-English translations of the errors beginners hit most.
+  const ERROR_HINTS = [
+    ['IndentationError', 'The spaces at the start of a line are off. Lines inside if / for / while / def must be indented by 4 spaces, and lines outside must not be.'],
+    ['SyntaxError', "Python couldn't read one of your lines. Check for a missing colon (:) at the end of if/for/def lines, and make sure every quote and bracket is closed."],
+    ['NameError', "You used a name Python doesn't know yet. Check the spelling and capitalisation (Python treats name and Name as different), and make sure you created the variable before using it."],
+    ['TypeError', "Two different types of value collided — like adding text to a number. Convert first with int(), float() or str(), e.g. int(\"5\") + 5."],
+    ['IndexError', "You asked for a position that doesn't exist in the list. Remember: positions start at 0, so the last item of 3 is at position 2."],
+    ['KeyError', "That key isn't in the dictionary. Check the spelling, or use .get(key) which returns None instead of crashing."],
+    ['ValueError', 'The value was the right type but the wrong content — like int("hello"). Check what you\'re converting.'],
+    ['ZeroDivisionError', 'Your code divided by zero somewhere. Check the value on the right side of the /.'],
+    ['AttributeError', "That value doesn't have the method you called. Check its type with print(type(x)) and the method's spelling."],
+    ['UnboundLocalError', 'You used a variable inside a function before giving it a value there.'],
+    ['RecursionError', 'Your function keeps calling itself and never stops — make sure it has a base case that returns without another call.'],
+  ];
+
+  function friendlyErrorHint(trace) {
+    for (const [name, hint] of ERROR_HINTS) {
+      if (trace.includes(name)) return hint;
+    }
+    return null;
   }
 
   function enableTabKey(textarea) {
@@ -118,8 +142,17 @@
 
     let saved = null;
     try { saved = localStorage.getItem(opts.storageKey); } catch (_) {}
-    code.value = saved !== null ? saved : '';
-    setState(code.value.trim() ? 'Restored · autosaved' : 'Blank · autosaved');
+    if (saved !== null) {
+      code.value = saved;
+      setState(code.value.trim() ? 'Restored · autosaved' : 'Blank · autosaved');
+    } else if (opts.prefill) {
+      // First visit: beginners should see runnable code, not an empty box.
+      code.value = opts.prefill;
+      setState('Example loaded · autosaved');
+    } else {
+      code.value = '';
+      setState('Blank · autosaved');
+    }
     code.addEventListener('input', () => save());
 
     loadBtn && loadBtn.addEventListener('click', () => replace(opts.starter || '', 'Loading the starter'));
@@ -185,6 +218,7 @@
       code: code,
       storageKey: opts.storageKey,
       starter: opts.starter,
+      prefill: opts.starter,
       loadId: 'challengeLoad',
       blankId: 'challengeBlank',
       stateId: 'challengeSaveState',
@@ -328,6 +362,7 @@
         code: exCode,
         storageKey: 'pysprint-example-' + cfg.course + '-' + cfg.lesson,
         starter: cfg.example,
+        prefill: cfg.example,
         loadId: 'exampleLoad',
         blankId: 'exampleBlank',
         stateId: 'exampleSaveState',
@@ -739,10 +774,11 @@ print(f"Average: {average:.1f}")
       });
 
       document.getElementById('pgCopyOut').addEventListener('click', (e) => {
+        const copyBtn = e.currentTarget;   // currentTarget is null inside the async callback
         navigator.clipboard.writeText(out.textContent).then(() => {
-          const original = e.currentTarget.textContent;
-          e.currentTarget.textContent = 'Copied';
-          setTimeout(() => { e.currentTarget.textContent = original; }, 1200);
+          const original = copyBtn.textContent;
+          copyBtn.textContent = 'Copied';
+          setTimeout(() => { copyBtn.textContent = original; }, 1200);
         }).catch(() => {});
       });
 
