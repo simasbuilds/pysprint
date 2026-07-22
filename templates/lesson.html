@@ -10,7 +10,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="lesson-layout" style="--accent: {{ course.color }}">
+<div class="lesson-layout" style="--accent: {{ course.color }}"
+     data-lesson-title="{{ lesson.title }}" data-course-title="{{ course.title }}">
   <aside class="lesson-side card">
     <a class="crumbs" href="{{ url_for('course_detail', slug=course.slug) }}">← {{ course.title }}</a>
     <div class="progress-track" role="progressbar" aria-valuenow="{{ (idx + 1) }}" aria-valuemin="0" aria-valuemax="{{ n_lessons }}">
@@ -24,6 +25,15 @@
         <span>{% if l.slug in done %}{{ icon('check') }}{% else %}{{ loop.index }}{% endif %}</span> {{ l.title }}
       </a>
       {% endfor %}
+    </nav>
+    <nav class="spy-nav" aria-label="On this page">
+      <span class="spy-label">On this page</span>
+      <a href="#learn">{{ icon('book') }} Learn</a>
+      {% if walkthrough %}<a href="#walkthrough">{{ icon('play') }} Watch it run</a>{% endif %}
+      <a href="#workspace">{{ icon('terminal') }} Workspace</a>
+      <a href="#challenge">{{ icon('target') }} Challenge</a>
+      {% if lesson.quiz %}<a href="#quizBlock">{{ icon('quiz') }} Quiz</a>{% endif %}
+      <a href="#notes">{{ icon('note') }} Notes</a>
     </nav>
   </aside>
 
@@ -56,7 +66,7 @@
       </nav>
     </details>
 
-    <section class="lesson-content">{{ lesson.content|safe }}</section>
+    <section class="lesson-content" id="learn">{{ lesson.content|safe }}</section>
 
     {% if extras %}
     <section class="callout-grid">
@@ -99,7 +109,7 @@
     </section>
     {% endif %}
 
-    <section class="card editor-block">
+    <section class="card editor-block" id="workspace">
       <div class="editor-heading">
         <div>
           <span class="eyebrow">Your workspace</span>
@@ -120,7 +130,7 @@
       <pre id="exampleOut" class="code-output" aria-live="polite">Output appears here…</pre>
     </section>
 
-    <section class="card editor-block challenge-block">
+    <section class="card editor-block challenge-block" id="challenge">
       <div class="editor-heading">
         <div>
           <span class="eyebrow">Prove it</span>
@@ -170,14 +180,14 @@
     </section>
     {% endif %}
 
-    <section class="card notes-block">
+    <section class="card notes-block" id="notes">
       <h2 class="block-title">{{ icon('note') }} My notes <span class="muted">(saved on this device)</span></h2>
       <textarea id="lessonNotes" class="notes-input" rows="4" placeholder="Write anything you want to remember from this lesson…"></textarea>
     </section>
 
     <footer class="lesson-footer">
       {% if prev %}
-      <a class="btn btn-ghost" href="{{ url_for('lesson', slug=course.slug, lesson_slug=prev.slug) }}">← {{ prev.title }}</a>
+      <a class="btn btn-ghost" data-lesson-prev href="{{ url_for('lesson', slug=course.slug, lesson_slug=prev.slug) }}">← {{ prev.title }}</a>
       {% else %}<span></span>{% endif %}
       <button class="btn btn-primary btn-lg" id="completeBtn"
               data-course="{{ course.slug }}" data-lesson="{{ lesson.slug }}"
@@ -185,11 +195,12 @@
         {% if lesson.slug in done %}{{ icon('check') }} Completed — mark again{% else %}Complete lesson (+{{ lesson.xp }} XP){% endif %}
       </button>
       {% if next %}
-      <a class="btn btn-ghost" href="{{ url_for('lesson', slug=course.slug, lesson_slug=next.slug) }}">{{ next.title }} →</a>
+      <a class="btn btn-ghost" data-lesson-next href="{{ url_for('lesson', slug=course.slug, lesson_slug=next.slug) }}">{{ next.title }} →</a>
       {% else %}
       <a class="btn btn-ghost" href="{{ url_for('course_detail', slug=course.slug) }}">Finish course →</a>
       {% endif %}
     </footer>
+    <p class="lesson-kbd-hint">Tip: use <kbd>←</kbd> and <kbd>→</kbd> to move between lessons, <kbd>⌘K</kbd> to search everything.</p>
   </article>
 </div>
 {% endblock %}

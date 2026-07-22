@@ -111,6 +111,12 @@
               <a href="{{ url_for('challenges') }}"><span class="menu-icon">{{ icon('swords') }}</span><div><strong>Challenge arena</strong><small>Practice with graded, interview-style problems</small></div><b>→</b></a>
               <a href="{{ url_for('review') }}"><span class="menu-icon">{{ icon('brain') }}</span><div><strong>Smart Review</strong><small>Keep concepts with spaced repetition</small></div><b>→</b></a>
             </div>
+            <div class="mega-foot">
+              <span class="mega-foot-label">Quick start</span>
+              <a href="{{ url_for('course_detail', slug='python-fundamentals') }}">{{ icon('spark') }} Lesson one</a>
+              <a href="{{ url_for('review') }}">{{ icon('clock') }} Today's review</a>
+              <span class="mega-kbd"><kbd>⌘K</kbd> jump anywhere</span>
+            </div>
           </div>
         </div>
         <div class="nav-menu-wrap">
@@ -129,6 +135,12 @@
               <a href="{{ url_for('projects') }}"><span class="menu-icon">{{ icon('blocks') }}</span><div><strong>Guided projects</strong><small>Ship five useful, portfolio-ready builds</small></div><b>→</b></a>
               <a href="{{ url_for('playground') }}"><span class="menu-icon">{{ icon('terminal') }}</span><div><strong>Python playground</strong><small>Write, run, import, and download real Python</small></div><b>→</b></a>
             </div>
+            <div class="mega-foot">
+              <span class="mega-foot-label">Quick start</span>
+              <a href="{{ url_for('playground') }}">{{ icon('terminal') }} Blank workspace</a>
+              <a href="{{ url_for('projects') }}">{{ icon('rocket') }} First project</a>
+              <span class="mega-kbd"><kbd>⌘K</kbd> jump anywhere</span>
+            </div>
           </div>
         </div>
         <a href="{{ url_for('about') }}" {% if request.path == '/about' %}class="active"{% endif %}>How it works</a>
@@ -144,6 +156,9 @@
         </div>
       </nav>
       <div class="nav-right">
+        <button class="cmdk-btn" id="cmdkBtn" aria-label="Quick search — Ctrl or Cmd + K" aria-haspopup="dialog">
+          {{ icon('search') }}<span class="cmdk-btn-text">Search</span><kbd>⌘K</kbd>
+        </button>
         {% if user %}
           <div class="nav-stats" title="Level {{ level.level }} — {{ level.title }}">
             <span class="nav-xp">{{ icon('bolt') }} {{ user.xp }} XP</span>
@@ -211,6 +226,53 @@
     </div>
     <p class="footer-copy">© {{ now_year }} PySprint by simasbuilds · Built with Flask & Pyodide</p>
   </footer>
+
+  <!-- ⌘K command palette -->
+  <div id="cmdk" class="cmdk" hidden>
+    <div class="cmdk-panel" role="dialog" aria-modal="true" aria-label="Quick navigation">
+      <div class="cmdk-head">
+        {{ icon('search', 'cmdk-glass') }}
+        <input id="cmdkInput" type="text" placeholder="Search pages, courses, actions…"
+               autocomplete="off" spellcheck="false" aria-label="Search pages, courses and actions">
+        <kbd>esc</kbd>
+      </div>
+      <div class="cmdk-list" id="cmdkList" role="listbox" aria-label="Results"></div>
+      <div class="cmdk-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> open</span>
+        <span><kbd>esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="cmdkData">
+  {
+    "pages": [
+      {"label": "Home", "hint": "Start page", "href": "{{ url_for('home') }}", "icon": "brand"},
+      {"label": "All courses", "hint": "The six-course learning path", "href": "{{ url_for('courses') }}", "icon": "book"},
+      {"label": "Challenge arena", "hint": "Graded standalone problems", "href": "{{ url_for('challenges') }}", "icon": "swords"},
+      {"label": "Real-life projects", "hint": "Five guided portfolio builds", "href": "{{ url_for('projects') }}", "icon": "blocks"},
+      {"label": "Playground", "hint": "Blank Python workspace", "href": "{{ url_for('playground') }}", "icon": "terminal"},
+      {"label": "Smart Review", "hint": "Spaced-repetition flashcards", "href": "{{ url_for('review') }}", "icon": "brain"},
+      {"label": "How it works", "hint": "About PySprint", "href": "{{ url_for('about') }}", "icon": "info"}
+      {%- if user -%}
+      ,{"label": "Dashboard", "hint": "XP, streaks and progress", "href": "{{ url_for('dashboard') }}", "icon": "chart"}
+      {%- else -%}
+      ,{"label": "Log in", "hint": "Pick up where you left off", "href": "{{ url_for('login') }}", "icon": "lock"}
+      ,{"label": "Create free account", "hint": "Save progress and earn XP", "href": "{{ url_for('register') }}", "icon": "rocket"}
+      {%- endif -%}
+    ],
+    "courses": [
+      {%- for c in nav_courses -%}
+      {"label": {{ c.title|tojson }}, "hint": "Course", "href": "/courses/{{ c.slug }}", "icon": "graduation", "color": {{ c.color|tojson }}}{{ "," if not loop.last }}
+      {%- endfor -%}
+    ],
+    "lessons": [
+      {%- for l in nav_lessons -%}
+      {"label": {{ l.title|tojson }}, "hint": {{ l.course|tojson }}, "href": {{ l.href|tojson }}, "icon": "book", "color": {{ l.color|tojson }}}{{ "," if not loop.last }}
+      {%- endfor -%}
+    ]
+  }
+  </script>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
   <button class="to-top" id="toTop" aria-label="Back to top">↑</button>

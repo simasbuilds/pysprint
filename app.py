@@ -113,6 +113,12 @@ def inject_globals():
         "now_year": datetime.now(timezone.utc).year,
         "n_lessons": total_lessons(),
         "n_courses": len(COURSES),
+        "nav_courses": [{"slug": c["slug"], "title": c["title"],
+                         "color": c["color"]} for c in COURSES],
+        "nav_lessons": [{"title": l["title"], "course": c["title"],
+                         "color": c["color"],
+                         "href": f"/courses/{c['slug']}/{l['slug']}"}
+                        for c in COURSES for l in c["lessons"]],
     }
 
 
@@ -120,8 +126,12 @@ def inject_globals():
 
 @app.get("/")
 def home():
+    # One flagship real-world outcome per course for the homepage spotlight.
+    spotlight = [{"course": c, "case": get_course_use_cases(c["slug"])[0]}
+                 for c in COURSES if get_course_use_cases(c["slug"])]
     return render_template("index.html", courses=COURSES,
                            projects=PROJECTS,
+                           use_cases=spotlight,
                            n_lessons=total_lessons(),
                            n_challenges=len(CHALLENGES),
                            n_achievements=len(ACHIEVEMENTS))

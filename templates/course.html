@@ -15,6 +15,8 @@
 {% endblock %}
 
 {% block content %}
+{% set ns = namespace(next=none) %}
+{% for l in course.lessons %}{% if ns.next is none and l.slug not in done %}{% set ns.next = l %}{% endif %}{% endfor %}
 <section class="page-head course-head" style="--accent: {{ course.color }}">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('courses') }}">Courses</a> / <span>{{ course.title }}</span></nav>
   <div class="course-head-row">
@@ -36,6 +38,18 @@
   </div>
   <span class="progress-label">{{ done|length }} / {{ course.lessons|length }} lessons complete</span>
   {% endif %}
+  <div class="course-head-actions">
+    {% if ns.next %}
+    <a class="btn btn-primary" href="{{ url_for('lesson', slug=course.slug, lesson_slug=ns.next.slug) }}">
+      {% if done %}Resume course — {{ ns.next.title }} →{% else %}Start the course →{% endif %}
+    </a>
+    {% else %}
+    <a class="btn btn-primary" href="{{ url_for('lesson', slug=course.slug, lesson_slug=course.lessons[0].slug) }}">
+      {{ icon('check') }} Course complete — revisit lesson one
+    </a>
+    {% endif %}
+    <a class="btn btn-ghost" href="{{ url_for('review') }}">{{ icon('brain') }} Review what you've learned</a>
+  </div>
 </section>
 
 <section class="section" style="--accent: {{ course.color }}">
@@ -58,16 +72,17 @@
   </div>
   <h2 class="section-title left">Course roadmap</h2>
   {% endif %}
-  <ol class="lesson-list">
+  <ol class="lesson-list timeline">
     {% for l in course.lessons %}
     <li>
       <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
-         class="lesson-row card {% if l.slug in done %}is-done{% endif %}">
+         class="lesson-row card {% if l.slug in done %}is-done{% endif %} {% if ns.next and l.slug == ns.next.slug %}is-next{% endif %}">
         <span class="lesson-num">{% if l.slug in done %}{{ icon('check') }}{% else %}{{ loop.index }}{% endif %}</span>
         <div class="lesson-row-body">
-          <h3>{{ l.title }}</h3>
+          <h3>{{ l.title }} {% if ns.next and l.slug == ns.next.slug %}<span class="next-up-badge">{% if done %}Next up{% else %}Start here{% endif %}</span>{% endif %}</h3>
           <div class="course-meta"><span>{{ icon('clock') }} {{ l.minutes }} min</span><span>{{ icon('bolt') }} {{ l.xp }} XP</span>
             {% if l.quiz %}<span>{{ icon('quiz') }} {{ l.quiz|length }} quiz</span>{% endif %}
+            <span>{{ icon('target') }} 1 challenge</span>
           </div>
         </div>
         <span class="course-row-go">{% if l.slug in done %}Review{% else %}Start{% endif %} →</span>

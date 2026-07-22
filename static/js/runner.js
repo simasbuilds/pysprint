@@ -166,9 +166,18 @@
       codeEl.focus({ preventScroll: true });
       return { ok: false, output: '' };
     }
+    const heroVisual = btn.closest('.hero-visual');
+    const liveStatus = heroVisual && heroVisual.querySelector('.editor-live');
+    const setHeroStatus = (label, state) => {
+      if (!heroVisual || !liveStatus) return;
+      heroVisual.classList.remove('is-executing', 'is-complete', 'is-failed');
+      if (state) heroVisual.classList.add(state);
+      liveStatus.innerHTML = '<i></i> ' + label;
+    };
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = 'Running…';
+    setHeroStatus('Running', 'is-executing');
     outEl.classList.remove('error');
     if (!pyodideReady) outEl.textContent = 'Loading Python engine (first run only, ~5s)…';
     const result = await run(codeEl.value);
@@ -179,6 +188,8 @@
     outEl.classList.add('flash');
     btn.disabled = false;
     btn.textContent = original;
+    setHeroStatus(result.ok ? 'Complete' : 'Check error', result.ok ? 'is-complete' : 'is-failed');
+    setTimeout(() => setHeroStatus('Ready', ''), 2200);
     return result;
   }
 
@@ -237,8 +248,8 @@
       } else {
         resultBox.className = 'check-result fail';
         resultBox.innerHTML = result.ok
-          ? iconMarkup('warning') + ' Not quite — your output doesn\'t match.<small>Expected:\n' +
-            escapeHtml(opts.expected) + '</small>'
+          ? iconMarkup('warning') + ' Not quite — compare the highlighted lines below.' +
+            renderDiff(opts.expected, result.output)
           : iconMarkup('warning') + ' Your code raised an error — read the traceback above, fix it, and run again.';
       }
     }
@@ -248,6 +259,33 @@
 
   function escapeHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Line-by-line comparison shown when output doesn't match the target.
+  function renderDiff(expected, got) {
+    const want = normalize(expected).split('\n');
+    const have = normalize(got).split('\n');
+    const rows = [];
+    const count = Math.max(want.length, have.length);
+    for (let i = 0; i < count; i++) {
+      const w = i < want.length ? want[i] : null;
+      const h = i < have.length ? have[i] : null;
+      let cls = 'diff-ok';
+      if (w === null) cls = 'diff-extra';
+      else if (h === null) cls = 'diff-missing';
+      else if (w !== h) cls = 'diff-bad';
+      rows.push(
+        '<div class="diff-row ' + cls + '">' +
+        '<span class="diff-ln">' + (i + 1) + '</span>' +
+        '<code>' + (w === null ? '<em>— nothing expected —</em>' : (escapeHtml(w) || '&nbsp;')) + '</code>' +
+        '<code>' + (h === null ? '<em>— line missing —</em>' : (escapeHtml(h) || '&nbsp;')) + '</code>' +
+        '</div>');
+    }
+    const wrong = rows.length && (normalize(expected) !== normalize(got));
+    return '<div class="diff-view"' + (wrong ? '' : ' hidden') + '>' +
+      '<div class="diff-row diff-head"><span class="diff-ln">#</span>' +
+      '<code>Target output</code><code>Your output</code></div>' +
+      rows.join('') + '</div>';
   }
 
   async function postJSON(url, body) {
@@ -402,7 +440,14 @@
             else if (chosen) opts[Number(chosen.value)].classList.add('wrong');
             q.querySelector('.quiz-explain').hidden = false;
           });
-          document.getElementById('quizScore').textContent = right + '/' + total + ' correct';
+          const score = document.getElementById('quizScore');
+          score.textContent = right + '/' + total + ' correct';
+          score.classList.remove('perfect');
+          if (right === total && total > 0) {
+            score.classList.add('perfect');
+            score.textContent += ' — perfect!';
+            confetti(score);
+          }
         });
       }
 
@@ -533,7 +578,8 @@
           } else {
             resultBox.className = 'check-result fail';
             resultBox.innerHTML = result.ok
-              ? iconMarkup('warning') + ' Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
+              ? iconMarkup('warning') + ' Not quite — compare the highlighted lines below.' +
+                renderDiff(spec.steps[i], result.output)
               : iconMarkup('warning') + ' Your code raised an error — read the traceback above and try again.';
           }
         };

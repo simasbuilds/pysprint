@@ -39,6 +39,36 @@
   onScroll();
   if (toTop) toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
+  // ── hero depth: restrained pointer parallax on capable devices ──
+  const heroVisual = document.querySelector('.hero-visual');
+  if (heroVisual &&
+      window.matchMedia('(pointer: fine)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let frame = 0;
+    heroVisual.addEventListener('pointermove', (event) => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = heroVisual.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        heroVisual.style.setProperty('--hero-x', (x * 10).toFixed(2) + 'px');
+        heroVisual.style.setProperty('--hero-y', (y * 8).toFixed(2) + 'px');
+        heroVisual.style.setProperty('--hero-rx', (-y * 2.2).toFixed(2) + 'deg');
+        heroVisual.style.setProperty('--hero-ry', (x * 2.2).toFixed(2) + 'deg');
+        heroVisual.style.setProperty('--console-x', (-x * 5).toFixed(2) + 'px');
+        heroVisual.style.setProperty('--console-y', (-y * 4).toFixed(2) + 'px');
+      });
+    });
+    heroVisual.addEventListener('pointerleave', () => {
+      heroVisual.style.setProperty('--hero-x', '0px');
+      heroVisual.style.setProperty('--hero-y', '0px');
+      heroVisual.style.setProperty('--hero-rx', '0deg');
+      heroVisual.style.setProperty('--hero-ry', '0deg');
+      heroVisual.style.setProperty('--console-x', '0px');
+      heroVisual.style.setProperty('--console-y', '0px');
+    });
+  }
+
   // ── mobile nav ──────────────────────────────────────────────────
   const burger = document.getElementById('navBurger');
   const links = document.getElementById('navLinks');
@@ -92,9 +122,10 @@
   const revealTargets = document.querySelectorAll(
     '.course-card, .feature, .challenge-card, .course-row, .lesson-row, ' +
     '.dash-course, .achieve-tile, .stat, .callout, .project-card, .feature-slab, ' +
-    '.learn-card, .use-case-card, .how-card, .method-step, .about-principles article');
+    '.learn-card, .use-case-card, .how-card, .method-step, .about-principles article, ' +
+    '.usecase-card, .proof-strip > div');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if ('IntersectionObserver' in window && !reduceMotion) {
+  if ('IntersectionObserver' in window && !reduceMotion && revealTargets.length) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
@@ -247,6 +278,199 @@
       }, 2800);
     }
   }
+
+  // ── ⌘K command palette ──────────────────────────────────────────
+  (function initCmdk() {
+    const overlay = document.getElementById('cmdk');
+    const input = document.getElementById('cmdkInput');
+    const list = document.getElementById('cmdkList');
+    const trigger = document.getElementById('cmdkBtn');
+    const dataEl = document.getElementById('cmdkData');
+    if (!overlay || !input || !list || !dataEl) return;
+
+    let data;
+    try { data = JSON.parse(dataEl.textContent); } catch (_) { return; }
+
+    const iconBase = (themeBtn && themeBtn.dataset.iconBase) || '/static/images/pysprint-icons.svg';
+    const actions = [
+      { label: 'Toggle light / dark theme', hint: 'Action', icon: 'moon',
+        run: () => { themeBtn && themeBtn.click(); } },
+      { label: 'Back to top', hint: 'Action', icon: 'rocket',
+        run: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+    ];
+    const items = [
+      ...data.pages.map(p => ({ ...p, group: 'Pages' })),
+      ...data.courses.map(c => ({ ...c, group: 'Courses' })),
+      // The full curriculum is searchable but only shown once you type,
+      // so the default view stays scannable.
+      ...(data.lessons || []).map(l => ({ ...l, group: 'Lessons', searchOnly: true })),
+      ...actions.map(a => ({ ...a, group: 'Actions' })),
+    ];
+
+    let visible = [];
+    let active = 0;
+
+    function iconSvg(name, color) {
+      return '<svg class="ui-icon"' + (color ? ' style="color:' + color + '"' : '') +
+        ' viewBox="0 0 24 24" aria-hidden="true"><use href="' + iconBase + '#ps-' + name + '"></use></svg>';
+    }
+
+    function render(query) {
+      const q = (query || '').trim().toLowerCase();
+      visible = q
+        ? items.filter(it => (it.label + ' ' + (it.hint || '') + ' ' + it.group).toLowerCase().includes(q))
+        : items.filter(it => !it.searchOnly);
+      active = 0;
+      list.textContent = '';
+      if (!visible.length) {
+        const empty = document.createElement('p');
+        empty.className = 'cmdk-empty';
+        empty.textContent = 'Nothing matches “' + query + '” — try “courses” or “playground”.';
+        list.appendChild(empty);
+        return;
+      }
+      let lastGroup = null;
+      visible.forEach((it, i) => {
+        if (it.group !== lastGroup) {
+          lastGroup = it.group;
+          const label = document.createElement('div');
+          label.className = 'cmdk-group';
+          label.textContent = it.group;
+          list.appendChild(label);
+        }
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'cmdk-item' + (i === active ? ' active' : '');
+        row.setAttribute('role', 'option');
+        row.dataset.index = i;
+        row.innerHTML = iconSvg(it.icon || 'spark', it.color) +
+          '<span class="cmdk-label"></span><small class="cmdk-hint"></small>' +
+          (it.href ? '<b>↵</b>' : '<b>run</b>');
+        row.querySelector('.cmdk-label').textContent = it.label;
+        row.querySelector('.cmdk-hint').textContent = it.hint || '';
+        row.addEventListener('click', () => choose(i));
+        row.addEventListener('pointermove', () => setActive(i));
+        list.appendChild(row);
+      });
+    }
+
+    function setActive(i) {
+      active = Math.max(0, Math.min(i, visible.length - 1));
+      list.querySelectorAll('.cmdk-item').forEach(el => {
+        el.classList.toggle('active', Number(el.dataset.index) === active);
+      });
+      const el = list.querySelector('.cmdk-item.active');
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    }
+
+    function choose(i) {
+      const it = visible[i];
+      if (!it) return;
+      close();
+      if (it.href) window.location.href = it.href;
+      else if (it.run) it.run();
+    }
+
+    function open() {
+      overlay.hidden = false;
+      document.body.classList.add('cmdk-open');
+      input.value = '';
+      render('');
+      input.focus();
+    }
+
+    function close() {
+      overlay.hidden = true;
+      document.body.classList.remove('cmdk-open');
+    }
+
+    trigger && trigger.addEventListener('click', open);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+      else if (e.key === 'Enter') { e.preventDefault(); choose(active); }
+    });
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        overlay.hidden ? open() : close();
+      } else if (e.key === 'Escape' && !overlay.hidden) {
+        close();
+      }
+    });
+  })();
+
+  // ── resume where you left off (works without an account) ───────
+  (function initResume() {
+    const RESUME_KEY = 'pysprint-last-lesson';
+    const layout = document.querySelector('.lesson-layout[data-lesson-title]');
+    if (layout) {
+      try {
+        localStorage.setItem(RESUME_KEY, JSON.stringify({
+          href: location.pathname,
+          title: layout.dataset.lessonTitle,
+          course: layout.dataset.courseTitle,
+          color: getComputedStyle(layout).getPropertyValue('--accent').trim(),
+          at: Date.now(),
+        }));
+      } catch (_) {}
+    }
+    const slot = document.getElementById('resumeSlot');
+    if (!slot) return;
+    let last = null;
+    try { last = JSON.parse(localStorage.getItem(RESUME_KEY) || 'null'); } catch (_) {}
+    if (!last || !last.href || last.href === location.pathname) return;
+    const link = document.createElement('a');
+    link.className = 'resume-chip';
+    link.href = last.href;
+    if (last.color) link.style.setProperty('--accent', last.color);
+    link.innerHTML = '<i></i><small>Continue where you left off</small><strong></strong><b>→</b>';
+    link.querySelector('strong').textContent = last.title +
+      (last.course ? ' · ' + last.course : '');
+    slot.appendChild(link);
+    slot.hidden = false;
+  })();
+
+  // ── lesson keyboard nav: ← previous, → next ─────────────────────
+  (function initLessonKeys() {
+    const prev = document.querySelector('[data-lesson-prev]');
+    const next = document.querySelector('[data-lesson-next]');
+    if (!prev && !next) return;
+    document.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === 'ArrowLeft' && prev) window.location.href = prev.href;
+      if (e.key === 'ArrowRight' && next) window.location.href = next.href;
+    });
+  })();
+
+  // ── scroll-spy for on-page section nav (.spy-nav) ───────────────
+  (function initSpy() {
+    const nav = document.querySelector('.spy-nav');
+    if (!nav || !('IntersectionObserver' in window)) return;
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+    const sections = links
+      .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
+    if (!sections.length) return;
+    const byId = {};
+    links.forEach(a => { byId[a.getAttribute('href').slice(1)] = a; });
+    const inView = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) inView.add(en.target.id);
+        else inView.delete(en.target.id);
+      });
+      // Highlight the first visible section in document order.
+      let current = null;
+      for (const s of sections) { if (inView.has(s.id)) { current = s.id; break; } }
+      links.forEach(a => a.classList.toggle('on', a === byId[current]));
+    }, { rootMargin: '-15% 0px -55% 0px' });
+    sections.forEach(s => io.observe(s));
+  })();
 
   // ── toasts ──────────────────────────────────────────────────────
   window.toast = function (msg, type) {

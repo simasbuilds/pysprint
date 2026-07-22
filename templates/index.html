@@ -37,6 +37,7 @@
         <span>{{ icon('check') }} Try every lesson without an account</span>
         <span>{{ icon('lock') }} Code stays on your device</span>
       </div>
+      <div id="resumeSlot" class="resume-slot stagger d4" hidden></div>
       <div class="hero-stats stagger d5">
         <div><strong data-count="{{ n_lessons }}">{{ n_lessons }}</strong><span>Interactive lessons</span></div>
         <div><strong data-count="{{ n_challenges }}">{{ n_challenges }}</strong><span>Coding challenges</span></div>
@@ -44,31 +45,56 @@
       </div>
     </div>
     <div class="hero-visual stagger d3">
-      <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}"
-           alt="Python code connected to data, APIs, charts and an automation arm"
-           width="1588" height="991" fetchpriority="high">
-      <div class="visual-label label-one"><span></span> No setup required</div>
-      <div class="visual-label label-two">Real CPython · in browser</div>
+      <div class="hero-media">
+        <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}"
+             alt="Python code connected to data, APIs, charts and an automation arm"
+             width="1588" height="991" fetchpriority="high">
+        <div class="hero-scan" aria-hidden="true"></div>
+        <svg class="hero-flow" viewBox="0 0 700 520" preserveAspectRatio="none" aria-hidden="true">
+          <path class="flow-track" d="M78 360 C190 310 205 185 334 230 S494 338 630 118"></path>
+          <path class="flow-signal" d="M78 360 C190 310 205 185 334 230 S494 338 630 118"></path>
+          <circle class="flow-node n1" cx="78" cy="360" r="5"></circle>
+          <circle class="flow-node n2" cx="334" cy="230" r="5"></circle>
+          <circle class="flow-node n3" cx="630" cy="118" r="5"></circle>
+        </svg>
+        <div class="visual-label label-one"><span></span> Runtime ready</div>
+        <div class="visual-label label-two">Real CPython · local</div>
+      </div>
+      <div class="hero-capabilities" aria-hidden="true">
+        <span>{{ icon('database') }}<b>DATA</b></span>
+        <span>{{ icon('api') }}<b>APIs</b></span>
+        <span>{{ icon('automation') }}<b>AUTO</b></span>
+      </div>
       <div class="hero-demo hero-console card">
-        <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py — try it</span></div>
-        <textarea id="heroCode" class="code-input" rows="4" spellcheck="false" aria-label="Python code editor">name = "world"
+        <div class="editor-chrome">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="editor-title" id="heroFile">hello.py — live workspace</span>
+          <span class="editor-live"><i></i> Ready</span>
+        </div>
+        <div class="hero-scenarios" id="heroScenarios" role="tablist" aria-label="Example scripts">
+          <button class="scenario-chip on" data-scenario="0" role="tab" aria-selected="true">hello.py</button>
+          <button class="scenario-chip" data-scenario="1" role="tab" aria-selected="false">sales.py</button>
+          <button class="scenario-chip" data-scenario="2" role="tab" aria-selected="false">weather.py</button>
+          <button class="scenario-chip" data-scenario="3" role="tab" aria-selected="false">organizer.py</button>
+        </div>
+        <textarea id="heroCode" class="code-input" rows="5" spellcheck="false" aria-label="Python code editor">name = "world"
 for i in range(3):
     print(f"Hello, {name}! ({i + 1})")</textarea>
         <div class="editor-bar">
           <button class="btn btn-run" id="heroRun">▶ Run Python</button>
           <span class="editor-hint">⌘/Ctrl + Enter</span>
         </div>
-        <pre id="heroOut" class="code-output" aria-live="polite">Click Run to execute ↑</pre>
+        <pre id="heroOut" class="code-output" aria-live="polite">› Ready. Run the code — or watch it run itself.</pre>
       </div>
     </div>
   </div>
 </section>
 
 <section class="proof-strip" aria-label="Platform benefits">
-  <div><strong>Real Python 3</strong><span>Full CPython via WebAssembly</span></div>
-  <div><strong>Practice first</strong><span>Write code in every lesson</span></div>
-  <div><strong>Keep the skill</strong><span>Built-in spaced repetition</span></div>
-  <div><strong>Own your progress</strong><span>Free learning, optional account</span></div>
+  <div><span class="proof-icon">{{ icon('terminal') }}</span><p><strong>Real Python 3</strong><span>Full CPython via WebAssembly</span></p></div>
+  <div><span class="proof-icon">{{ icon('target') }}</span><p><strong>Practice first</strong><span>Write code in every lesson</span></p></div>
+  <div><span class="proof-icon">{{ icon('brain') }}</span><p><strong>Keep the skill</strong><span>Built-in spaced repetition</span></p></div>
+  <div><span class="proof-icon">{{ icon('lock') }}</span><p><strong>Own your progress</strong><span>Free learning, optional account</span></p></div>
 </section>
 
 <section class="section">
@@ -128,8 +154,8 @@ for i in range(3):
       <span class="how-num">2</span>
       <div class="how-card-title"><span class="how-icon">{{ icon('terminal') }}</span><div><small>Apply</small><h3>Code it live</h3></div></div>
       <div class="how-demo how-demo-code" aria-hidden="true">
-        <code class="type-line">print("I am coding")<span class="caret"></span></code>
-        <code class="type-result">Correct! Output matches.</code>
+        <code class="type-line"><span class="code-prompt">›</span> print("I am coding")<span class="caret"></span></code>
+        <code class="type-result"><span class="code-status">PASS</span> Output matches.</code>
       </div>
       <p>Every lesson ends with a graded challenge. Real Python 3 runs in your browser and checks your output the instant you hit Run.</p>
     </div>
@@ -215,6 +241,29 @@ for i in range(3):
   </div>
 </section>
 
+<section class="section usecase-section">
+  <div class="section-kicker"><span>05</span><p>Python in the real world</p></div>
+  <div class="usecase-head">
+    <div>
+      <span class="eyebrow">Every concept has a job</span>
+      <h2>See where each skill <span class="grad">earns its keep</span></h2>
+    </div>
+    <p>Nothing here is abstract. Each course is anchored to the software people actually get paid to write — pick the outcome that excites you and start there.</p>
+  </div>
+  <div class="usecase-grid">
+    {% for item in use_cases %}
+    <a href="{{ url_for('course_detail', slug=item.course.slug) }}" class="usecase-card card" style="--accent: {{ item.course.color }}">
+      <span class="usecase-icon">{{ icon(item.case.icon) }}</span>
+      <div class="usecase-body">
+        <h3>{{ item.case.title }}</h3>
+        <p>{{ item.case.desc }}</p>
+      </div>
+      <span class="usecase-course"><i></i>{{ item.course.title }} <b>→</b></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
 <section class="section alt">
   <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
   <div class="feature-grid">
@@ -244,5 +293,140 @@ for i in range(3):
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script>
   PyRunner.wireSimple('heroRun', 'heroCode', 'heroOut');
+
+  /* Hero auto-demo: types real-world scripts and "executes" them on a loop
+     until the visitor takes over. The outputs are exactly what CPython
+     prints for each script; pressing Run always executes for real. */
+  (function () {
+    'use strict';
+    var scenarios = [
+      { file: 'hello.py', label: 'First program',
+        code: 'name = "world"\nfor i in range(3):\n    print(f"Hello, {name}! ({i + 1})")',
+        out: ['Hello, world! (1)', 'Hello, world! (2)', 'Hello, world! (3)'] },
+      { file: 'sales.py', label: 'Data analysis',
+        code: 'orders = [("Laptop", 1149), ("Mouse", 29), ("Desk", 349)]\ntotal = sum(price for _, price in orders)\ntop = max(orders, key=lambda o: o[1])\nprint(f"Revenue: €{total}")\nprint(f"Best seller: {top[0]}")',
+        out: ['Revenue: €1527', 'Best seller: Laptop'] },
+      { file: 'weather.py', label: 'Working with APIs',
+        code: 'import json\n\nraw = \'{"city": "Vilnius", "temp": 24, "sky": "clear"}\'\nreport = json.loads(raw)\nprint(f"{report[\'city\']}: {report[\'temp\']}°C, {report[\'sky\']}")',
+        out: ['Vilnius: 24°C, clear'] },
+      { file: 'organizer.py', label: 'Automation',
+        code: 'files = ["report.pdf", "logo.png", "notes.txt", "deck.pdf"]\npdfs = [f for f in files if f.endswith(".pdf")]\nprint(f"Found {len(pdfs)} PDF(s):")\nfor f in pdfs:\n    print(" •", f)',
+        out: ['Found 2 PDF(s):', ' • report.pdf', ' • deck.pdf'] },
+    ];
+
+    var visual = document.querySelector('.hero-visual');
+    var codeEl = document.getElementById('heroCode');
+    var outEl = document.getElementById('heroOut');
+    var fileEl = document.getElementById('heroFile');
+    var liveEl = document.querySelector('.hero-console .editor-live');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.scenario-chip'));
+    if (!visual || !codeEl || !outEl) return;
+
+    var autoplay = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var timers = [];
+
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+    function setStatus(label, state) {
+      visual.classList.remove('is-executing', 'is-complete', 'is-failed');
+      if (state) visual.classList.add(state);
+      if (liveEl) liveEl.innerHTML = '<i></i> ' + label;
+    }
+
+    function selectChip(i) {
+      chips.forEach(function (chip, j) {
+        chip.classList.toggle('on', i === j);
+        chip.setAttribute('aria-selected', String(i === j));
+      });
+    }
+
+    function showOutput(lines, animate) {
+      outEl.classList.remove('error');
+      if (!animate) { outEl.textContent = lines.join('\n'); return; }
+      outEl.textContent = '';
+      lines.forEach(function (line, i) {
+        later(function () {
+          var span = document.createElement('span');
+          span.className = 'out-line';
+          span.textContent = line;
+          outEl.appendChild(span);
+        }, i * 240);
+      });
+    }
+
+    function playScenario(i) {
+      var s = scenarios[i];
+      selectChip(i);
+      if (fileEl) fileEl.textContent = s.file + ' — ' + s.label;
+      setStatus('Writing', '');
+      codeEl.classList.add('is-autotyping');
+      outEl.textContent = '› ' + s.file + ' queued…';
+      var pos = 0;
+      (function type() {
+        if (!autoplay) return;
+        codeEl.value = s.code.slice(0, pos);
+        codeEl.scrollTop = codeEl.scrollHeight;
+        if (pos <= s.code.length) { pos += 1; later(type, 16 + Math.random() * 22); return; }
+        codeEl.classList.remove('is-autotyping');
+        setStatus('Running', 'is-executing');
+        outEl.textContent = '› python ' + s.file;
+        later(function () {
+          if (!autoplay) return;
+          showOutput(s.out, true);
+          later(function () {
+            if (!autoplay) return;
+            setStatus('Complete · exit 0', 'is-complete');
+            later(function () {
+              if (autoplay) playScenario((i + 1) % scenarios.length);
+            }, 3600);
+          }, s.out.length * 240 + 250);
+        }, 620);
+      })();
+    }
+
+    function stopAutoplay() {
+      if (!autoplay) return;
+      autoplay = false;
+      clearTimers();
+      codeEl.classList.remove('is-autotyping');
+      setStatus('Ready', '');
+      if (fileEl) fileEl.textContent = 'live workspace — yours';
+    }
+
+    // Any real interaction hands the console over to the visitor.
+    ['pointerdown', 'keydown'].forEach(function (evt) {
+      codeEl.addEventListener(evt, stopAutoplay);
+    });
+    document.getElementById('heroRun').addEventListener('pointerdown', stopAutoplay);
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var i = Number(chip.dataset.scenario);
+        stopAutoplay();
+        var s = scenarios[i];
+        selectChip(i);
+        codeEl.value = s.code;
+        if (fileEl) fileEl.textContent = s.file + ' — ' + s.label;
+        outEl.classList.remove('error');
+        outEl.textContent = '› ' + s.file + ' loaded. Press Run to execute it for real.';
+      });
+    });
+
+    if (autoplay) {
+      if ('IntersectionObserver' in window) {
+        var started = false;
+        new IntersectionObserver(function (entries, io) {
+          if (!started && entries[0].isIntersecting) {
+            started = true;
+            io.disconnect();
+            later(function () { if (autoplay) playScenario(1); }, 1100);
+          }
+        }, { threshold: 0.4 }).observe(codeEl);
+      } else {
+        later(function () { if (autoplay) playScenario(1); }, 1100);
+      }
+    }
+  })();
 </script>
 {% endblock %}
