@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}Python Challenge Arena — PySprint{% endblock %}
+{% block title %}Python Challenge Arena — LearnWithPython{% endblock %}
 {% block description %}Test your Python skills against {{ challenges|length }} graded coding challenges — from vowel counters to rate limiters. Earn big XP and climb the leaderboard.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="arena-visual" aria-hidden="true">
-    <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}" alt="" width="1588" height="991">
+    <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}" alt="" width="1600" height="1040">
     <div class="arena-score"><strong>{{ challenges|length }}</strong><span>problems</span></div>
     <div class="arena-score second"><strong>{{ challenges|sum(attribute='xp') }}</strong><span>max XP</span></div>
   </div>

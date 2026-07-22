@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}Log in to PySprint — Continue Learning Python{% endblock %}
-{% block description %}Log in to PySprint to continue your Python journey — your XP, streak and achievements are waiting.{% endblock %}
+{% block title %}Log in to LearnWithPython — Continue Learning Python{% endblock %}
+{% block description %}Log in to LearnWithPython to continue your Python journey — your XP, streak and achievements are waiting.{% endblock %}
 {% block robots %}noindex, follow{% endblock %}
 
 {% block content %}
@@ -17,6 +17,12 @@
     <h1>Log in</h1>
     <p class="muted">Continue your Python path.</p>
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+    {% if google_enabled %}
+    <a class="btn btn-google btn-lg" href="{{ url_for('google_login', next=request.args.get('next', '')) }}">
+      {{ icon('google', 'google-glyph') }} Continue with Google
+    </a>
+    <div class="auth-divider"><span>or use email</span></div>
+    {% endif %}
     <label>Username or email
       <input type="text" name="username" required autocomplete="username" autofocus>
     </label>

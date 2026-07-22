@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}{{ course.title }} — Python Course | PySprint{% endblock %}
+{% block title %}{{ course.title }} — Python Course | LearnWithPython{% endblock %}
 {% block description %}Master {{ course.title }} with live Python exercises, real-world examples and graded browser challenges. Free, interactive and no setup required.{% endblock %}
 
 {% block structured_data %}
@@ -8,7 +8,7 @@
 {"@context": "https://schema.org", "@type": "Course",
  "name": "{{ course.title }}",
  "description": "{{ course.description }}",
- "provider": {"@type": "Organization", "name": "PySprint", "url": "{{ site_url }}"},
+ "provider": {"@type": "Organization", "name": "LearnWithPython", "url": "{{ site_url }}"},
  "isAccessibleForFree": true,
  "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "courseWorkload": "PT{{ course.lessons|sum(attribute='minutes') }}M"}}
 </script>

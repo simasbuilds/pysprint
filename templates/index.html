@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
+{% block title %}LearnWithPython — Learn Python Interactively, Free{% endblock %}
 {% block description %}Master Python with {{ n_lessons }} interactive lessons across {{ n_courses }} courses — from your first print() to decorators, generators and real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "EducationalOrganization",
- "name": "PySprint", "url": "{{ site_url }}",
+ "name": "LearnWithPython", "url": "{{ site_url }}",
  "description": "Free interactive Python courses: fundamentals, data structures, OOP, APIs and automation.",
  "sameAs": ["https://github.com/simasbuilds"]}
 </script>
@@ -47,8 +47,8 @@
     <div class="hero-visual stagger d3">
       <div class="hero-media">
         <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}"
-             alt="Python code connected to data, APIs, charts and an automation arm"
-             width="1588" height="991" fetchpriority="high">
+             alt="A code editor connected to a data chart, an API bracket icon, and an automation gear"
+             width="1600" height="1040" fetchpriority="high">
         <div class="hero-scan" aria-hidden="true"></div>
         <svg class="hero-flow" viewBox="0 0 700 520" preserveAspectRatio="none" aria-hidden="true">
           <path class="flow-track" d="M78 360 C190 310 205 185 334 230 S494 338 630 118"></path>
@@ -77,7 +77,7 @@
           <button class="scenario-chip" data-scenario="2" role="tab" aria-selected="false">weather.py</button>
           <button class="scenario-chip" data-scenario="3" role="tab" aria-selected="false">organizer.py</button>
         </div>
-        <textarea id="heroCode" class="code-input" rows="5" spellcheck="false" aria-label="Python code editor">name = "world"
+        <textarea id="heroCode" class="code-input" rows="4" spellcheck="false" aria-label="Python code editor">name = "world"
 for i in range(3):
     print(f"Hello, {name}! ({i + 1})")</textarea>
         <div class="editor-bar">
@@ -102,7 +102,7 @@ for i in range(3):
   <div class="path-feature">
     <img src="{{ url_for('static', filename='images/learning-path.png') }}"
          alt="Connected stations progressing from syntax to expert Python"
-         width="1657" height="949" loading="lazy" data-reveal="left">
+         width="1600" height="900" loading="lazy" data-reveal="left">
     <div class="path-feature-copy" data-reveal="right">
       <span class="eyebrow">A route you can trust</span>
       <h2>A complete path, <span class="grad">beginner to expert</span></h2>
@@ -176,7 +176,7 @@ for i in range(3):
   <div class="project-showcase">
     <img src="{{ url_for('static', filename='images/real-projects.png') }}"
          alt="Python powering budget, security, sales, task and webhook projects"
-         width="1774" height="887" loading="lazy" data-reveal="left">
+         width="1600" height="900" loading="lazy" data-reveal="left">
     <div data-reveal="right">
       <span class="eyebrow">From lesson to shipped</span>
       <h2>Build <span class="grad">real software</span>, step by step</h2>
@@ -207,7 +207,7 @@ for i in range(3):
       <span class="eyebrow">How to actually learn Python</span>
       <h2>Four habits separate people who <span class="grad">finish</span> from people who restart.</h2>
     </div>
-    <p>Every mechanic on PySprint exists to enforce one of these evidence-backed habits. Steal them — they work everywhere, not just here.</p>
+    <p>Every mechanic on LearnWithPython exists to enforce one of these evidence-backed habits. Steal them — they work everywhere, not just here.</p>
   </div>
   <div class="learn-grid">
     <div class="learn-card card">

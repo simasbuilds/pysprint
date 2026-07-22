@@ -1,4 +1,4 @@
-"""PySprint — an interactive Python learning platform.
+"""LearnWithPython — an interactive Python learning platform.
 
 Flask backend: pages, auth, progress API, achievements, SEO routes.
 Run:  python app.py   (then open http://127.0.0.1:5000)
@@ -31,6 +31,27 @@ app.config["SITE_URL"] = os.environ.get("SITE_URL", "http://127.0.0.1:5000")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
+
+# ── Google Sign-In (optional; activates when credentials are present) ──
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "").strip()
+google_oauth = None
+if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
+    try:
+        from authlib.integrations.flask_client import OAuth
+        _oauth = OAuth(app)
+        google_oauth = _oauth.register(
+            name="google",
+            client_id=GOOGLE_CLIENT_ID,
+            client_secret=GOOGLE_CLIENT_SECRET,
+            server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+            client_kwargs={"scope": "openid email profile"},
+        )
+    except Exception as exc:  # Authlib missing or misconfigured — stay disabled.
+        app.logger.warning("Google OAuth disabled: %s", exc)
+        google_oauth = None
+
+app.config["GOOGLE_ENABLED"] = google_oauth is not None
 
 db.init_db()
 
@@ -119,6 +140,7 @@ def inject_globals():
                          "color": c["color"],
                          "href": f"/courses/{c['slug']}/{l['slug']}"}
                         for c in COURSES for l in c["lessons"]],
+        "google_enabled": app.config.get("GOOGLE_ENABLED", False),
     }
 
 
@@ -332,6 +354,64 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("home"))
+
+
+# ── Google Sign-In (OpenID Connect via Authlib) ──────────────────────
+
+def _unique_username(base):
+    """Derive an available username from a Google display name / email."""
+    base = re.sub(r"[^a-zA-Z0-9_]", "", (base or "user")).lower()[:20] or "user"
+    if len(base) < 3:
+        base = (base + "user")[:20]
+    candidate, n = base, 0
+    while db.find_user(candidate):
+        n += 1
+        suffix = str(n)
+        candidate = base[: 24 - len(suffix)] + suffix
+    return candidate
+
+
+@app.get("/auth/google")
+def google_login():
+    if not google_oauth:
+        return redirect(url_for("login"))
+    session["oauth_next"] = safe_next(request.args.get("next")) or url_for("dashboard")
+    redirect_uri = app.config["SITE_URL"].rstrip("/") + url_for("google_callback")
+    return google_oauth.authorize_redirect(redirect_uri)
+
+
+@app.get("/auth/google/callback")
+def google_callback():
+    if not google_oauth:
+        return redirect(url_for("login"))
+    try:
+        token = google_oauth.authorize_access_token()
+        info = token.get("userinfo") or google_oauth.userinfo()
+    except Exception as exc:  # user cancelled or token exchange failed
+        app.logger.warning("Google callback failed: %s", exc)
+        return redirect(url_for("login"))
+
+    sub = info.get("sub")
+    email = (info.get("email") or "").strip()
+    if not sub or not email:
+        return redirect(url_for("login"))
+    avatar = info.get("picture")
+
+    user = db.find_user_by_google(sub)
+    if not user:
+        existing = db.find_user(email)          # link Google to a prior password account
+        if existing:
+            db.link_google_to_user(existing["id"], sub, avatar)
+            user = db.get_user(existing["id"])
+        else:
+            username = _unique_username(info.get("name") or email.split("@")[0])
+            uid = db.create_google_user(username, email, sub, avatar)
+            user = db.get_user(uid)
+
+    session["user_id"] = user["id"]
+    session.permanent = True
+    award_new_achievements(user)
+    return redirect(session.pop("oauth_next", None) or url_for("dashboard"))
 
 
 # ── progress API ─────────────────────────────────────────────────────

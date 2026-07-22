@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   PySprint design system v2 — light-first, theme-aware, animated
+   LearnWithPython design system v2 — light-first, theme-aware, animated
    Light theme is the default; [data-theme="dark"] flips the palette.
    Code editors intentionally stay dark in both themes.
    ═══════════════════════════════════════════════════════════════════ */
@@ -713,8 +713,10 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
 .footer { border-top: 1px solid var(--border); background: var(--bg-soft); margin-top: 3rem; }
 .footer-inner {
   max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.25rem 1rem;
-  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem;
 }
+.footer-tag { color: var(--text); display: block; margin-bottom: .15rem; }
+.footer-soon { color: var(--text-dim); font-size: .82rem; opacity: .8; }
 .footer-brand p { color: var(--text-dim); font-size: .9rem; margin-top: .5rem; max-width: 300px; }
 .footer-col { display: flex; flex-direction: column; gap: .45rem; }
 .footer-col h4 { color: var(--text-dim); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .3rem; }
@@ -1063,9 +1065,13 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
   position: absolute; z-index: 4; width: min(410px, 86%); left: -1.4rem; bottom: -1.7rem;
   animation: none; border: 1px solid rgba(255, 255, 255, .16); box-shadow: 0 30px 70px rgba(4, 10, 22, .4);
 }
-.hero-console .code-input { min-height: 104px; font-size: .78rem; padding-block: .7rem; }
-.hero-console .editor-bar { padding-block: .55rem; }
-.hero-console .code-output { min-height: 2.7rem; padding-block: .7rem; font-size: .76rem; }
+.hero-console .code-input { min-height: 76px; font-size: .72rem; line-height: 1.5; padding-block: .55rem; }
+.hero-console .editor-bar { padding-block: .45rem; }
+.hero-console .code-output { min-height: 2.1rem; max-height: 90px; padding-block: .55rem; font-size: .7rem; }
+.hero-console .editor-chrome { padding-block: .5rem; }
+.hero-console .editor-title { font-size: .7rem; }
+.hero-console .hero-scenarios { padding: .4rem .6rem; gap: .28rem; }
+.hero-console .scenario-chip { padding: .16rem .45rem; font-size: .6rem; }
 .proof-strip {
   max-width: 1240px; margin: 0 auto; padding: 1rem 1.25rem 3.5rem;
   display: grid; grid-template-columns: repeat(4, 1fr);
@@ -1203,7 +1209,7 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
   .hero h1 { font-size: clamp(2.55rem, 13vw, 4rem); }
   .hero-sub br { display: none; }
   .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
-  .hero-stats div { padding-right: .4rem; }
+  .hero-stats div { min-width: 0; padding-right: .4rem; margin-right: 0; border-right: 0; }
   .hero-stats strong { font-size: 1.4rem; }
   .hero-stats span { font-size: .7rem; line-height: 1.25; }
   .hero-visual { min-height: auto; padding-bottom: 0; }
@@ -1790,7 +1796,7 @@ p { text-wrap: pretty; }
   .global-cta { border-radius: 16px; }
 }
 
-/* ═══════════════════ v7: PySprint professional learning lab ═══════ */
+/* ═══════════════════ v7: LearnWithPython professional learning lab ═══════ */
 :root {
   --brand-1: #2563eb;
   --brand-2: #0f9f8f;
@@ -1909,27 +1915,27 @@ body {
 .theme-toggle { border-radius: 11px; }
 
 /* Hero: tighter message, clearer value, and a calmer visual hierarchy. */
-.hero { padding: 4.35rem 1.25rem 3.2rem; }
-.hero-inner { max-width: 1280px; grid-template-columns: .92fr 1.08fr; gap: 2.75rem; }
+.hero { padding: 4.75rem 1.25rem 4rem; }
+.hero-inner { max-width: 1280px; grid-template-columns: .92fr 1.08fr; gap: 3.5rem; }
 .hero h1 { max-width: 650px; font-size: clamp(3rem, 5.15vw, 4.8rem); line-height: .98; }
 .hero-sub { max-width: 600px; font-size: 1.03rem; line-height: 1.7; }
 .pill { color: #165fd4; background: #eef4ff; border-color: #cfddf7; }
 [data-theme="dark"] .pill { color: #93c5fd; background: var(--tint-1); border-color: var(--border); }
 .hero-assurance {
   display: flex; align-items: center; flex-wrap: wrap; gap: .35rem;
-  margin: -1.25rem 0 1.7rem; color: var(--text-dim); font-size: .75rem; font-weight: 700;
+  margin: -.5rem 0 1.85rem; color: var(--text-dim); font-size: .75rem; font-weight: 700;
 }
 .hero-assurance .ui-icon { color: var(--brand-2); }
 .hero-assurance > span { display: inline-flex; align-items: center; gap: .3rem; }
 .hero-assurance > span + span::before { content: ''; width: 1px; height: 14px; margin-inline: .35rem; background: var(--border); }
-.hero-stats { gap: 0; border-top: 1px solid var(--border); padding-top: 1.2rem; }
+.hero-stats { gap: 0; border-top: 1px solid var(--border); padding-top: 1.5rem; }
 .hero-stats div { min-width: 135px; padding-right: 1.2rem; margin-right: 1.2rem; border-right: 1px solid var(--border); }
 .hero-stats div:last-child { border-right: 0; }
 .hero-stats strong { color: var(--brand-1); background: none; font-size: 1.65rem; }
 .hero-visual { min-height: 535px; }
 .hero-visual > img { min-height: 520px; border-radius: 24px; box-shadow: 0 30px 70px rgba(8, 20, 38, .2); }
 .hero-visual::after { border-radius: 18px; }
-.hero-console { width: min(400px, 88%); bottom: -1.25rem; left: -1rem; }
+.hero-console { width: min(320px, 62%); bottom: -1.1rem; left: -1.1rem; }
 .proof-strip { padding-bottom: 2.7rem; }
 .proof-strip strong { color: var(--text); }
 
@@ -2908,4 +2914,21 @@ body.cmdk-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .lesson-list.timeline li:has(.is-next)::before,
   .resume-chip, .resume-chip i { animation: none; }
+}
+
+/* ═══════════════════ v12: Google sign-in, rebrand polish ═══════════ */
+.btn-google {
+  width: 100%; gap: .6rem; background: #fff; color: #1f2937;
+  border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.btn-google:hover { background: #f8fafc; box-shadow: 0 2px 8px rgba(0,0,0,.1); transform: translateY(-1px); }
+[data-theme="dark"] .btn-google { background: #1f2937; color: #e6ebf4; border-color: #374151; }
+[data-theme="dark"] .btn-google:hover { background: #263042; }
+.google-glyph { width: 18px; height: 18px; stroke: none; fill: none; }
+.auth-divider {
+  display: flex; align-items: center; gap: .8rem; margin: .35rem 0 .1rem;
+  color: var(--text-dim); font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
 }

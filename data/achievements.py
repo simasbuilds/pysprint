@@ -15,7 +15,7 @@ ACHIEVEMENTS = [
      "desc": "Complete 15 lessons.",
      "check": lambda s: s["lessons_done"] >= 15},
     {"id": "completionist", "icon": "trophy", "title": "Completionist",
-     "desc": "Complete every lesson on PySprint.",
+     "desc": "Complete every lesson on LearnWithPython.",
      "check": lambda s: s["lessons_done"] >= s["total_lessons"]},
 
     {"id": "fundamentals-master", "icon": "terminal", "title": "Fundamentals Master",

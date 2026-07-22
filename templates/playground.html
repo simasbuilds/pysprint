@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}Python Playground — Browser IDE | PySprint{% endblock %}
+{% block title %}Python Playground — Browser IDE | LearnWithPython{% endblock %}
 {% block description %}Write, run, import and download real Python 3 in a focused browser IDE — with practical recipes, autosave, run history and zero installation.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"PySprint Python Playground","applicationCategory":"DeveloperApplication","operatingSystem":"Any modern web browser","url":"{{ site_url }}{{ request.path }}","description":{{ self.description()|striptags|trim|tojson }},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Run Python 3 in the browser","Local autosave","Import and download Python files","Practical starter recipes"]}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"LearnWithPython Python Playground","applicationCategory":"DeveloperApplication","operatingSystem":"Any modern web browser","url":"{{ site_url }}{{ request.path }}","description":{{ self.description()|striptags|trim|tojson }},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Run Python 3 in the browser","Local autosave","Import and download Python files","Practical starter recipes"]}
 </script>
 {% endblock %}
 

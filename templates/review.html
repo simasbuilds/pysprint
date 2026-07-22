@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}Smart Review — Spaced-Repetition Python Flashcards | PySprint{% endblock %}
-{% block description %}PySprint's built-in study engine: every Python concept as a flashcard, scheduled with spaced repetition so you never forget what you learned.{% endblock %}
+{% block title %}Smart Review — Spaced-Repetition Python Flashcards | LearnWithPython{% endblock %}
+{% block description %}LearnWithPython's built-in study engine: every Python concept as a flashcard, scheduled with spaced repetition so you never forget what you learned.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LearningResource","name":"PySprint Smart Review","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","learningResourceType":"Spaced-repetition flashcards","inLanguage":"en-US","isAccessibleForFree":true}
+{"@context":"https://schema.org","@type":"LearningResource","name":"LearnWithPython Smart Review","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","learningResourceType":"Spaced-repetition flashcards","inLanguage":"en-US","isAccessibleForFree":true}
 </script>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 <section class="page-head review-head">
   <span class="eyebrow">Five minutes a day</span>
   <h1>Smart Review {{ icon('brain', 'heading-icon') }}</h1>
-  <p>Every quiz concept on PySprint, turned into flashcards and scheduled with <strong>spaced repetition</strong> — cards you find hard come back sooner, cards you know come back later. Five minutes a day keeps everything fresh.</p>
+  <p>Every quiz concept on LearnWithPython, turned into flashcards and scheduled with <strong>spaced repetition</strong> — cards you find hard come back sooner, cards you know come back later. Five minutes a day keeps everything fresh.</p>
 </section>
 
 <section class="section narrow">

@@ -1,4 +1,4 @@
-/* PySprint shared UI: theme, nav, toasts, achievement modal,
+/* LearnWithPython shared UI: theme, nav, toasts, achievement modal,
    scroll-reveal, count-up stats, copy buttons, progress bar, back-to-top. */
 (function () {
   'use strict';

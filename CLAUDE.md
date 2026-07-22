@@ -1,10 +1,10 @@
-# CLAUDE.md — PySprint
+# CLAUDE.md — LearnWithPython
 
 Guidance for Claude Code (and any developer) working in this repository.
 
 ## What this is
 
-**PySprint** is a full-stack interactive Python learning platform:
+**LearnWithPython** is a full-stack interactive Python learning platform:
 Flask + SQLite backend, Jinja server-rendered multi-page frontend, and real
 Python 3 running **in the browser** via Pyodide (WebAssembly). Learners take
 courses, pass graded coding challenges, take quizzes, earn XP/streaks/

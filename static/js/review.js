@@ -1,4 +1,4 @@
-/* PySprint Smart Review — a lightweight spaced-repetition engine (SM-2 style).
+/* LearnWithPython Smart Review — a lightweight spaced-repetition engine (SM-2 style).
    Card state lives in localStorage: {ease, intervalMin, due, reps}.
    Grades: 0 Again (<1m) · 1 Hard (10m) · 2 Good (1d) · 3 Easy (4d) */
 (function () {

@@ -1,4 +1,4 @@
-# 🐍 PySprint — Learn Python by Actually Writing Python
+# 🐍 LearnWithPython — Learn Python by Actually Writing Python
 
 A full-stack, interactive Python learning platform. Six structured courses,
 34 lessons, 10 arena challenges, real Python 3 running **in your browser**
@@ -76,6 +76,35 @@ Copy `.env.example` → `.env`:
 | `SITE_URL` | Canonical URL used in SEO tags & sitemap |
 | `DATABASE_PATH` | SQLite file location |
 | `FLASK_DEBUG` / `PORT` | Dev server settings |
+| `SESSION_COOKIE_SECURE` | Set `1` in production (HTTPS) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Enables "Continue with Google" (optional) |
+| `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase project keys (optional) |
+
+### 🔵 Enabling Google Sign-In
+
+The "Continue with Google" button is **feature-flagged** — it stays hidden and
+the routes redirect to the normal login until you provide credentials, so the
+site runs fine without it.
+
+1. `pip install -r requirements.txt` (adds Authlib).
+2. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   → **Create OAuth client ID** → *Web application*.
+3. Add an **Authorized redirect URI**: `{SITE_URL}/auth/google/callback`
+   (e.g. `https://learnwithpython.com/auth/google/callback` and
+   `http://127.0.0.1:5000/auth/google/callback` for local dev).
+4. Put the client ID/secret in `.env` (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`).
+5. Restart — the button appears on `/login` and `/register` automatically.
+
+Google users get a passwordless account (schema migrates automatically to add
+`google_sub` / `avatar_url` columns; existing password accounts are linked by
+email on first Google sign-in).
+
+### 🟢 Supabase (optional data backend)
+
+`.env` carries `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`
+placeholders. Create a project at [supabase.com](https://supabase.com), copy the
+keys from **Project Settings → API**, and drop them in. (The default backend is
+local SQLite; Supabase wiring is the next milestone.)
 
 ## 🧭 Deploying
 

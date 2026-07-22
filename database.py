@@ -1,11 +1,11 @@
-"""SQLite persistence layer for PySprint (stdlib only, no ORM)."""
+"""SQLite persistence layer for LearnWithPython (stdlib only, no ORM)."""
 
 import os
 import sqlite3
 from contextlib import contextmanager
 from datetime import date
 
-DB_PATH = os.environ.get("DATABASE_PATH", "pysprint.db")
+DB_PATH = os.environ.get("DATABASE_PATH", "learnwithpython.db")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -58,6 +58,12 @@ def get_db():
 def init_db():
     with get_db() as db:
         db.executescript(SCHEMA)
+        # Lightweight, additive migrations (safe to run every boot).
+        cols = {r["name"] for r in db.execute("PRAGMA table_info(users)")}
+        if "google_sub" not in cols:
+            db.execute("ALTER TABLE users ADD COLUMN google_sub TEXT")
+        if "avatar_url" not in cols:
+            db.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
 
 
 # ── users ────────────────────────────────────────────────────────────
@@ -78,6 +84,33 @@ def find_user(username_or_email):
             (username_or_email, username_or_email),
         ).fetchone()
         return dict(row) if row else None
+
+
+def find_user_by_google(google_sub):
+    with get_db() as db:
+        row = db.execute(
+            "SELECT * FROM users WHERE google_sub = ?", (google_sub,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def create_google_user(username, email, google_sub, avatar_url=None):
+    """Create a passwordless account linked to a Google identity."""
+    with get_db() as db:
+        cur = db.execute(
+            "INSERT INTO users (username, email, password_hash, google_sub, avatar_url) "
+            "VALUES (?, ?, '', ?, ?)",
+            (username, email, google_sub, avatar_url),
+        )
+        return cur.lastrowid
+
+
+def link_google_to_user(user_id, google_sub, avatar_url=None):
+    with get_db() as db:
+        db.execute(
+            "UPDATE users SET google_sub = ?, avatar_url = COALESCE(?, avatar_url) WHERE id = ?",
+            (google_sub, avatar_url, user_id),
+        )
 
 
 def get_user(user_id):

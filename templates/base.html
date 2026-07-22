@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}PySprint — Learn Python Interactively{% endblock %}</title>
+  <title>{% block title %}LearnWithPython — Learn Python Interactively{% endblock %}</title>
   <meta name="description" content="{% filter forceescape %}{% block description %}Learn Python for free with interactive lessons, in-browser coding challenges, quizzes, XP and achievements. From absolute beginner to building your own APIs.{% endblock %}{% endfilter %}">
   <meta name="keywords" content="learn python, python course, interactive python, python for beginners, python API tutorial, coding challenges, free python course">
   <meta name="author" content="simasbuilds">
-  <meta name="application-name" content="PySprint">
+  <meta name="application-name" content="LearnWithPython">
   <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#07111f" media="(prefers-color-scheme: dark)">
   <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}">
@@ -16,12 +16,12 @@
   <!-- Open Graph -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:locale" content="en_US">
-  <meta property="og:site_name" content="PySprint">
+  <meta property="og:site_name" content="LearnWithPython">
   <meta property="og:title" content="{% filter forceescape %}{% block og_title %}{{ self.title() }}{% endblock %}{% endfilter %}">
   <meta property="og:description" content="{{ self.description()|striptags|trim|forceescape }}">
   <meta property="og:url" content="{{ site_url }}{{ request.path }}">
   <meta property="og:image" content="{% block social_image %}{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/pysprint-hero.png') }}{% endblock %}">
-  <meta property="og:image:alt" content="{% filter forceescape %}{% block social_image_alt %}PySprint interactive Python learning workspace{% endblock %}{% endfilter %}">
+  <meta property="og:image:alt" content="{% filter forceescape %}{% block social_image_alt %}LearnWithPython interactive Python learning workspace{% endblock %}{% endfilter %}">
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ self.og_title()|striptags|trim|forceescape }}">
@@ -49,14 +49,14 @@
       {
         "@type": "Organization",
         "@id": "{{ site_url.rstrip('/') }}/#organization",
-        "name": "PySprint",
+        "name": "LearnWithPython",
         "url": "{{ site_url.rstrip('/') }}/",
         "logo": "{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/favicon.svg') }}"
       },
       {
         "@type": "WebSite",
         "@id": "{{ site_url.rstrip('/') }}/#website",
-        "name": "PySprint",
+        "name": "LearnWithPython",
         "url": "{{ site_url.rstrip('/') }}/",
         "publisher": {"@id": "{{ site_url.rstrip('/') }}/#organization"},
         "description": "Free interactive Python courses with in-browser coding, projects, challenges and spaced repetition."
@@ -87,10 +87,10 @@
   </div>
   <header class="nav">
     <div class="nav-inner">
-      <a href="{{ url_for('home') }}" class="brand" aria-label="PySprint home">
+      <a href="{{ url_for('home') }}" class="brand" aria-label="LearnWithPython home">
         <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span>
-        <span class="brand-name">Py<em>Sprint</em></span>
-        <span class="brand-tag">LEARN LAB</span>
+        <span class="brand-name">LearnWith<em>Python</em></span>
+        <span class="brand-tag">PYTHON LAB</span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <div class="nav-menu-wrap">
@@ -205,8 +205,8 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span> <strong>PySprint</strong>
-        <p>Learn Python by writing Python. Free, interactive, forever.</p>
+        <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span> <strong>LearnWithPython</strong>
+        <p><strong class="footer-tag">Real Python. Real results.</strong> Learn by writing real code in your browser — free, interactive, forever.</p>
       </div>
       <div class="footer-col">
         <h4>Learn</h4>
@@ -223,8 +223,13 @@
         {% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}
         <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">GitHub</a>
       </div>
+      <div class="footer-col">
+        <h4>The series</h4>
+        <a href="https://learnwithsql.com" rel="noopener" target="_blank">LearnWithSQL ↗</a>
+        <span class="footer-soon">LearnWithPython · you're here</span>
+      </div>
     </div>
-    <p class="footer-copy">© {{ now_year }} PySprint by simasbuilds · Built with Flask & Pyodide</p>
+    <p class="footer-copy">© {{ now_year }} LearnWithPython by simasbuilds · Built with Flask & Pyodide</p>
   </footer>
 
   <!-- ⌘K command palette -->
@@ -253,7 +258,7 @@
       {"label": "Real-life projects", "hint": "Five guided portfolio builds", "href": "{{ url_for('projects') }}", "icon": "blocks"},
       {"label": "Playground", "hint": "Blank Python workspace", "href": "{{ url_for('playground') }}", "icon": "terminal"},
       {"label": "Smart Review", "hint": "Spaced-repetition flashcards", "href": "{{ url_for('review') }}", "icon": "brain"},
-      {"label": "How it works", "hint": "About PySprint", "href": "{{ url_for('about') }}", "icon": "info"}
+      {"label": "How it works", "hint": "About LearnWithPython", "href": "{{ url_for('about') }}", "icon": "info"}
       {%- if user -%}
       ,{"label": "Dashboard", "hint": "XP, streaks and progress", "href": "{{ url_for('dashboard') }}", "icon": "chart"}
       {%- else -%}

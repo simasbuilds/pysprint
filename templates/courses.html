@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}Python Courses — PySprint{% endblock %}
+{% block title %}Python Courses — LearnWithPython{% endblock %}
 {% block description %}Structured Python courses from Fundamentals through APIs and Automation to Expert Python. Interactive, free, beginner to advanced.{% endblock %}
 {% block social_image %}{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/learning-path.png') }}{% endblock %}
-{% block social_image_alt %}The PySprint learning path from Python fundamentals to expert Python{% endblock %}
+{% block social_image_alt %}The LearnWithPython learning path from Python fundamentals to expert Python{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ItemList","name":"Free interactive Python courses","numberOfItems":{{ courses|length }},"itemListElement":[
@@ -26,7 +26,7 @@
   </div>
   <img src="{{ url_for('static', filename='images/learning-path.png') }}"
        alt="A visual pathway from Python fundamentals to automation"
-       width="1657" height="949">
+       width="1600" height="900">
 </section>
 
 <section class="section" id="courseCatalog">

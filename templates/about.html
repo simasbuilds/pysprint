@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
-{% block title %}About PySprint — How It Works{% endblock %}
-{% block description %}How PySprint teaches Python: interactive lessons, in-browser code execution, spaced repetition and gamified progress. Free and open source by simasbuilds.{% endblock %}
+{% block title %}About LearnWithPython — How It Works{% endblock %}
+{% block description %}How LearnWithPython teaches Python: interactive lessons, in-browser code execution, spaced repetition and gamified progress. Free and open source by simasbuilds.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"AboutPage","name":"About PySprint","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","mainEntity":{"@id":"{{ site_url.rstrip('/') }}/#organization"}}
+{"@context":"https://schema.org","@type":"AboutPage","name":"About LearnWithPython","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","mainEntity":{"@id":"{{ site_url.rstrip('/') }}/#organization"}}
 </script>
 {% endblock %}
 
 {% block content %}
 <section class="page-head about-head">
-  <span class="eyebrow">Why PySprint exists</span>
+  <span class="eyebrow">Why LearnWithPython exists</span>
   <h1>Python is learned at the keyboard.</h1>
-  <p>PySprint turns that principle into a complete, free learning system: understand a concept, run it immediately, build with it, then review it before it fades.</p>
+  <p>LearnWithPython turns that principle into a complete, free learning system: understand a concept, run it immediately, build with it, then review it before it fades.</p>
   <div class="page-head-actions">
     <a class="btn btn-primary" href="{{ url_for('courses') }}">Explore the learning path →</a>
     <a class="btn btn-ghost" href="{{ url_for('playground') }}">Try the playground</a>
@@ -29,7 +29,7 @@
   <div class="about-story">
     <div class="card pad prose">
     <h2>The method</h2>
-    <p>Research on learning to code is unambiguous: <strong>you learn to program by programming</strong>, not by watching. PySprint is built entirely around that idea:</p>
+    <p>Research on learning to code is unambiguous: <strong>you learn to program by programming</strong>, not by watching. LearnWithPython is built entirely around that idea:</p>
     <ul>
       <li><strong>Read a little, code a lot.</strong> Lessons are short and every single one ends with a live coding challenge, graded instantly in your browser.</li>
       <li><strong>Real Python, zero setup.</strong> A full CPython interpreter runs in your browser via WebAssembly (Pyodide). What works here works on your machine.</li>
@@ -41,7 +41,7 @@
     <p>{{ n_lessons }} lessons across {{ n_courses }} courses take you from <code>print("Hello")</code> through REST APIs and automation all the way to expert Python — generators, decorators, context managers and the data model — plus {{ n_challenges }} arena challenges including genuine interview classics.</p>
 
     <h2>Open source</h2>
-    <p>PySprint is built by <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">simasbuilds</a> with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
+    <p>LearnWithPython is built by <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">simasbuilds</a> with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
     </div>
     <aside class="about-manifesto">
       <span class="eyebrow">The promise</span>

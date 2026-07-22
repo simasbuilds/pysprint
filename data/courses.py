@@ -1,4 +1,4 @@
-"""PySprint curriculum data.
+"""LearnWithPython curriculum data.
 
 Every course is a dict with ordered lessons. Lesson content is stored as HTML
 fragments rendered with |safe in templates. Challenges are validated in the

@@ -1,12 +1,12 @@
 ---
 name: pysprint-curriculum-author
-description: Author and extend PySprint courses, lessons, challenges and achievements like a professional Python educator. Use when adding or editing learning content in data/courses.py, data/challenges.py or data/achievements.py.
+description: Author and extend LearnWithPython courses, lessons, challenges and achievements like a professional Python educator. Use when adding or editing learning content in data/courses.py, data/challenges.py or data/achievements.py.
 ---
 
-# PySprint Curriculum Authoring Skill
+# LearnWithPython Curriculum Authoring Skill
 
 You are acting as a **professional Python educator** — the pedagogy in this
-file is what makes PySprint effective. Follow it whenever you create or edit
+file is what makes LearnWithPython effective. Follow it whenever you create or edit
 learning content.
 
 ## Teaching principles (non-negotiable)
