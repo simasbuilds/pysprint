@@ -130,14 +130,22 @@
       setState(message || (code.value.trim() ? 'Saved on this device' : 'Blank · autosaved'));
     }
 
-    function replace(next, action) {
-      if (code.value.trim() && code.value !== next &&
-          !window.confirm(action + ' will replace the code currently in this editor. Continue?')) return;
+    function apply(next) {
       code.value = next;
       save(next.trim() ? 'Starter loaded · autosaved' : 'Blank · autosaved');
       code.dispatchEvent(new Event('input', { bubbles: true }));
       code.focus({ preventScroll: true });
       code.setSelectionRange(code.value.length, code.value.length);
+    }
+
+    function replace(next, action) {
+      const previous = code.value;
+      const replacing = previous.trim() && previous !== next;
+      apply(next);
+      // No blocking prompt — the change is instant and reversible via the toast.
+      if (replacing && typeof window.toast === 'function') {
+        toast(action, '', { label: 'Undo', run: () => apply(previous) });
+      }
     }
 
     let saved = null;
@@ -155,8 +163,8 @@
     }
     code.addEventListener('input', () => save());
 
-    loadBtn && loadBtn.addEventListener('click', () => replace(opts.starter || '', 'Loading the starter'));
-    blankBtn && blankBtn.addEventListener('click', () => replace('', 'Starting blank'));
+    loadBtn && loadBtn.addEventListener('click', () => replace(opts.starter || '', 'Starter loaded'));
+    blankBtn && blankBtn.addEventListener('click', () => replace('', 'Editor cleared'));
   }
 
   async function execInto(codeEl, outEl, btn) {
@@ -695,13 +703,21 @@ print(f"Average: {average:.1f}")
       code.addEventListener('scroll', () => { lines.scrollTop = code.scrollTop; });
       updateEditorMeta();
 
-      function replaceCode(next, action) {
-        if (code.value.trim() && code.value !== next &&
-            !window.confirm(action + ' will replace your current code. Continue?')) return false;
+      function applyCode(next) {
         code.value = next;
         code.dispatchEvent(new Event('input', { bubbles: true }));
         code.focus({ preventScroll: true });
         code.setSelectionRange(0, 0);
+      }
+
+      function replaceCode(next, action) {
+        const previous = code.value;
+        const replacing = previous.trim() && previous !== next;
+        applyCode(next);
+        // Instant + reversible: no blocking browser dialog.
+        if (replacing && typeof window.toast === 'function') {
+          toast(action, '', { label: 'Undo', run: () => applyCode(previous) });
+        }
         return true;
       }
 
@@ -709,7 +725,7 @@ print(f"Average: {average:.1f}")
         btn.addEventListener('click', () => {
           const recipe = recipes[btn.dataset.recipe];
           if (!recipe) return;
-          if (!replaceCode(recipe, 'Loading this recipe')) return;
+          if (!replaceCode(recipe, 'Recipe loaded')) return;
           document.querySelectorAll('[data-recipe]').forEach(item => item.classList.remove('active'));
           btn.classList.add('active');
         });
@@ -755,7 +771,7 @@ print(f"Average: {average:.1f}")
           restore.type = 'button';
           restore.textContent = 'Restore';
           restore.addEventListener('click', () => {
-            if (replaceCode(item.code, 'Restoring this run')) {
+            if (replaceCode(item.code, 'Run restored')) {
               filename.value = item.filename || 'playground.py';
               window.scrollTo({ top: document.querySelector('.playground-ide').offsetTop - 90, behavior: 'smooth' });
             }
@@ -852,7 +868,7 @@ print(f"Average: {average:.1f}")
         }
         const reader = new FileReader();
         reader.onload = () => {
-          if (replaceCode(String(reader.result || ''), 'Importing ' + file.name)) {
+          if (replaceCode(String(reader.result || ''), 'Imported ' + file.name)) {
             filename.value = file.name.endsWith('.py') ? file.name : file.name + '.py';
           }
           e.target.value = '';

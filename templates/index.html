@@ -45,30 +45,10 @@
       </div>
     </div>
     <div class="hero-visual stagger d3">
-      <div class="hero-media">
-        <img src="{{ url_for('static', filename='images/pysprint-hero.png') }}"
-             alt="A code editor connected to a data chart, an API bracket icon, and an automation gear"
-             width="1600" height="1040" fetchpriority="high">
-        <div class="hero-scan" aria-hidden="true"></div>
-        <svg class="hero-flow" viewBox="0 0 700 520" preserveAspectRatio="none" aria-hidden="true">
-          <path class="flow-track" d="M78 360 C190 310 205 185 334 230 S494 338 630 118"></path>
-          <path class="flow-signal" d="M78 360 C190 310 205 185 334 230 S494 338 630 118"></path>
-          <circle class="flow-node n1" cx="78" cy="360" r="5"></circle>
-          <circle class="flow-node n2" cx="334" cy="230" r="5"></circle>
-          <circle class="flow-node n3" cx="630" cy="118" r="5"></circle>
-        </svg>
-        <div class="visual-label label-one"><span></span> Runtime ready</div>
-        <div class="visual-label label-two">Real CPython · local</div>
-      </div>
-      <div class="hero-capabilities" aria-hidden="true">
-        <span>{{ icon('database') }}<b>DATA</b></span>
-        <span>{{ icon('api') }}<b>APIs</b></span>
-        <span>{{ icon('automation') }}<b>AUTO</b></span>
-      </div>
-      <div class="hero-demo hero-console card">
+      <div class="hero-demo hero-console hero-terminal card">
         <div class="editor-chrome">
           <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span class="editor-title" id="heroFile">hello.py — live workspace</span>
+          <span class="editor-title" id="heroFile">python3 · learnwithpython</span>
           <span class="editor-live"><i></i> Ready</span>
         </div>
         <div class="hero-scenarios" id="heroScenarios" role="tablist" aria-label="Example scripts">
@@ -77,14 +57,20 @@
           <button class="scenario-chip" data-scenario="2" role="tab" aria-selected="false">weather.py</button>
           <button class="scenario-chip" data-scenario="3" role="tab" aria-selected="false">organizer.py</button>
         </div>
-        <textarea id="heroCode" class="code-input" rows="4" spellcheck="false" aria-label="Python code editor">name = "world"
+        <textarea id="heroCode" class="code-input" rows="8" spellcheck="false" aria-label="Python code editor">name = "world"
 for i in range(3):
     print(f"Hello, {name}! ({i + 1})")</textarea>
         <div class="editor-bar">
           <button class="btn btn-run" id="heroRun">▶ Run Python</button>
           <span class="editor-hint">⌘/Ctrl + Enter</span>
         </div>
-        <pre id="heroOut" class="code-output" aria-live="polite">› Ready. Run the code — or watch it run itself.</pre>
+        <pre id="heroOut" class="code-output tall" aria-live="polite">› Ready. Run the code — or watch it run itself.</pre>
+      </div>
+      <div class="hero-capabilities" aria-hidden="true">
+        <span>{{ icon('terminal') }}<b>Real CPython</b></span>
+        <span>{{ icon('database') }}<b>Data</b></span>
+        <span>{{ icon('api') }}<b>APIs</b></span>
+        <span>{{ icon('automation') }}<b>Automation</b></span>
       </div>
     </div>
   </div>

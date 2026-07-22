@@ -472,19 +472,35 @@
     sections.forEach(s => io.observe(s));
   })();
 
-  // ── toasts ──────────────────────────────────────────────────────
-  window.toast = function (msg, type) {
+  // ── toasts (optional inline action, e.g. Undo) ──────────────────
+  window.toast = function (msg, type, action) {
     const wrap = document.getElementById('toasts');
     if (!wrap) return;
     const el = document.createElement('div');
     el.className = 'toast ' + (type || '');
-    el.textContent = msg;
-    wrap.appendChild(el);
-    setTimeout(() => {
+    const text = document.createElement('span');
+    text.textContent = msg;
+    el.appendChild(text);
+
+    let timer;
+    const dismiss = () => {
+      clearTimeout(timer);
       el.style.opacity = '0';
       el.style.transition = 'opacity .3s';
       setTimeout(() => el.remove(), 350);
-    }, 3800);
+    };
+
+    if (action && action.label && typeof action.run === 'function') {
+      const btn = document.createElement('button');
+      btn.className = 'toast-action';
+      btn.type = 'button';
+      btn.textContent = action.label;
+      btn.addEventListener('click', () => { action.run(); dismiss(); });
+      el.appendChild(btn);
+    }
+
+    wrap.appendChild(el);
+    timer = setTimeout(dismiss, action ? 6000 : 3800);
   };
 
   // ── achievement modal queue ─────────────────────────────────────
