@@ -39,36 +39,6 @@
   onScroll();
   if (toTop) toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  // ── hero depth: restrained pointer parallax on capable devices ──
-  const heroVisual = document.querySelector('.hero-visual');
-  if (heroVisual &&
-      window.matchMedia('(pointer: fine)').matches &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let frame = 0;
-    heroVisual.addEventListener('pointermove', (event) => {
-      if (frame) cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const rect = heroVisual.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width - 0.5;
-        const y = (event.clientY - rect.top) / rect.height - 0.5;
-        heroVisual.style.setProperty('--hero-x', (x * 10).toFixed(2) + 'px');
-        heroVisual.style.setProperty('--hero-y', (y * 8).toFixed(2) + 'px');
-        heroVisual.style.setProperty('--hero-rx', (-y * 2.2).toFixed(2) + 'deg');
-        heroVisual.style.setProperty('--hero-ry', (x * 2.2).toFixed(2) + 'deg');
-        heroVisual.style.setProperty('--console-x', (-x * 5).toFixed(2) + 'px');
-        heroVisual.style.setProperty('--console-y', (-y * 4).toFixed(2) + 'px');
-      });
-    });
-    heroVisual.addEventListener('pointerleave', () => {
-      heroVisual.style.setProperty('--hero-x', '0px');
-      heroVisual.style.setProperty('--hero-y', '0px');
-      heroVisual.style.setProperty('--hero-rx', '0deg');
-      heroVisual.style.setProperty('--hero-ry', '0deg');
-      heroVisual.style.setProperty('--console-x', '0px');
-      heroVisual.style.setProperty('--console-y', '0px');
-    });
-  }
-
   // ── mobile nav ──────────────────────────────────────────────────
   const burger = document.getElementById('navBurger');
   const links = document.getElementById('navLinks');
