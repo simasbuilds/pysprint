@@ -75,7 +75,7 @@
   </script>
   {% block structured_data %}{% endblock %}
 </head>
-<body>
+<body data-logged-in="{{ '1' if user else '0' }}">
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="read-progress" id="readProgress" aria-hidden="true"></div>
 
@@ -293,6 +293,7 @@
   </div>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/progress.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

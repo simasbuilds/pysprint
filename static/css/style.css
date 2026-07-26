@@ -3032,3 +3032,117 @@ body.cmdk-open { overflow: hidden; }
   .hero-terminal .code-input { min-height: 150px; font-size: .9rem; }
   .hero-terminal .code-output { max-height: 120px; }
 }
+
+/* ═══════════════════ v14: guest progress & save nudge ══════════════ */
+/* Learners can finish the whole curriculum signed-out; this invites them
+   to keep it without ever blocking the lesson. */
+.save-nudge {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+  gap: 1rem 1.15rem; margin-top: 1.25rem; padding: 1.15rem 1.35rem;
+  border-left: 4px solid var(--success);
+  background: linear-gradient(100deg, color-mix(in srgb, var(--success) 8%, var(--surface)), var(--surface) 60%);
+  animation: fadeUp .45s cubic-bezier(.16, 1, .3, 1);
+}
+.save-nudge-icon {
+  width: 40px; height: 40px; flex: 0 0 40px; display: grid; place-items: center;
+  border-radius: 12px; color: #fff; background: var(--success);
+}
+.save-nudge-icon .ui-icon { width: 21px; height: 21px; }
+.save-nudge strong { display: block; font-size: 1rem; margin-bottom: .2rem; }
+.save-nudge p { color: var(--text-dim); font-size: .88rem; line-height: 1.55; margin: 0; }
+.save-nudge-actions { display: flex; align-items: center; gap: .5rem; }
+
+@media (max-width: 760px) {
+  .save-nudge { grid-template-columns: auto 1fr; padding: 1rem; }
+  .save-nudge-actions { grid-column: 1 / -1; }
+  .save-nudge-actions .btn { flex: 1; justify-content: center; }
+}
+
+/* ═══════════ v15: close the 761–900px nav gap (h-overflow fix) ══════ */
+/* The desktop nav stops fitting around 900px but only collapsed at 760px,
+   which pushed .nav-right past the viewport and caused horizontal scroll
+   on small tablets. Collapse to the burger for that range too. */
+@media (min-width: 761px) and (max-width: 900px) {
+  .nav-links {
+    position: absolute; display: none; top: 100%; left: 0; right: 0; bottom: auto;
+    width: 100%; height: auto; max-height: calc(100dvh - 99px); padding: 1.1rem;
+    flex-direction: column; align-items: stretch; gap: .25rem;
+    background: var(--surface); overflow-y: auto; box-shadow: var(--shadow-lg); z-index: 55;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-links.open { display: flex; }
+  .nav-links > a, .nav-menu-wrap, .nav-menu-trigger { width: 100%; }
+  .nav-links > a, .nav-menu-trigger {
+    justify-content: space-between; min-height: 50px; font-size: 1rem; padding-inline: 1rem;
+  }
+  .mega-menu, .build-menu {
+    position: static; width: 100%; left: auto; grid-template-columns: 1fr;
+    margin: .35rem 0; padding: .35rem; gap: 0;
+    background: var(--surface-2); box-shadow: none; border-radius: 14px;
+  }
+  .mega-links { grid-template-columns: 1fr 1fr; }
+  .mobile-nav-cta { display: block; margin-top: .75rem; }
+  .mobile-nav-cta .btn { width: 100%; min-height: 50px; color: var(--cream); }
+  .nav-burger { display: block; }
+  .mega-foot { display: none; }
+}
+
+/* Playground: let the grid tracks actually shrink. Grid items default to
+   min-width:auto, so the 5-wide recipe row forced the sidebar past the
+   viewport at ~768–820px instead of scrolling inside its own container. */
+.playground-layout > * { min-width: 0; }
+.lab-sidebar, .recipe-list { min-width: 0; max-width: 100%; }
+
+/* ═══════════ v15b: hero rhythm when the columns stack ══════════════ */
+/* Once the hero is one column the terminal was stretching to the full
+   container (≈970px slab). Cap and centre both columns so the stacked
+   layout keeps a deliberate measure instead of edge-to-edge sprawl. */
+@media (max-width: 1024px) {
+  .hero { padding-top: 4rem; padding-bottom: 3.5rem; }
+  .hero-inner { gap: 2.75rem; justify-items: center; }
+  .hero-copy { max-width: 720px; width: 100%; }
+  .hero-visual { max-width: 720px; width: 100%; }
+  .hero h1 { max-width: 100%; }
+}
+@media (max-width: 760px) {
+  .hero { padding: 3rem .9rem 2.25rem; }
+  .hero-inner { gap: 2.25rem; }
+  /* even, tappable rhythm down the stacked hero */
+  .hero-cta { margin-bottom: 1.35rem; }
+  .hero-assurance { margin: 0 0 1.5rem; gap: .5rem .75rem; }
+  .hero-stats { padding-top: 1.35rem; }
+  .hero-visual .hero-capabilities { margin-top: 1.1rem; gap: .45rem; }
+}
+
+/* ═══════════ v16: lesson step markers (follow-along clarity) ════════ */
+/* Every lesson now reads as an explicit sequence, so learners always know
+   where they are and what comes next. */
+.step-head { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.step-head h2 { margin: 0; }
+.lesson-content .step-head h2 { font-size: 1.35rem; letter-spacing: -.02em; }
+.step-chip {
+  display: inline-flex; align-items: center; flex: 0 0 auto;
+  padding: .22rem .68rem; border-radius: 99px;
+  color: var(--accent, var(--brand-1));
+  background: color-mix(in srgb, var(--accent, var(--brand-1)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, var(--brand-1)) 28%, transparent);
+  font: 800 .66rem/1.5 var(--font); text-transform: uppercase; letter-spacing: .09em;
+  white-space: nowrap;
+}
+.editor-heading .step-chip { margin-bottom: .35rem; }
+
+/* numbered markers in the sidebar step list */
+.spy-nav a i {
+  width: 19px; height: 19px; flex: 0 0 19px; display: inline-grid; place-items: center;
+  border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-dim); font: 800 .64rem/1 var(--font); font-style: normal;
+}
+.spy-nav a.on i {
+  color: #fff; background: var(--accent, var(--brand-1));
+  border-color: var(--accent, var(--brand-1));
+}
+
+@media (max-width: 640px) {
+  .step-head { gap: .55rem; margin-bottom: .8rem; }
+  .lesson-content .step-head h2 { font-size: 1.2rem; }
+}

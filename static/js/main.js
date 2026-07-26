@@ -450,6 +450,14 @@
     sections.forEach(s => io.observe(s));
   })();
 
+  // ── generic dismiss buttons ([data-dismiss="elementId"]) ────────
+  document.querySelectorAll('[data-dismiss]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.dismiss);
+      if (target) target.hidden = true;
+    });
+  });
+
   // ── toasts (optional inline action, e.g. Undo) ──────────────────
   window.toast = function (msg, type, action) {
     const wrap = document.getElementById('toasts');

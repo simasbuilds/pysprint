@@ -467,14 +467,48 @@
 
       // Complete button
       const completeBtn = document.getElementById('completeBtn');
+
+      function markComplete() {
+        completeBtn.innerHTML = iconMarkup('check') + ' Completed — mark again';
+        completeBtn.dataset.done = '1';
+        // Tick this lesson in the sidebar immediately.
+        const side = document.querySelector(
+          '.side-lesson[data-lesson-slug="' + cfg.lesson + '"]');
+        if (side) {
+          side.classList.add('is-done');
+          const badge = side.querySelector('span');
+          if (badge && !badge.querySelector('.ui-icon')) badge.innerHTML = iconMarkup('check');
+        }
+      }
+
+      // A calm, dismissible invitation — never a redirect or a wall.
+      function showSaveNudge() {
+        const slot = document.getElementById('saveNudge');
+        if (!slot || slot.dataset.shown) return;
+        slot.dataset.shown = '1';
+        slot.hidden = false;
+      }
+
       completeBtn.addEventListener('click', () => {
         if (!challengePassed && !completeBtn.dataset.done) {
           toast('Pass the challenge first — that is where the learning happens.', 'error');
           return;
         }
+        // Guests keep full access: the lesson completes on this device and we
+        // simply invite them to sign in so it follows them everywhere.
         if (!cfg.loggedIn) {
-          toast('Log in (free) to save progress and earn XP!', '');
-          setTimeout(() => { window.location = '/login?next=' + encodeURIComponent(location.pathname); }, 1200);
+          const fresh = window.GuestProgress
+            ? GuestProgress.complete(cfg.course, cfg.lesson, cfg.xp)
+            : true;
+          markComplete();
+          if (fresh) {
+            if (window.xpFly) xpFly(completeBtn, '+' + cfg.xp + ' XP');
+            confetti(completeBtn);
+            toast('Lesson complete — +' + cfg.xp + ' XP saved on this device.', 'success');
+          } else {
+            toast('Already completed — nice revision session!', '');
+          }
+          showSaveNudge();
           return;
         }
         postJSON('/api/complete-lesson', { course: cfg.course, lesson: cfg.lesson })
@@ -484,8 +518,7 @@
               toast('+' + data.xp_gained + ' XP — lesson complete!', 'success');
               if (window.xpFly) xpFly(completeBtn, '+' + data.xp_gained + ' XP');
               confetti(completeBtn);
-              completeBtn.textContent = 'Completed';
-              completeBtn.dataset.done = '1';
+              markComplete();
             } else {
               toast('Already completed — nice revision session!', '');
             }

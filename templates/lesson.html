@@ -18,22 +18,23 @@
       <div class="progress-fill" style="width: {{ ((idx + 1) / n_lessons * 100)|round|int }}%"></div>
     </div>
     <span class="progress-label">Lesson {{ idx + 1 }} of {{ n_lessons }}</span>
-    <nav class="side-lessons" aria-label="Course lessons">
+    <nav class="side-lessons" aria-label="Course lessons" data-course-nav="{{ course.slug }}">
       {% for l in course.lessons %}
       <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
+         data-lesson-slug="{{ l.slug }}"
          class="side-lesson {% if l.slug == lesson.slug %}current{% endif %} {% if l.slug in done %}is-done{% endif %}">
         <span>{% if l.slug in done %}{{ icon('check') }}{% else %}{{ loop.index }}{% endif %}</span> {{ l.title }}
       </a>
       {% endfor %}
     </nav>
     <nav class="spy-nav" aria-label="On this page">
-      <span class="spy-label">On this page</span>
-      <a href="#learn">{{ icon('book') }} Learn</a>
-      {% if walkthrough %}<a href="#walkthrough">{{ icon('play') }} Watch it run</a>{% endif %}
-      <a href="#workspace">{{ icon('terminal') }} Workspace</a>
-      <a href="#challenge">{{ icon('target') }} Challenge</a>
-      {% if lesson.quiz %}<a href="#quizBlock">{{ icon('quiz') }} Quiz</a>{% endif %}
-      <a href="#notes">{{ icon('note') }} Notes</a>
+      <span class="spy-label">Steps in this lesson</span>
+      <a href="#learn"><i>1</i> Learn the idea</a>
+      {% if walkthrough %}<a href="#walkthrough"><i>2</i> Watch it run</a>{% endif %}
+      <a href="#workspace"><i>{{ 3 if walkthrough else 2 }}</i> Try it yourself</a>
+      <a href="#challenge"><i>{{ 4 if walkthrough else 3 }}</i> Pass the challenge</a>
+      {% if lesson.quiz %}<a href="#quizBlock"><i>{{ 5 if walkthrough else 4 }}</i> Check understanding</a>{% endif %}
+      <a href="#notes"><i>{{ (6 if walkthrough else 5) if lesson.quiz else (5 if walkthrough else 4) }}</i> Your notes</a>
     </nav>
   </aside>
 
@@ -66,7 +67,10 @@
       </nav>
     </details>
 
-    <section class="lesson-content" id="learn">{{ lesson.content|safe }}</section>
+    <section class="lesson-content" id="learn">
+      <div class="step-head"><span class="step-chip">Step 1</span><h2>Learn the idea</h2></div>
+      {{ lesson.content|safe }}
+    </section>
 
     {% if extras %}
     <section class="callout-grid">
@@ -93,7 +97,7 @@
 
     {% if walkthrough %}
     <section class="card walkthrough" id="walkthrough">
-      <h2 class="block-title">{{ icon('play') }} Watch how it runs <span class="muted">— line by line</span></h2>
+      <div class="step-head"><span class="step-chip">Step 2</span><h2 class="block-title">{{ icon('play') }} Watch how it runs <span class="muted">— line by line</span></h2></div>
       <div class="wl-body">
         <pre class="wl-code" id="wlCode" aria-label="Code being explained"></pre>
         <div class="wl-explain">
@@ -112,7 +116,7 @@
     <section class="card editor-block" id="workspace">
       <div class="editor-heading">
         <div>
-          <span class="eyebrow">Your workspace</span>
+          <span class="step-chip">Step {{ 3 if walkthrough else 2 }}</span>
           <h2 class="block-title">{{ icon('terminal') }} Try it yourself</h2>
         </div>
         <span class="save-state" id="exampleSaveState">Blank · autosaved</span>
@@ -133,8 +137,8 @@
     <section class="card editor-block challenge-block" id="challenge">
       <div class="editor-heading">
         <div>
-          <span class="eyebrow">Prove it</span>
-          <h2 class="block-title">{{ icon('target') }} Challenge <span class="xp-tag">+{{ lesson.xp }} XP</span></h2>
+          <span class="step-chip">Step {{ 4 if walkthrough else 3 }}</span>
+          <h2 class="block-title">{{ icon('target') }} Pass the challenge <span class="xp-tag">+{{ lesson.xp }} XP</span></h2>
         </div>
         <span class="save-state" id="challengeSaveState">Blank · autosaved</span>
       </div>
@@ -161,7 +165,7 @@
 
     {% if lesson.quiz %}
     <section class="card quiz-block" id="quizBlock">
-      <h2 class="block-title">{{ icon('quiz') }} Quick quiz</h2>
+      <div class="step-head"><span class="step-chip">Step {{ 5 if walkthrough else 4 }}</span><h2 class="block-title">{{ icon('quiz') }} Check your understanding</h2></div>
       {% for q in lesson.quiz %}
       <fieldset class="quiz-q" data-answer="{{ q.answer }}">
         <legend>{{ loop.index }}. {{ q.q }}</legend>
@@ -181,7 +185,7 @@
     {% endif %}
 
     <section class="card notes-block" id="notes">
-      <h2 class="block-title">{{ icon('note') }} My notes <span class="muted">(saved on this device)</span></h2>
+      <div class="step-head"><span class="step-chip">Last step</span><h2 class="block-title">{{ icon('note') }} Your notes <span class="muted">(saved on this device)</span></h2></div>
       <textarea id="lessonNotes" class="notes-input" rows="4" placeholder="Write anything you want to remember from this lesson…"></textarea>
     </section>
 
@@ -200,6 +204,21 @@
       <a class="btn btn-ghost" href="{{ url_for('course_detail', slug=course.slug) }}">Finish course →</a>
       {% endif %}
     </footer>
+
+    {% if not user %}
+    <aside class="save-nudge card" id="saveNudge" hidden>
+      <span class="save-nudge-icon">{{ icon('check') }}</span>
+      <div>
+        <strong>Saved on this device</strong>
+        <p>Your progress and XP are stored in this browser. Create a free account and we'll move everything across — so it's waiting on your phone and laptop too.</p>
+      </div>
+      <div class="save-nudge-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('register', next=request.path) }}">Save my progress →</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-dismiss="saveNudge">Not now</button>
+      </div>
+    </aside>
+    {% endif %}
+
     <p class="lesson-kbd-hint">Tip: use <kbd>←</kbd> and <kbd>→</kbd> to move between lessons, <kbd><span class="mod-key">⌘</span>K</kbd> to search everything.</p>
   </article>
 </div>

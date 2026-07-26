@@ -331,7 +331,10 @@ def register():
             uid = db.create_user(username, email, generate_password_hash(password))
             session["user_id"] = uid
             session.permanent = True
-            return redirect(url_for("dashboard"))
+            # Come back to the lesson they were on, so device progress syncs
+            # in context instead of dumping them on the dashboard.
+            return redirect(safe_next(request.args.get("next"))
+                            or url_for("dashboard"))
     return render_template("register.html", error=error)
 
 
@@ -479,6 +482,45 @@ def api_complete_project():
     return jsonify({
         "ok": True, "first_time": first_time, "xp_gained": xp_gained,
         "xp": fresh["xp"], "streak": streak, "level": level_info(fresh["xp"]),
+        "new_achievements": new_achievements,
+    })
+
+
+@app.post("/api/sync-progress")
+@login_required
+def api_sync_progress():
+    """Merge device-local (guest) lesson progress into the signed-in account.
+
+    Learners can take the whole curriculum without an account; when they
+    finally sign up we fold that work in so the "log in to save" prompt is
+    honest. Unknown slugs are ignored and XP is only granted once.
+    """
+    payload = request.get_json(silent=True) or {}
+    items = payload.get("completions")
+    if not isinstance(items, list):
+        return jsonify({"error": "bad_payload"}), 400
+
+    user = current_user()
+    synced = xp_gained = 0
+    for item in items[:500]:                      # bound the work per call
+        if not isinstance(item, dict):
+            continue
+        course, idx = get_lesson(str(item.get("course", "")),
+                                 str(item.get("lesson", "")))
+        if not course or idx is None:
+            continue
+        lesson_ = course["lessons"][idx]
+        if db.complete_lesson(user["id"], course["slug"], lesson_["slug"]):
+            synced += 1
+            xp_gained += lesson_["xp"]
+
+    if xp_gained:
+        db.add_xp(user["id"], xp_gained)
+    new_achievements = award_new_achievements(db.get_user(user["id"]))
+    fresh = db.get_user(user["id"])
+    return jsonify({
+        "ok": True, "synced": synced, "xp_gained": xp_gained,
+        "xp": fresh["xp"], "level": level_info(fresh["xp"]),
         "new_achievements": new_achievements,
     })
 
