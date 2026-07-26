@@ -56,6 +56,12 @@ app.config["GOOGLE_ENABLED"] = google_oauth is not None
 
 db.init_db()
 
+# Admins are designated by the operator, never self-service. Set
+# ADMIN_USERNAMES="alice,bob@example.com" in the environment.
+for _name in (n.strip() for n in os.environ.get("ADMIN_USERNAMES", "").split(",")):
+    if _name:
+        db.set_admin(_name, True)
+
 XP_PER_LEVEL = 250
 LEVEL_TITLES = ["Newcomer", "Explorer", "Apprentice", "Coder", "Builder",
                 "Engineer", "Architect", "Wizard", "Master", "Legend"]
@@ -82,6 +88,20 @@ def login_required(fn):
             if request.path.startswith("/api/"):
                 return jsonify({"error": "login_required"}), 401
             return redirect(url_for("login", next=request.path))
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+def admin_required(fn):
+    """Admin-only. 404s for signed-in non-admins so the portal isn't
+    discoverable, and never leaks that the URL exists."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user = current_user()
+        if not user:
+            return redirect(url_for("login", next=request.path))
+        if not user["is_admin"]:
+            abort(404)
         return fn(*args, **kwargs)
     return wrapper
 
@@ -147,14 +167,42 @@ def inject_globals():
 
 # ── pages ────────────────────────────────────────────────────────────
 
+def next_unfinished_lesson(lessons_by_course):
+    """The next lesson in curriculum order that isn't done yet."""
+    for course in COURSES:
+        done = lessons_by_course.get(course["slug"], set())
+        for lesson_ in course["lessons"]:
+            if lesson_["slug"] not in done:
+                return {"course": course, "lesson": lesson_}
+    return None
+
+
 @app.get("/")
 def home():
     # One flagship real-world outcome per course for the homepage spotlight.
     spotlight = [{"course": c, "case": get_course_use_cases(c["slug"])[0]}
                  for c in COURSES if get_course_use_cases(c["slug"])]
+
+    # Returning learners get their own progress cockpit instead of marketing
+    # stats — the reason to come back is seeing your own streak move.
+    me = None
+    user = current_user()
+    if user:
+        lessons_by_course, challenges = db.get_progress(user["id"])
+        done_total = sum(len(v) for v in lessons_by_course.values())
+        me = {
+            "lessons_done": done_total,
+            "pct": round(done_total / total_lessons() * 100) if total_lessons() else 0,
+            "challenges_done": len(challenges & ARENA_SLUGS),
+            "achievements": len(db.get_earned_achievements(user["id"])),
+            "resume": next_unfinished_lesson(lessons_by_course),
+            "done_today": user["last_active"] == date.today().isoformat(),
+        }
+
     return render_template("index.html", courses=COURSES,
                            projects=PROJECTS,
                            use_cases=spotlight,
+                           me=me,
                            n_lessons=total_lessons(),
                            n_challenges=len(CHALLENGES),
                            n_achievements=len(ACHIEVEMENTS))
@@ -537,6 +585,62 @@ def api_me():
                     "level": level_info(user["xp"])})
 
 
+# ── admin portal ─────────────────────────────────────────────────────
+
+@app.get("/admin")
+@admin_required
+def admin():
+    search = (request.args.get("q") or "").strip()[:60]
+    sort = request.args.get("sort", "recent")
+    members, total = db.list_members(search=search, sort=sort)
+    course_titles = {c["slug"]: c["title"] for c in COURSES}
+    engagement = []
+    for row in db.course_engagement():
+        course = get_course(row["course_slug"])
+        engagement.append({
+            **row,
+            "title": course_titles.get(row["course_slug"], row["course_slug"]),
+            "lessons": len(course["lessons"]) if course else 0,
+        })
+    for m in members:
+        m["level"] = level_info(m["xp"])
+    return render_template("admin.html", members=members, total=total,
+                           search=search, sort=sort,
+                           stats=db.platform_stats(),
+                           signups=db.signups_by_day(),
+                           engagement=engagement,
+                           n_lessons=total_lessons())
+
+
+@app.get("/admin/members/<int:uid>")
+@admin_required
+def admin_member(uid):
+    detail = db.member_detail(uid)
+    if not detail:
+        abort(404)
+    course_titles = {c["slug"]: c["title"] for c in COURSES}
+    lesson_titles = {(c["slug"], l["slug"]): l["title"]
+                     for c in COURSES for l in c["lessons"]}
+    by_course = {}
+    for row in detail["lessons"]:
+        key = row["course_slug"]
+        by_course.setdefault(key, {
+            "title": course_titles.get(key, key),
+            "total": len(get_course(key)["lessons"]) if get_course(key) else 0,
+            "items": [],
+        })
+        by_course[key]["items"].append({
+            **row,
+            "title": lesson_titles.get((key, row["lesson_slug"]), row["lesson_slug"]),
+        })
+    achievement_titles = {a["id"]: a for a in ACHIEVEMENTS}
+    return render_template("admin_member.html", d=detail,
+                           level=level_info(detail["user"]["xp"]),
+                           by_course=by_course,
+                           achievement_titles=achievement_titles,
+                           n_lessons=total_lessons())
+
+
 # ── SEO ──────────────────────────────────────────────────────────────
 
 @app.get("/sitemap.xml")
@@ -569,7 +673,7 @@ def sitemap():
 def robots():
     base = app.config["SITE_URL"].rstrip("/")
     return app.response_class(
-        f"User-agent: *\nAllow: /\nDisallow: /dashboard\nDisallow: /api/\n"
+        f"User-agent: *\nAllow: /\nDisallow: /dashboard\nDisallow: /admin\nDisallow: /api/\n"
         f"Sitemap: {base}/sitemap.xml\n",
         mimetype="text/plain")
 

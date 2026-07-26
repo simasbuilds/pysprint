@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Admin · Members — LearnWithPython{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="admin-wrap">
+  <header class="admin-head">
+    <div>
+      <span class="eyebrow">{{ icon('shield') }} Admin portal</span>
+      <h1>Members &amp; platform health</h1>
+      <p>Everyone learning on LearnWithPython, what they've completed, and how the curriculum is performing.</p>
+    </div>
+    <div class="admin-head-meta">
+      <span class="admin-live"><i></i> Live data</span>
+      <span>{{ stats.members }} member{{ '' if stats.members == 1 else 's' }}</span>
+    </div>
+  </header>
+
+  {# ── headline metrics ── #}
+  <div class="admin-kpis">
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('graduation') }}</span>
+      <strong data-count="{{ stats.members }}">{{ stats.members }}</strong>
+      <span>Total members</span>
+      <small>{{ stats.new_7d }} joined this week</small>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('flame') }}</span>
+      <strong data-count="{{ stats.active_7d }}">{{ stats.active_7d }}</strong>
+      <span>Active (7 days)</span>
+      <small>{{ stats.active_today }} active today</small>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('check') }}</span>
+      <strong data-count="{{ stats.lessons_completed }}">{{ stats.lessons_completed }}</strong>
+      <span>Lessons completed</span>
+      <small>{{ stats.learners_with_progress }} learners started</small>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('bolt') }}</span>
+      <strong data-count="{{ stats.total_xp }}">{{ stats.total_xp }}</strong>
+      <span>XP earned</span>
+      <small>{{ stats.challenges_completed }} arena solves</small>
+    </article>
+  </div>
+
+  <div class="admin-grid">
+    {# ── signups sparkline ── #}
+    <section class="card admin-panel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('chart') }} Signups · last 14 days</h2>
+        <span class="admin-panel-note">{{ stats.new_7d }} in 7d</span>
+      </div>
+      {% set peak = (signups | map(attribute='n') | max) if signups else 0 %}
+      {% if signups %}
+      <div class="admin-bars" role="img" aria-label="Daily signups for the last 14 days">
+        {% for row in signups %}
+        <div class="admin-bar" title="{{ row.day }}: {{ row.n }} signup(s)">
+          <span style="height: {{ ((row.n / peak) * 100) | round | int if peak else 0 }}%"></span>
+          <b>{{ row.n }}</b>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="admin-empty">No signups in this window yet.</p>
+      {% endif %}
+      <div class="admin-split">
+        <div><strong>{{ stats.google_members }}</strong><span>via Google</span></div>
+        <div><strong>{{ stats.members - stats.google_members }}</strong><span>via email</span></div>
+        <div><strong>{{ stats.admins }}</strong><span>admins</span></div>
+      </div>
+    </section>
+
+    {# ── which courses land ── #}
+    <section class="card admin-panel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('book') }} Course engagement</h2>
+        <span class="admin-panel-note">by completions</span>
+      </div>
+      {% if engagement %}
+      <ul class="admin-course-list">
+        {% for c in engagement %}
+        <li>
+          <div class="admin-course-top">
+            <strong>{{ c.title }}</strong>
+            <span>{{ c.completions }} completion{{ '' if c.completions == 1 else 's' }}</span>
+          </div>
+          <div class="progress-track sm">
+            <div class="progress-fill" style="width: {{ ((c.completions / engagement[0].completions) * 100) | round | int }}%"></div>
+          </div>
+          <small>{{ c.learners }} learner{{ '' if c.learners == 1 else 's' }} · {{ c.lessons }} lessons available</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="admin-empty">No lesson completions recorded yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  {# ── member roster ── #}
+  <section class="card admin-panel admin-members">
+    <div class="admin-panel-head">
+      <h2>{{ icon('graduation') }} Members <span class="muted">({{ total }})</span></h2>
+      <form class="admin-tools" method="get" action="{{ url_for('admin') }}">
+        <label class="admin-search">
+          {{ icon('search') }}
+          <input type="search" name="q" value="{{ search }}" placeholder="Search name or email…" aria-label="Search members">
+        </label>
+        <select name="sort" aria-label="Sort members">
+          <option value="recent" {{ 'selected' if sort == 'recent' }}>Most recent</option>
+          <option value="xp" {{ 'selected' if sort == 'xp' }}>Highest XP</option>
+          <option value="lessons" {{ 'selected' if sort == 'lessons' }}>Most lessons</option>
+          <option value="streak" {{ 'selected' if sort == 'streak' }}>Longest streak</option>
+          <option value="joined" {{ 'selected' if sort == 'joined' }}>Newest</option>
+          <option value="name" {{ 'selected' if sort == 'name' }}>Name A–Z</option>
+        </select>
+        <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+      </form>
+    </div>
+
+    {% if members %}
+    <div class="admin-table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th scope="col">Member</th>
+            <th scope="col">Level</th>
+            <th scope="col">XP</th>
+            <th scope="col">Progress</th>
+            <th scope="col">Streak</th>
+            <th scope="col">Last active</th>
+            <th scope="col"><span class="sr-only">Open</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <th scope="row">
+              <a class="admin-member" href="{{ url_for('admin_member', uid=m.id) }}">
+                <span class="admin-avatar">{{ m.username[0]|upper }}</span>
+                <span>
+                  <strong>{{ m.username }}{% if m.is_admin %} <em class="admin-pill">admin</em>{% endif %}</strong>
+                  <small>{{ m.email }}</small>
+                </span>
+              </a>
+            </th>
+            <td><span class="admin-level">{{ m.level.level }} · {{ m.level.title }}</span></td>
+            <td class="admin-num">{{ m.xp }}</td>
+            <td>
+              <div class="admin-progress">
+                <div class="progress-track sm">
+                  <div class="progress-fill" style="width: {{ ((m.lessons_done / n_lessons) * 100) | round | int if n_lessons else 0 }}%"></div>
+                </div>
+                <small>{{ m.lessons_done }}/{{ n_lessons }} lessons · {{ m.challenges_done }} arena · {{ m.achievements }} badges</small>
+              </div>
+            </td>
+            <td class="admin-num">{% if m.streak %}{{ icon('flame') }} {{ m.streak }}{% else %}—{% endif %}</td>
+            <td><small>{{ m.last_active or 'never' }}</small></td>
+            <td><a class="admin-open" href="{{ url_for('admin_member', uid=m.id) }}">View →</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="admin-empty">
+      {% if search %}No members match “{{ search }}”.{% else %}No members yet.{% endif %}
+    </p>
+    {% endif %}
+  </section>
+
+  <p class="admin-foot">
+    {{ icon('lock') }} Admin access is granted by the operator via the
+    <code>ADMIN_USERNAMES</code> environment variable. Passwords are never
+    readable — only salted hashes are stored, and they are never sent to this page.
+  </p>
+</section>
+{% endblock %}

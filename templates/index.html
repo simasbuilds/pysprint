@@ -22,27 +22,74 @@
   </div>
   <div class="hero-inner">
     <div class="hero-copy">
+      {% if me %}
+      <span class="pill stagger d1"><span class="pulse-dot"></span> Welcome back, {{ user.username }}</span>
+      <h1 class="stagger d2">{% if me.done_today %}You've already shown up today.{% else %}Keep the <span class="grad">streak alive.</span>{% endif %}</h1>
+      <p class="hero-sub stagger d3">
+        {% if me.resume %}Next up: <strong>{{ me.resume.lesson.title }}</strong> in {{ me.resume.course.title }}. About {{ me.resume.lesson.minutes }} minutes — that's all it takes to keep moving.
+        {% else %}You've finished every lesson. Sharpen it in the arena, or revisit anything in Smart Review.{% endif %}
+      </p>
+      {% else %}
       <span class="pill stagger d1"><span class="pulse-dot"></span> Real Python · Free forever · Zero setup</span>
       <h1 class="stagger d2">Learn Python by building <span class="word-rotate" data-words='["real things.","games.","APIs.","data tools.","habits."]'><span class="grad">real things.</span></span></h1>
       <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
+      {% endif %}
       <div class="hero-cta stagger d4">
-        {% if user %}
+        {% if me and me.resume %}
+          <a href="{{ url_for('lesson', slug=me.resume.course.slug, lesson_slug=me.resume.lesson.slug) }}" class="btn btn-primary btn-lg">Continue: {{ me.resume.lesson.title }} →</a>
+          <a href="{{ url_for('dashboard') }}" class="btn btn-ghost btn-lg">My dashboard</a>
+        {% elif user %}
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
+          <a href="{{ url_for('challenges') }}" class="btn btn-ghost btn-lg">Challenge arena</a>
         {% else %}
           <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start learning free →</a>
+          <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
         {% endif %}
-        <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
       </div>
+      {% if not user %}
       <div class="hero-assurance stagger d4">
         <span>{{ icon('check') }} Try every lesson without an account</span>
         <span>{{ icon('lock') }} Code stays on your device</span>
       </div>
+      {% endif %}
       <div id="resumeSlot" class="resume-slot stagger d4" hidden></div>
+      {% if me %}
+      <div class="hero-progress stagger d5">
+        <div class="hp-ring" style="--pct: {{ level.pct }}">
+          <svg viewBox="0 0 72 72" aria-hidden="true">
+            <circle class="hp-track" cx="36" cy="36" r="31"></circle>
+            <circle class="hp-fill" cx="36" cy="36" r="31"
+                    style="stroke-dasharray: {{ (level.pct * 1.948)|round(1) }} 195"></circle>
+          </svg>
+          <b>{{ level.level }}</b>
+          <small>{{ level.title }}</small>
+        </div>
+        <div class="hp-stats">
+          <div class="hp-stat">
+            <strong>{{ icon('flame') }} {{ user.streak }}</strong>
+            <span>day streak</span>
+          </div>
+          <div class="hp-stat">
+            <strong>{{ icon('bolt') }} {{ user.xp }}</strong>
+            <span>{{ level.needed - level.into }} XP to level {{ level.level + 1 }}</span>
+          </div>
+          <div class="hp-stat">
+            <strong>{{ me.lessons_done }}<em>/{{ n_lessons }}</em></strong>
+            <span>lessons · {{ me.achievements }} badges</span>
+          </div>
+        </div>
+        <div class="hp-course">
+          <div class="progress-track"><div class="progress-fill" style="width: {{ me.pct }}%"></div></div>
+          <span>{{ me.pct }}% of the curriculum complete</span>
+        </div>
+      </div>
+      {% else %}
       <div class="hero-stats stagger d5">
         <div><strong data-count="{{ n_lessons }}">{{ n_lessons }}</strong><span>Interactive lessons</span></div>
         <div><strong data-count="{{ n_challenges }}">{{ n_challenges }}</strong><span>Coding challenges</span></div>
         <div><strong data-count="{{ projects|length }}">{{ projects|length }}</strong><span>Portfolio projects</span></div>
       </div>
+      {% endif %}
     </div>
     <div class="hero-visual stagger d3">
       <div class="hero-demo hero-console hero-terminal card">

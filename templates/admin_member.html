@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Admin · {{ d.user.username }} — LearnWithPython{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="admin-wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{{ url_for('admin') }}">← All members</a>
+  </nav>
+
+  <header class="admin-member-head card">
+    <span class="admin-avatar xl">{{ d.user.username[0]|upper }}</span>
+    <div class="admin-member-id">
+      <h1>{{ d.user.username }}{% if d.user.is_admin %} <em class="admin-pill">admin</em>{% endif %}</h1>
+      <p>{{ d.user.email }}</p>
+      <div class="course-meta">
+        <span>{{ icon('calendar') }} Joined {{ d.user.created_at[:10] }}</span>
+        <span>{{ icon('clock') }} Last active {{ d.user.last_active or 'never' }}</span>
+        <span>{{ icon('lock') }} {{ 'Google account' if d.user.google_sub else 'Email account' }}</span>
+      </div>
+    </div>
+    <div class="admin-member-level">
+      <strong>{{ level.level }}</strong>
+      <span>{{ level.title }}</span>
+      <div class="progress-track sm"><div class="progress-fill" style="width: {{ level.pct }}%"></div></div>
+      <small>{{ level.into }} / {{ level.needed }} XP to next level</small>
+    </div>
+  </header>
+
+  <div class="admin-kpis four">
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('bolt') }}</span>
+      <strong>{{ d.user.xp }}</strong><span>Total XP</span>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('check') }}</span>
+      <strong>{{ d.lessons|length }}</strong><span>Lessons complete</span>
+      <small>of {{ n_lessons }} available</small>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('swords') }}</span>
+      <strong>{{ d.challenges|length }}</strong><span>Arena &amp; projects</span>
+    </article>
+    <article class="admin-kpi card">
+      <span class="admin-kpi-icon">{{ icon('flame') }}</span>
+      <strong>{{ d.user.streak }}</strong><span>Day streak</span>
+    </article>
+  </div>
+
+  <div class="admin-grid">
+    <section class="card admin-panel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('book') }} Progress by course</h2>
+        <span class="admin-panel-note">{{ by_course|length }} started</span>
+      </div>
+      {% if by_course %}
+      <ul class="admin-course-list">
+        {% for slug, c in by_course.items() %}
+        <li>
+          <div class="admin-course-top">
+            <strong>{{ c.title }}</strong>
+            <span>{{ c['items']|length }}{% if c.total %}/{{ c.total }}{% endif %}</span>
+          </div>
+          <div class="progress-track sm">
+            <div class="progress-fill" style="width: {{ ((c['items']|length / c.total) * 100) | round | int if c.total else 0 }}%"></div>
+          </div>
+          <details class="admin-lessons">
+            <summary>{{ c['items']|length }} lesson{{ '' if c['items']|length == 1 else 's' }} completed</summary>
+            <ul>
+              {% for l in c['items'] %}
+              <li><span>{{ icon('check') }} {{ l.title }}</span><small>{{ l.completed_at[:16] }}</small></li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="admin-empty">This member hasn't completed a lesson yet.</p>
+      {% endif %}
+    </section>
+
+    <section class="card admin-panel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('trophy') }} Achievements</h2>
+        <span class="admin-panel-note">{{ d.achievements|length }} earned</span>
+      </div>
+      {% if d.achievements %}
+      <ul class="admin-badges">
+        {% for a in d.achievements %}
+        {% set meta = achievement_titles.get(a.achievement_id) %}
+        <li>
+          <span class="admin-badge-icon">{{ icon(meta.icon if meta else 'trophy') }}</span>
+          <div>
+            <strong>{{ meta.title if meta else a.achievement_id }}</strong>
+            <small>{{ a.earned_at[:16] }}</small>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="admin-empty">No achievements yet.</p>
+      {% endif %}
+
+      <div class="admin-panel-head" style="margin-top:1.5rem">
+        <h2>{{ icon('swords') }} Arena &amp; projects</h2>
+      </div>
+      {% if d.challenges %}
+      <ul class="admin-simple-list">
+        {% for c in d.challenges %}
+        <li><span>{{ c.challenge_slug.replace('project:', 'Project · ')|replace('-', ' ')|title }}</span><small>{{ c.completed_at[:16] }}</small></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="admin-empty">Nothing solved in the arena yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <p class="admin-foot">
+    {{ icon('lock') }} This view is read-only and never exposes credentials.
+  </p>
+</section>
+{% endblock %}

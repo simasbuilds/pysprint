@@ -149,6 +149,9 @@
         {% if user %}
           <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}>Dashboard</a>
         {% endif %}
+        {% if user and user.is_admin %}
+          <a href="{{ url_for('admin') }}" class="nav-admin {% if request.path.startswith('/admin') %}active{% endif %}">{{ icon('shield') }} Admin</a>
+        {% endif %}
         <div class="mobile-nav-cta">
           {% if user %}
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Continue learning →</a>
