@@ -225,6 +225,8 @@
 {% endblock %}
 
 {% block scripts %}
+<script id="glossaryData" type="application/json">{{ glossary|tojson }}</script>
+<script src="{{ url_for('static', filename='js/glossary.js') }}"></script>
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script id="challengeSpec" type="application/json">{{ {"expected": lesson.challenge.expected_output}|tojson }}</script>
 <script>

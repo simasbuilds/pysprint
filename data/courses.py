@@ -1269,7 +1269,13 @@ def add_book():
     book = {"id": len(books) + 1, "title": data["title"]}
     books.append(book)
     return book, 201</code></pre>
-<p>Key ideas: the <code>@app.get(...)</code> decorator registers the route; returning <code>(body, 201)</code> sets the status code; <code>&lt;int:book_id&gt;</code> in a path captures URL parameters. This very site is built exactly this way — check its source when you finish!</p>
+<p>The three things to remember:</p>
+<ul>
+<li><code>@app.get("/api/books")</code> — the line above a function says "run this function for this URL"</li>
+<li><code>return book, 201</code> — return a second value to set the status code (201 means "created")</li>
+<li><code>&lt;int:book_id&gt;</code> in a URL — captures a number from the address and passes it to your function</li>
+</ul>
+<p>This very site is built exactly this way.</p>
 """,
                 "example": '# Route handlers are just functions - practise the logic:\nbooks = [{"id": 1, "title": "Fluent Python"}]\n\ndef add_book(data):\n    book = {"id": len(books) + 1, "title": data["title"]}\n    books.append(book)\n    return book, 201\n\nbody, status = add_book({"title": "Automate the Boring Stuff"})\nprint(status, body["id"], body["title"])',
                 "challenge": {

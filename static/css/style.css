@@ -217,8 +217,8 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
 .notice ul { margin-left: 1.2rem; }
 
 /* ── scroll reveal ───────────────────────────────────────────────── */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.16, 1, .3, 1); }
-.reveal.in { opacity: 1; transform: none; }
+.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.16, 1, .3, 1); }
+.js .reveal.in { opacity: 1; transform: none; }
 
 /* ── hero ────────────────────────────────────────────────────────── */
 .hero { padding: 4.5rem 1.25rem 3.5rem; position: relative; overflow: hidden; }
@@ -1005,10 +1005,6 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
 .nav { border-bottom: 1px solid var(--nav-line); }
 .nav-inner { max-width: 1240px; min-height: 66px; padding-block: .55rem; gap: 2rem; }
 .brand { position: relative; flex-shrink: 0; }
-.brand-tag {
-  align-self: flex-start; color: var(--text-dim); font: 800 .52rem/1 var(--mono);
-  letter-spacing: .09em; margin: .15rem 0 0 .15rem;
-}
 .nav-links { align-items: center; gap: .15rem; }
 .nav-links > a, .nav-menu-trigger {
   min-height: 40px; display: inline-flex; align-items: center; gap: .3rem;
@@ -1198,8 +1194,7 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
 @media (max-width: 760px) {
   .announce-inner { justify-content: flex-start; overflow-x: auto; white-space: nowrap; }
   .announce-inner a { display: none; }
-  .brand-tag { display: none; }
-  .nav-inner { gap: .6rem; }
+    .nav-inner { gap: .6rem; }
   .nav-right { margin-left: auto; }
   .nav-right > .btn { display: none; }
   .nav-links {
@@ -2149,9 +2144,9 @@ body {
 @keyframes pageIn { from { opacity: 0; transform: translateY(16px); } }
 
 /* Directional scroll reveals (assigned via data-reveal or by main.js). */
-.reveal-left { opacity: 0; transform: translateX(-36px); }
-.reveal-right { opacity: 0; transform: translateX(36px); }
-.reveal-scale { opacity: 0; transform: scale(.94); }
+.js .reveal-left { opacity: 0; transform: translateX(-36px); }
+.js .reveal-right { opacity: 0; transform: translateX(36px); }
+.js .reveal-scale { opacity: 0; transform: scale(.94); }
 .reveal-left, .reveal-right, .reveal-scale {
   transition: opacity .65s ease, transform .65s cubic-bezier(.16, 1, .3, 1);
 }
@@ -3145,4 +3140,66 @@ body.cmdk-open { overflow: hidden; }
 @media (max-width: 640px) {
   .step-head { gap: .55rem; margin-bottom: .8rem; }
   .lesson-content .step-head h2 { font-size: 1.2rem; }
+}
+
+/* ═══════════ v17: inline glossary + section entrances ══════════════ */
+/* Any jargon in a lesson explains itself — hover, click or tap. */
+.gloss {
+  display: inline; padding: 0; border: 0; background: none; cursor: help;
+  color: inherit; font: inherit;
+  border-bottom: 2px dotted color-mix(in srgb, var(--accent, var(--brand-1)) 55%, transparent);
+  transition: color .15s, border-color .15s, background .15s;
+}
+.gloss:hover, .gloss[aria-expanded="true"] {
+  color: var(--accent, var(--brand-1));
+  border-bottom-color: var(--accent, var(--brand-1));
+  background: color-mix(in srgb, var(--accent, var(--brand-1)) 9%, transparent);
+  border-radius: 3px;
+}
+.gloss:focus-visible { outline: 2px solid var(--brand-1); outline-offset: 2px; border-radius: 3px; }
+.gloss-pop {
+  position: absolute; z-index: 95; padding: .85rem 1rem;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-lg);
+  animation: glossIn .16s cubic-bezier(.16, 1, .3, 1);
+}
+@keyframes glossIn { from { opacity: 0; transform: translateY(-5px); } }
+.gloss-pop strong { display: block; font-size: .95rem; margin-bottom: .25rem; text-transform: capitalize; }
+.gloss-pop p { margin: 0; color: var(--text-dim); font-size: .86rem; line-height: 1.55; }
+.gloss-pop p code { font-size: .82em; }
+.gloss-pop-foot {
+  display: block; margin-top: .6rem; padding-top: .5rem; border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: .66rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+
+/* Sections and course cards arrive with a calm, staggered entrance. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .section-enter { opacity: 0; transform: translateY(26px); }
+  .js .section-enter.in {
+    opacity: 1; transform: none;
+    transition: opacity .7s cubic-bezier(.16, 1, .3, 1), transform .7s cubic-bezier(.16, 1, .3, 1);
+  }
+  /* children stagger in after their section */
+  .section-enter.in .course-card,
+  .section-enter.in .usecase-card,
+  .section-enter.in .learn-card,
+  .section-enter.in .project-card { animation: cardRise .6s cubic-bezier(.16, 1, .3, 1) backwards; }
+  .section-enter.in .course-card:nth-child(n+2),
+  .section-enter.in .usecase-card:nth-child(n+2) { animation-delay: .06s; }
+  .section-enter.in .course-card:nth-child(n+4),
+  .section-enter.in .usecase-card:nth-child(n+4) { animation-delay: .12s; }
+  .section-enter.in .course-card:nth-child(n+7) { animation-delay: .18s; }
+}
+@keyframes cardRise { from { opacity: 0; transform: translateY(18px); } }
+
+/* lesson sections settle in as you scroll the lesson */
+@media (prefers-reduced-motion: no-preference) {
+  .lesson-main > section, .lesson-main > .callout-grid { animation: sectionSettle .55s cubic-bezier(.16, 1, .3, 1) backwards; }
+  .lesson-main > *:nth-child(n+3) { animation-delay: .05s; }
+}
+@keyframes sectionSettle { from { opacity: 0; transform: translateY(14px); } }
+
+@media (max-width: 640px) {
+  .gloss-pop { max-width: calc(100vw - 24px); }
 }

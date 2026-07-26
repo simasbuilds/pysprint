@@ -39,6 +39,9 @@
     (function () {
       var t = localStorage.getItem('pysprint-theme') || 'light';
       document.documentElement.dataset.theme = t;
+      // Scroll-reveal styles only apply when JS can undo them, so a
+      // no-JS visitor never gets a blank page.
+      document.documentElement.classList.add('js');
     })();
   </script>
   {% block head %}{% endblock %}
@@ -90,7 +93,6 @@
       <a href="{{ url_for('home') }}" class="brand" aria-label="LearnWithPython home">
         <span class="brand-mark">{{ icon('brand', 'brand-glyph') }}</span>
         <span class="brand-name">LearnWith<em>Python</em></span>
-        <span class="brand-tag">PYTHON LAB</span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <div class="nav-menu-wrap">

@@ -101,7 +101,7 @@
     '.course-card, .feature, .challenge-card, .course-row, .lesson-row, ' +
     '.dash-course, .achieve-tile, .stat, .callout, .project-card, .feature-slab, ' +
     '.learn-card, .use-case-card, .how-card, .method-step, .about-principles article, ' +
-    '.usecase-card, .proof-strip > div');
+    '.usecase-card, .proof-strip > div, .section-enter');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if ('IntersectionObserver' in window && !reduceMotion && revealTargets.length) {
     const io = new IntersectionObserver((entries) => {
@@ -127,6 +127,14 @@
       el.style.transitionDelay = (i % 4) * 80 + 'ms';
       io.observe(el);
     });
+
+    // Safety net: if the observer never fires (odd browser, background tab,
+    // restored bfcache page), reveal everything rather than leave the page
+    // blank. Content visibility must never depend on an animation.
+    setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.in), [data-reveal]:not(.in)')
+        .forEach(el => el.classList.add('in'));
+    }, 2500);
 
     // Progress bars grow from zero the first time they're seen.
     document.querySelectorAll('.progress-fill').forEach(fill => {

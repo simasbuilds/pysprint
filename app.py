@@ -18,6 +18,7 @@ import database as db
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.courses import COURSES, get_course, get_lesson, total_lessons
+from data.glossary import get_glossary
 from data.lesson_extras import get_extras
 from data.projects import PROJECTS, get_project
 from data.use_cases import get_course_use_cases
@@ -205,6 +206,7 @@ def lesson(slug, lesson_slug):
         done=done, n_lessons=len(lessons),
         extras=get_extras(slug, lesson_slug),
         walkthrough=get_walkthrough(slug, lesson_slug),
+        glossary=get_glossary(),
     )
 
 
