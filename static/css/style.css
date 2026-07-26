@@ -2779,16 +2779,25 @@ body.cmdk-open { overflow: hidden; }
 
 /* course syllabus timeline */
 .lesson-list.timeline { position: relative; padding-left: 1.4rem; }
-.lesson-list.timeline::before {
-  content: ''; position: absolute; left: 8px; top: 24px; bottom: 24px; width: 2px;
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--accent) 55%, var(--border)),
-    var(--border));
-  border-radius: 2px;
+/* The connector is drawn per row — from this dot down to the next one — so
+   the rail starts exactly at the first circle and ends at the last, with no
+   stub dangling past either end, whatever height the cards are. */
+.lesson-list.timeline li::after {
+  content: ''; position: absolute; z-index: 0;
+  left: calc(-1.4rem + 8px); top: 50%; width: 2px;
+  height: calc(100% + .8rem);          /* row height + list gap = next dot */
+  background: var(--border); border-radius: 2px;
+  transition: background .3s;
+}
+.lesson-list.timeline li:last-child::after { display: none; }
+/* the trail fills in as lessons are completed */
+.lesson-list.timeline li:has(.is-done)::after {
+  background: linear-gradient(180deg, var(--success),
+    color-mix(in srgb, var(--success) 45%, var(--border)));
 }
 .lesson-list.timeline li { position: relative; }
 .lesson-list.timeline li::before {
-  content: ''; position: absolute; left: calc(-1.4rem + 3px); top: 50%; translate: 0 -50%;
+  content: ''; position: absolute; z-index: 1; left: calc(-1.4rem + 3px); top: 50%; translate: 0 -50%;
   width: 12px; height: 12px; border-radius: 50%;
   background: var(--surface); border: 2px solid var(--border);
   transition: border-color .2s, background .2s;
@@ -2953,6 +2962,7 @@ body.cmdk-open { overflow: hidden; }
 @media (max-width: 760px) {
   .lesson-list.timeline { padding-left: 1.1rem; }
   .lesson-list.timeline li::before { left: calc(-1.1rem + 2px); }
+  .lesson-list.timeline li::after { left: calc(-1.1rem + 7px); }
   .resume-chip small { display: none; }
   .diff-row { min-width: 360px; }
   .course-head-actions .btn { width: 100%; justify-content: center; }
