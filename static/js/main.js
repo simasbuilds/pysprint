@@ -3,6 +3,14 @@
 (function () {
   'use strict';
 
+  // ── platform-aware modifier key (Mac shows ⌘, everyone else Ctrl) ─
+  const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || '') ||
+                /Mac OS X/.test(navigator.userAgent || '');
+  window.MOD_KEY = isMac ? '⌘' : 'Ctrl';
+  document.querySelectorAll('.mod-key').forEach(el => {
+    el.textContent = window.MOD_KEY;
+  });
+
   // ── theme toggle (light default; persisted) ─────────────────────
   const themeBtn = document.getElementById('themeToggle');
   function applyThemeIcon() {

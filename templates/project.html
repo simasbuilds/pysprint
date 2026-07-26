@@ -51,7 +51,7 @@
         <p class="challenge-prompt">{{ step.prompt|safe }}</p>
         <div class="editor-wrap">
           <div class="standalone-save"><span class="save-state" id="save-{{ loop.index0 }}">Blank · autosaved</span></div>
-          <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">step_{{ loop.index }}.py</span></div>
+          <div class="editor-chrome"><span class="editor-badge">PY</span><span class="editor-title">step_{{ loop.index }}.py</span></div>
           <textarea id="code-{{ loop.index0 }}" class="code-input" rows="10" spellcheck="false" autocapitalize="off" autocomplete="off"
                     placeholder="# Build this step here, or tap “Load starter”…" aria-label="Step {{ loop.index }} code editor"></textarea>
           <div class="editor-bar">

@@ -809,7 +809,7 @@ print(f"Average: {average:.1f}")
         runStatus.textContent = result.ok ? 'Completed successfully' : 'Needs attention';
         runMeta.textContent = elapsed + ' ms · ' + result.output.split('\n').length + ' output line(s)';
         runBtn.disabled = false;
-        runBtn.innerHTML = '▶ Run Python <kbd>⌘↵</kbd>';
+        runBtn.innerHTML = '▶ Run Python <kbd>' + (window.MOD_KEY || '⌘') + '↵</kbd>';
 
         const history = getHistory();
         history.unshift({

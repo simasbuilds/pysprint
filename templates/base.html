@@ -115,7 +115,7 @@
               <span class="mega-foot-label">Quick start</span>
               <a href="{{ url_for('course_detail', slug='python-fundamentals') }}">{{ icon('spark') }} Lesson one</a>
               <a href="{{ url_for('review') }}">{{ icon('clock') }} Today's review</a>
-              <span class="mega-kbd"><kbd>⌘K</kbd> jump anywhere</span>
+              <span class="mega-kbd"><kbd><span class="mod-key">⌘</span>K</kbd> jump anywhere</span>
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@
               <span class="mega-foot-label">Quick start</span>
               <a href="{{ url_for('playground') }}">{{ icon('terminal') }} Blank workspace</a>
               <a href="{{ url_for('projects') }}">{{ icon('rocket') }} First project</a>
-              <span class="mega-kbd"><kbd>⌘K</kbd> jump anywhere</span>
+              <span class="mega-kbd"><kbd><span class="mod-key">⌘</span>K</kbd> jump anywhere</span>
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@
       </nav>
       <div class="nav-right">
         <button class="cmdk-btn" id="cmdkBtn" aria-label="Quick search — Ctrl or Cmd + K" aria-haspopup="dialog">
-          {{ icon('search') }}<span class="cmdk-btn-text">Search</span><kbd>⌘K</kbd>
+          {{ icon('search') }}<span class="cmdk-btn-text">Search</span><kbd><span class="mod-key">⌘</span>K</kbd>
         </button>
         {% if user %}
           <div class="nav-stats" title="Level {{ level.level }} — {{ level.title }}">

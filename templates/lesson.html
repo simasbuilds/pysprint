@@ -118,14 +118,14 @@
         <span class="save-state" id="exampleSaveState">Blank · autosaved</span>
       </div>
       <p class="editor-intro">The lesson example is loaded and ready — press <strong>Run</strong>, then change something and run it again. Breaking it is part of learning. Want a clean slate? Tap “New blank”.</p>
-      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">example.py</span></div>
+      <div class="editor-chrome"><span class="editor-badge">PY</span><span class="editor-title">example.py</span></div>
       <textarea id="exampleCode" class="code-input" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off"
                 placeholder="# Write Python here…" aria-label="Example code editor"></textarea>
       <div class="editor-bar">
         <button class="btn btn-run" id="exampleRun">▶ Run</button>
         <button class="btn btn-ghost btn-sm" id="exampleLoad">↙ Load example</button>
         <button class="btn btn-ghost btn-sm" id="exampleBlank">＋ New blank</button>
-        <span class="editor-hint">⌘/Ctrl + Enter to run</span>
+        <span class="editor-hint"><span class="mod-key">⌘</span> + Enter to run</span>
       </div>
       <pre id="exampleOut" class="code-output" aria-live="polite">Output appears here…</pre>
     </section>
@@ -143,7 +143,7 @@
         <span>Target output</span>
         <pre>{{ lesson.challenge.expected_output }}</pre>
       </div>
-      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">challenge.py</span></div>
+      <div class="editor-chrome"><span class="editor-badge">PY</span><span class="editor-title">challenge.py</span></div>
       <textarea id="challengeCode" class="code-input" rows="10" spellcheck="false" autocapitalize="off" autocomplete="off"
                 placeholder="# Solve the challenge here, or tap “Load starter”…" aria-label="Challenge code editor"></textarea>
       <div class="editor-bar">
@@ -200,7 +200,7 @@
       <a class="btn btn-ghost" href="{{ url_for('course_detail', slug=course.slug) }}">Finish course →</a>
       {% endif %}
     </footer>
-    <p class="lesson-kbd-hint">Tip: use <kbd>←</kbd> and <kbd>→</kbd> to move between lessons, <kbd>⌘K</kbd> to search everything.</p>
+    <p class="lesson-kbd-hint">Tip: use <kbd>←</kbd> and <kbd>→</kbd> to move between lessons, <kbd><span class="mod-key">⌘</span>K</kbd> to search everything.</p>
   </article>
 </div>
 {% endblock %}
