@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}404 — Page Not Found | LearnWithPython{% endblock %}
 {% block description %}This page could not be found on LearnWithPython.{% endblock %}
 {% block robots %}noindex, nofollow{% endblock %}
@@ -7,11 +8,28 @@
 <section class="auth-wrap error-wrap">
   <div class="card auth-card center">
     <pre class="code-output">Traceback (most recent call last):
-  File "pysprint.py", line 404, in &lt;browse&gt;
+  File "learnwithpython.py", line 404, in &lt;browse&gt;
 PageNotFoundError: nothing lives at this URL</pre>
     <h1>404</h1>
-    <p class="muted">Even the best developers hit exceptions. Let's handle this one:</p>
+    <p class="muted">Even the best developers hit exceptions. Here's how to handle this one:</p>
+
+    <div class="error-actions">
+      <a class="error-action" href="{{ url_for('courses') }}">
+        <span>{{ icon('book') }}</span>
+        <div><strong>Browse courses</strong><small>{{ n_courses }} courses · {{ n_lessons }} lessons</small></div>
+      </a>
+      <a class="error-action" href="{{ url_for('playground') }}">
+        <span>{{ icon('terminal') }}</span>
+        <div><strong>Open the playground</strong><small>Run real Python right now</small></div>
+      </a>
+      <a class="error-action" href="{{ url_for('challenges') }}">
+        <span>{{ icon('swords') }}</span>
+        <div><strong>Challenge arena</strong><small>Test what you know</small></div>
+      </a>
+    </div>
+
     <a class="btn btn-primary" href="{{ url_for('home') }}">→ Back to safety</a>
+    <p class="error-tip">Tip: press <kbd><span class="mod-key">⌘</span>K</kbd> anywhere to search every lesson.</p>
   </div>
 </section>
 {% endblock %}

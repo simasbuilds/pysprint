@@ -18,7 +18,7 @@
   </div>
 </section>
 
-<section class="section narrow">
+<section class="challenge-page">
   <div class="card editor-block challenge-block">
     <p class="challenge-prompt">{{ ch.prompt|safe }}</p>
     <div class="output-target">
@@ -44,6 +44,20 @@
   {% if ch.slug in done %}
   <p class="notice card">{{ icon('check') }} You've already solved this one — re-run it any time for practice.</p>
   {% endif %}
+
+  <nav class="challenge-nav" aria-label="Challenge navigation">
+    {% if prev %}
+    <a href="{{ url_for('challenge_detail', slug=prev.slug) }}" rel="prev">
+      <small>← Previous</small><strong>{{ prev.title }}</strong>
+    </a>
+    {% else %}<span></span>{% endif %}
+    <a class="cn-all" href="{{ url_for('challenges') }}">All challenges</a>
+    {% if next %}
+    <a class="cn-next" href="{{ url_for('challenge_detail', slug=next.slug) }}" rel="next">
+      <small>Next →</small><strong>{{ next.title }}</strong>
+    </a>
+    {% else %}<span></span>{% endif %}
+  </nav>
 </section>
 {% endblock %}
 

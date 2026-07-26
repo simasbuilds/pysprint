@@ -299,7 +299,12 @@ def challenge_detail(slug):
     done = set()
     if user:
         _, done = db.get_progress(user["id"])
-    return render_template("challenge.html", ch=ch, done=done)
+    idx = next((i for i, c in enumerate(CHALLENGES) if c["slug"] == slug), None)
+    return render_template(
+        "challenge.html", ch=ch, done=done,
+        prev=CHALLENGES[idx - 1] if idx else None,
+        next=CHALLENGES[idx + 1] if idx is not None and idx + 1 < len(CHALLENGES) else None,
+    )
 
 
 @app.get("/playground")
