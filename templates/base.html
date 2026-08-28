@@ -260,7 +260,7 @@
       {"label": "Home", "hint": "Start page", "href": "{{ url_for('home') }}", "icon": "brand"},
       {"label": "All courses", "hint": "The six-course learning path", "href": "{{ url_for('courses') }}", "icon": "book"},
       {"label": "Challenge arena", "hint": "Graded standalone problems", "href": "{{ url_for('challenges') }}", "icon": "swords"},
-      {"label": "Real-life projects", "hint": "Five guided portfolio builds", "href": "{{ url_for('projects') }}", "icon": "blocks"},
+      {"label": "Real-life projects", "hint": "{{ n_projects }} guided portfolio builds", "href": "{{ url_for('projects') }}", "icon": "blocks"},
       {"label": "Playground", "hint": "Blank Python workspace", "href": "{{ url_for('playground') }}", "icon": "terminal"},
       {"label": "Smart Review", "hint": "Spaced-repetition flashcards", "href": "{{ url_for('review') }}", "icon": "brain"},
       {"label": "How it works", "hint": "About LearnWithPython", "href": "{{ url_for('about') }}", "icon": "info"}

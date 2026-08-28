@@ -28,7 +28,7 @@ No migrations, no seed step.
 app.py               Flask app: all routes, auth, progress API, SEO routes
 database.py          SQLite layer (stdlib sqlite3, no ORM). Schema lives here.
 data/
-  courses.py         THE CURRICULUM. 6 courses × lessons (content/example/
+  courses.py         THE CURRICULUM. 10 courses × lessons (content/example/
                      challenge/quiz). This is where 90% of edits happen.
   lesson_extras.py   Per-lesson deep-dive callouts (real_world / pitfalls /
                      pro_tip), keyed by (course_slug, lesson_slug)
@@ -84,6 +84,28 @@ preserve insertion order, that's fine). Test the solution actually produces
 **New course:** append to `COURSES` with `slug/title/tagline/level/color/
 icon/description/lessons`, and add a matching completion achievement in
 `data/achievements.py`.
+
+## Content today
+
+10 courses / 55 lessons, 9 projects (36 graded steps), 18 arena challenges.
+Counts are never hardcoded in copy — `inject_globals` exposes `n_lessons`,
+`n_courses`, `n_projects`, `n_project_steps` and `n_challenges`, and
+`user_stats` exposes `total_projects` / `total_challenges` so achievements
+scale with the data.
+
+Every `expected_output` is produced by executing the paired `solution` and
+capturing stdout, so the two cannot drift. Re-run the verification snippet
+below over lessons, `data/challenges.py` and every step in
+`data/projects.py` after touching content.
+
+## Touch targets
+
+Controls are sized by input device, not viewport (`@media (pointer:
+coarse)`): a 27px chip is fine with a mouse and too small for a thumb, and a
+large phone is still a touch device. Everything interactive measures >=40px
+there. Because larger controls made the 320px nav overflow, the brand and
+nav gaps shrink below 400px — check that bar again if you add anything to
+`.nav-right`.
 
 ## Conventions
 

@@ -15,12 +15,12 @@
 {% block content %}
 <section class="directory-hero directory-dark">
   <div class="directory-copy">
-    <span class="eyebrow">Five guided builds · 20 graded steps</span>
+    <span class="eyebrow">{{ n_projects }} guided builds · {{ n_project_steps }} graded steps</span>
     <h1>Stop collecting tutorials. <span>Ship something real.</span></h1>
     <p>Build the software people actually use—each architecture explained first, then constructed and checked step by step.</p>
     <div class="directory-actions">
       <a href="{{ url_for('project_detail', slug='personal-budget') }}" class="btn btn-primary btn-lg">Build your first project →</a>
-      <a href="#projectCatalog" class="btn btn-dark-ghost btn-lg">Browse all five</a>
+      <a href="#projectCatalog" class="btn btn-dark-ghost btn-lg">Browse all {{ n_projects }}</a>
     </div>
   </div>
   <img src="{{ url_for('static', filename='images/real-projects.png') }}"

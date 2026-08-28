@@ -3491,3 +3491,39 @@ body.cmdk-open { overflow: hidden; }
   font: 700 .7rem var(--mono); color: var(--text-dim); background: var(--surface-2);
   border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: .06rem .32rem;
 }
+
+/* ═══════════ touch targets & narrow-phone nav ══════════════════════
+   Sized by input device, not viewport: a 27px chip is fine with a mouse
+   and too small for a thumb, and a large phone is still a touch device.
+   ~44px is the Apple HIG minimum, 48dp the Material one; 40px is the
+   floor used here so dense toolbars stay usable. */
+@media (pointer: coarse) {
+  .btn, a.btn, button.btn { min-height: 42px; }
+  .btn-sm { min-height: 42px; padding-inline: 1rem; }
+  .chip, .scenario-chip { min-height: 42px; display: inline-flex; align-items: center; }
+  .hero-console .scenario-chip { min-height: 40px; padding-inline: .7rem; }
+  .copy-btn { min-height: 40px; padding: .5rem .85rem; }
+  /* the playground console's Copy/Clear are bare <button>s */
+  .console-tools button { min-height: 40px; padding-inline: .8rem; }
+  .ide-tool, .ide-action { min-height: 40px; }
+  .ide-action.compact { min-width: 40px; }
+  .text-button { min-height: 40px; display: inline-flex; align-items: center; }
+  .cmdk-btn, .theme-toggle, .nav-burger { width: 42px; height: 42px; }
+  .nav-links > a, .nav-menu-trigger { min-height: 46px; }
+  .quiz-opt { min-height: 46px; }
+  .cmdk-item { min-height: 50px; }
+}
+
+/* Those larger controls must still fit a 320px bar, which was already
+   overflowing by 27px before they grew. Trim the brand and the gaps
+   rather than dropping a control. */
+@media (max-width: 400px) {
+  .nav-inner { padding-inline: .6rem; gap: .6rem; }
+  .nav-right { gap: .35rem; }
+  .brand { gap: .4rem; font-size: 1.02rem; }
+  .brand-mark { width: 30px; height: 30px; }
+}
+@media (max-width: 340px) {
+  .brand-name { font-size: .9em; }
+  .cmdk-btn, .theme-toggle, .nav-burger { width: 38px; height: 38px; }
+}
