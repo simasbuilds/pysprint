@@ -16,3 +16,7 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Scratch files written by lesson/project solutions when verifying them
+nums.txt
+todo.txt

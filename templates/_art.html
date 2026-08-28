@@ -87,6 +87,33 @@
     <circle cx="48" cy="32" r="6" stroke-opacity=".62"/>
     <path d="M22.5 32h6" stroke-opacity=".72"/><path d="M35.5 32h6" stroke-opacity=".72"/>
     <path d="M34 18.5 27.5 31h5.5l-1.5 9.5L39 28h-5.5z" stroke-linejoin="round"/>
+  {%- elif slug == 'log-analyzer' %}
+    {# a latency trace spiking over a baseline #}
+    <path d="M13 15h6" stroke-opacity=".45"/><path d="M13 15h6" stroke-opacity="0"/>
+    <path d="M12 16h37" stroke-opacity=".5"/>
+    <path d="M15 34h6l4-13 5 24 4-17 4 8h11"/>
+    <circle cx="30" cy="45" r="2.6" stroke-opacity=".8"/>
+  {%- elif slug == 'search-engine' %}
+    {# a lens over ranked result bars #}
+    <circle cx="27" cy="26" r="11"/>
+    <path d="m35.5 34.5 8 8"/>
+    <path d="M17 47h30" stroke-opacity=".45"/>
+    <path d="M17 53h20" stroke-opacity=".3"/>
+  {%- elif slug == 'lru-cache' %}
+    {# stacked store with a hot entry on top #}
+    <ellipse cx="32" cy="17" rx="15" ry="6"/>
+    <path d="M17 17v22c0 3.3 6.7 6 15 6s15-2.7 15-6V17" stroke-opacity=".62"/>
+    <path d="M17 28c0 3.3 6.7 6 15 6s15-2.7 15-6" stroke-opacity=".62"/>
+    <path d="m28 50 4-5 4 5" stroke-opacity=".85"/>
+  {%- elif slug == 'recommender' %}
+    {# one node radiating matches to similar nodes #}
+    <circle cx="32" cy="32" r="6.5"/>
+    <circle cx="15" cy="18" r="4" stroke-opacity=".6"/>
+    <circle cx="49" cy="18" r="4" stroke-opacity=".6"/>
+    <circle cx="15" cy="47" r="4" stroke-opacity=".45"/>
+    <circle cx="49" cy="47" r="4" stroke-opacity=".8"/>
+    <path d="m27.5 28-9-6.5" stroke-opacity=".55"/><path d="m36.5 28 9-6.5" stroke-opacity=".55"/>
+    <path d="m27.5 36-9 7.5" stroke-opacity=".4"/><path d="m36.5 36 9 7.5" stroke-opacity=".7"/>
   {%- else %}
     <circle cx="32" cy="32" r="12"/><path d="m27 32 4 4 7-8"/>
   {%- endif %}

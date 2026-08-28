@@ -2,7 +2,7 @@
    Exposes:
      PyRunner.run(code) -> {ok, output}
      PyRunner.wireSimple(runBtnId, codeId, outId)
-     PySprint.initLesson(cfg) / initChallenge(cfg) / initPlayground()
+     LearnwithPython.initLesson(cfg) / initChallenge(cfg) / initPlayground()
 */
 (function () {
   'use strict';
@@ -314,7 +314,7 @@
   }
 
   // ── page initialisers ──────────────────────────────────────────────
-  const PySprint = {
+  const LearnwithPython = {
     initLesson(cfg) {
       // Animated walkthrough player (only some lessons have one)
       if (cfg.walkthrough) initWalkthrough(cfg.example, cfg.walkthrough);
@@ -497,5 +497,6 @@
   };
 
   window.PyRunner = PyRunner;
-  window.PySprint = PySprint;
+  window.LearnwithPython = LearnwithPython;
+  window.PySprint = LearnwithPython;   // pre-rename alias, kept so nothing breaks
 })();

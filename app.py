@@ -70,12 +70,17 @@ def user_stats(user):
     courses_done = {c["slug"] for c in COURSES
                     if lessons_by_course.get(c["slug"], set()) >=
                     {l["slug"] for l in c["lessons"]}}
+    done_projects = {s for s in challenges if s.startswith("project:")}
     return {
         "lessons_done": sum(len(v) for v in lessons_by_course.values()),
         "courses_done": courses_done,
         "challenges_done": len(challenges & ARENA_SLUGS),
-        "projects_done": len({s for s in challenges if s.startswith("project:")}),
+        "projects_done": len(done_projects),
+        "advanced_projects_done": len(
+            {p["slug"] for p in PROJECTS
+             if p["level"] == "Advanced" and f"project:{p['slug']}" in challenges}),
         "total_projects": len(PROJECTS),
+        "total_challenges": len(CHALLENGES),
         "xp": user["xp"],
         "streak": user["streak"],
         "total_lessons": total_lessons(),
@@ -428,22 +433,27 @@ def api_search_index():
     for c in COURSES:
         items.append({"kind": "Course", "title": c["title"],
                       "sub": c["tagline"], "icon": c["icon"],
+                      "kw": c["slug"].replace("-", " "),
                       "url": url_for("course_detail", slug=c["slug"])})
         for i, l in enumerate(c["lessons"], 1):
             items.append({"kind": "Lesson", "title": l["title"],
                           "sub": "%s · lesson %d" % (c["title"], i),
                           "icon": c["icon"],
+                          "kw": "%s %s" % (l["slug"].replace("-", " "),
+                                           c["slug"].replace("-", " ")),
                           "url": url_for("lesson", slug=c["slug"],
                                          lesson_slug=l["slug"])})
     for pr in PROJECTS:
         items.append({"kind": "Project", "title": pr["title"],
                       "sub": "%s · %d min" % (pr["level"], pr["minutes"]),
                       "icon": pr["icon"],
+                      "kw": pr["slug"].replace("-", " "),
                       "url": url_for("project_detail", slug=pr["slug"])})
     for ch in CHALLENGES:
         items.append({"kind": "Challenge", "title": ch["title"],
                       "sub": "%s · %d XP" % (ch["difficulty"], ch["xp"]),
                       "icon": "swords",
+                      "kw": ch["slug"].replace("-", " "),
                       "url": url_for("challenge_detail", slug=ch["slug"])})
     for title, sub, icon, endpoint in [
         ("All courses", "Browse the full curriculum", "book", "courses"),

@@ -14,22 +14,22 @@
   window.psIcon = psIcon;
 
   // ── theme toggle (light default; persisted) ─────────────────────
-  const themeBtn = document.getElementById('themeToggle');
-  // The button holds both icons; CSS shows whichever matches the theme.
+  // Two toggles exist — one in the bar, one in the mobile drawer, because a
+  // narrow phone bar has no room for three 44px controls.
+  const themeBtns = document.querySelectorAll('.theme-toggle');
+  // Each button holds both icons; CSS shows whichever matches the theme.
   function applyThemeIcon() {
-    if (!themeBtn) return;
     const dark = document.documentElement.dataset.theme === 'dark';
-    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    themeBtns.forEach(b => b.setAttribute(
+      'aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme'));
   }
   applyThemeIcon();
-  if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
-      localStorage.setItem('pysprint-theme', next);
-      applyThemeIcon();
-    });
-  }
+  themeBtns.forEach(btn => btn.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('pysprint-theme', next);
+    applyThemeIcon();
+  }));
 
   // ── sticky nav shadow on scroll ─────────────────────────────────
   const nav = document.querySelector('.nav');

@@ -9,11 +9,14 @@
   const input = document.getElementById('paletteInput');
   const list = document.getElementById('paletteList');
   const openBtn = document.getElementById('paletteBtn');
+  const closeBtn = document.getElementById('paletteClose');
+  const clearBtn = document.getElementById('paletteClear');
   if (!modal || !input || !list) return;
 
   const CACHE_KEY = 'pysprint-search-index';
   const KIND_ORDER = { Lesson: 0, Course: 1, Project: 2, Challenge: 3, Page: 4 };
   const isMac = /Mac|iP(hone|ad|od)/.test(navigator.platform || navigator.userAgent);
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
   let items = null;
   let loading = false;
@@ -24,6 +27,8 @@
   // Show the right modifier on the nav hint.
   const hint = document.getElementById('paletteHint');
   if (hint && !isMac) hint.textContent = 'Ctrl K';
+  // the long placeholder truncates on a phone
+  if (isTouch) input.placeholder = 'Search lessons, projects…';
 
   // ── index loading ────────────────────────────────────────────────
   async function loadIndex() {
@@ -77,7 +82,10 @@
       .map(it => {
         const titleScore = score(q, it.title);
         const subScore = score(q, it.sub || '') * 0.35;
-        const best = Math.max(titleScore, subScore);
+        // slugs, weighted just under the title, so "lru" or "recommender"
+        // find pages whose visible words differ from their url
+        const kwScore = score(q, it.kw || '') * 0.8;
+        const best = Math.max(titleScore, subScore, kwScore);
         return { it: it, s: best - (KIND_ORDER[it.kind] || 0) * 0.5 };
       })
       .filter(r => r.s > 0)
@@ -137,7 +145,7 @@
         '<span class="palette-text">' +
         '<span class="palette-title">' + highlight(it.title, q) + '</span>' +
         '<span class="palette-sub">' + esc(it.sub || '') + '</span>' +
-        '</span><span class="palette-go">Open ↵</span></a>';
+        '</span>' + (isTouch ? '' : '<span class="palette-go">Open ↵</span>') + '</a>';
     });
     list.innerHTML = html;
   }
@@ -157,16 +165,36 @@
     document.body.classList.add('nav-open');
     input.value = '';
     sel = 0;
+    syncClear();
     render();
     loadIndex();
     input.focus();
+    fitToViewport();
   }
 
   function close() {
     if (modal.hidden) return;
     modal.hidden = true;
+    modal.style.height = '';
+    modal.style.top = '';
     document.body.classList.remove('nav-open');
+    input.blur();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  // ── keep the sheet inside the *visual* viewport ──────────────────
+  // On phones the software keyboard shrinks the visual viewport without
+  // changing the layout viewport, so a 100vh sheet puts its results behind
+  // the keyboard. visualViewport reports the space actually left.
+  const vv = window.visualViewport;
+  function fitToViewport() {
+    if (!vv || modal.hidden) return;
+    modal.style.height = vv.height + 'px';
+    modal.style.top = vv.offsetTop + 'px';
+  }
+  if (vv) {
+    vv.addEventListener('resize', fitToViewport);
+    vv.addEventListener('scroll', fitToViewport);
   }
 
   // ── wiring ───────────────────────────────────────────────────────
@@ -198,7 +226,12 @@
     }
   });
 
-  input.addEventListener('input', () => { sel = 0; render(); });
+  function syncClear() { if (clearBtn) clearBtn.hidden = !input.value; }
+  input.addEventListener('input', () => { sel = 0; syncClear(); render(); });
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    input.value = ''; sel = 0; syncClear(); render(); input.focus();
+  });
+  if (closeBtn) closeBtn.addEventListener('click', close);
   modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
   list.addEventListener('mousemove', (e) => {
     const item = e.target.closest('.palette-item');

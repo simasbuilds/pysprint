@@ -95,7 +95,21 @@ static/js/
    (first visit). The hero editor is a *graded* first task — it checks the
    learner actually edited the name before showing the success panel — so
    time-to-first-real-Python is about ten seconds with no signup.
-12. **Light theme is the default**; dark mode via `data-theme="dark"` on
+12. **Touch targets are sized by input device, not viewport**
+   (`@media (pointer: coarse)`) — a 30px control is fine with a mouse and
+   too small for a thumb, and a large phone is still a touch device.
+   Everything interactive measures >=40px there. Because three 44px controls
+   plus the wordmark overflow a 360px bar, the theme toggle moves into the
+   mobile drawer below 640px — hence two `.theme-toggle` buttons, both wired
+   by `main.js`.
+13. **The command palette is a full-height sheet on touch**, sized to
+   `visualViewport` so results sit above the software keyboard, with a real
+   Close button and no keyboard hints. It scores against a `kw` field
+   carrying slugs, so "lru" or "recommender" find pages whose visible titles
+   differ from their URL.
+14. **Auto-fill grids use `minmax(min(Npx, 100%), 1fr)`** — a bare
+   `minmax(Npx, 1fr)` forces horizontal overflow below N px.
+15. **Light theme is the default**; dark mode via `data-theme="dark"` on
    `<html>`, toggled in the nav and persisted in localStorage. All colors
    come from CSS custom properties in `:root` / `[data-theme="dark"]` —
    never hardcode a color in a component rule. Code editors deliberately
@@ -148,7 +162,11 @@ print("all lesson solutions verified")
 EOF
 ```
 
-Run the same pattern over `data/challenges.py` when editing the arena.
+Run the same pattern over `data/challenges.py` and over every project step in `data/projects.py`.
+
+Content today: 6 courses / 34 lessons, 9 projects (36 graded steps),
+18 arena challenges, 22 achievements. Projects and challenges are sorted
+easiest-first at import time, so append in any order.
 
 ## Deployment notes
 

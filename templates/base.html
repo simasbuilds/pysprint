@@ -70,6 +70,10 @@
             <a class="btn btn-ghost btn-sm" href="{{ url_for('login') }}">Log in</a>
             <a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Start free</a>
           {% endif %}
+          <button class="theme-toggle theme-toggle-drawer" type="button"
+                  aria-label="Toggle light/dark theme" title="Toggle theme">
+            {{ ic.icon('moon', 18, 'theme-moon') }}{{ ic.icon('sun', 18, 'theme-sun') }}
+          </button>
         </div>
       </nav>
       <div class="nav-right">
@@ -148,9 +152,15 @@
           <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>
         </svg>
         <input id="paletteInput" type="text" autocomplete="off" spellcheck="false"
-               placeholder="Search courses, lessons, projects, challenges…"
+               autocapitalize="off" autocorrect="off" enterkeyhint="go"
+               placeholder="Search courses, lessons, projects…"
                aria-label="Search" aria-controls="paletteList" aria-expanded="true">
-        <kbd class="kbd">esc</kbd>
+        <button type="button" id="paletteClear" class="palette-clear" aria-label="Clear search" hidden>
+          {{ ic.icon('x-circle', 18, '') }}
+        </button>
+        <button type="button" id="paletteClose" class="palette-close" aria-label="Close search">
+          <span class="palette-close-txt">Close</span><kbd class="kbd palette-close-kbd">esc</kbd>
+        </button>
       </div>
       <div id="paletteList" class="palette-list" role="listbox" aria-label="Search results"></div>
       <div class="palette-foot">

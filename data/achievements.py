@@ -44,8 +44,11 @@ ACHIEVEMENTS = [
      "desc": "Solve 5 arena challenges.",
      "check": lambda s: s["challenges_done"] >= 5},
     {"id": "arena-legend", "icon": "crown", "title": "Arena Legend",
-     "desc": "Solve all 10 arena challenges.",
+     "desc": "Solve 10 arena challenges.",
      "check": lambda s: s["challenges_done"] >= 10},
+    {"id": "arena-perfect", "icon": "burst", "title": "Undefeated",
+     "desc": "Solve every arena challenge.",
+     "check": lambda s: s["challenges_done"] >= s.get("total_challenges", 99)},
 
     {"id": "xp-500", "icon": "star", "title": "Rising Star",
      "desc": "Earn 500 XP.",
@@ -63,6 +66,10 @@ ACHIEVEMENTS = [
     {"id": "shipper", "icon": "rocket", "title": "Shipper",
      "desc": "Complete every real-life project.",
      "check": lambda s: s.get("projects_done", 0) >= s.get("total_projects", 99)},
+
+    {"id": "architect-real", "icon": "database", "title": "Systems Thinker",
+     "desc": "Finish an Advanced real-life project.",
+     "check": lambda s: s.get("advanced_projects_done", 0) >= 1},
 
     {"id": "streak-3", "icon": "calendar", "title": "Habit Forming",
      "desc": "Learn 3 days in a row.",
