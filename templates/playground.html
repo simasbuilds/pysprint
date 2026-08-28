@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "_icons.html" as ic %}
-{% block title %}Python Playground — Run Python Online | PySprint{% endblock %}
+{% block title %}Python Playground — Run Python Online | LearnwithPython{% endblock %}
 {% block description %}A free online Python 3 playground. Write and run real Python in your browser — no installation, no signup. Powered by WebAssembly.{% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
 <section class="section narrow">
   <div class="card editor-block">
     <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">playground.py</span></div>
-    <textarea id="pgCode" class="code-input" rows="16" spellcheck="false" aria-label="Playground code editor"># Welcome to the PySprint playground!
+    <textarea id="pgCode" class="code-input" rows="16" spellcheck="false" aria-label="Playground code editor"># Welcome to the LearnwithPython playground!
 # Everything here is real Python 3 running in your browser.
 
 import math
@@ -42,5 +42,5 @@ print(Counter("pysprint").most_common(2))</textarea>
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
-<script>PySprint.initPlayground();</script>
+<script>LearnwithPython.initPlayground();</script>
 {% endblock %}

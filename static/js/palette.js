@@ -1,4 +1,4 @@
-/* PySprint command palette — ⌘K / Ctrl+K quick-jump to any course, lesson,
+/* LearnwithPython command palette — ⌘K / Ctrl+K quick-jump to any course, lesson,
    project, challenge or page. The index is fetched once on first open and
    cached in sessionStorage; matching is a small fuzzy-subsequence scorer so
    "dictcomp" finds "Dictionary Comprehensions". */

@@ -1,4 +1,4 @@
-"""PySprint — an interactive Python learning platform.
+"""LearnwithPython — an interactive Python learning platform.
 
 Flask backend: pages, auth, progress API, achievements, SEO routes.
 Run:  python app.py   (then open http://127.0.0.1:5000)
@@ -452,7 +452,7 @@ def api_search_index():
         ("Playground", "A blank Python scratchpad", "beaker", "playground"),
         ("Flashcard review", "Spaced repetition practice", "brain", "review"),
         ("Dashboard", "Your XP, streak and achievements", "bar-chart", "dashboard"),
-        ("About PySprint", "How the platform works", "info", "about"),
+        ("About LearnwithPython", "How the platform works", "info", "about"),
     ]:
         items.append({"kind": "Page", "title": title, "sub": sub,
                       "icon": icon, "url": url_for(endpoint)})

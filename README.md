@@ -1,4 +1,4 @@
-# PySprint — Learn Python by Actually Writing Python
+# LearnwithPython — Learn Python by Actually Writing Python
 
 A full-stack, interactive Python learning platform. Six structured courses,
 34 lessons, 10 arena challenges, real Python 3 running **in your browser**

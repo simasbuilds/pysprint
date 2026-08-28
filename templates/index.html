@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% import "_art.html" as art %}
-{% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
+{% block title %}LearnwithPython — Learn Python Interactively, Free{% endblock %}
 {% block description %}Master Python with {{ n_lessons }} interactive lessons across 6 courses — from your first print() to building real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "EducationalOrganization",
- "name": "PySprint", "url": "{{ site_url }}",
+ "name": "LearnwithPython", "url": "{{ site_url }}",
  "description": "Free interactive Python courses: fundamentals, data structures, OOP, APIs and automation.",
  "sameAs": ["https://github.com/simasbuilds"]}
 </script>
@@ -133,7 +133,7 @@ print(f"Hello, {name}!")</textarea>
 </section>
 
 <section class="section alt">
-  <h2 class="section-title">How PySprint <span class="grad">works</span></h2>
+  <h2 class="section-title">How LearnwithPython <span class="grad">works</span></h2>
   <p class="section-sub">Three moves, repeated until you're dangerous. Watch it happen:</p>
   <div class="how-grid">
     <div class="how-card card">
@@ -228,7 +228,7 @@ print(f"Hello, {name}!")</textarea>
     btn.disabled = true;
     var label = btn.innerHTML;
     btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>' +
-                    (window.PySprintEngineReady ? 'Running…' : 'Starting Python…');
+                    (window.LearnwithPythonEngineReady ? 'Running…' : 'Starting Python…');
     out.classList.remove('error');
     var res = await PyRunner.run(code.value);
     out.textContent = res.output;

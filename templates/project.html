@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_icons.html" as ic %}
 {% import "_art.html" as art %}
-{% block title %}{{ project.title }} — Real-Life Python Project | PySprint{% endblock %}
+{% block title %}{{ project.title }} — Real-Life Python Project | LearnwithPython{% endblock %}
 {% block description %}{{ project.summary }}{% endblock %}
 
 {% block content %}
@@ -74,7 +74,7 @@
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script id="projectSpec" type="application/json">{{ {"steps": project.steps|map(attribute="expected_output")|list}|tojson }}</script>
 <script>
-  PySprint.initProject({
+  LearnwithPython.initProject({
     project: {{ project.slug|tojson }},
     loggedIn: {{ 'true' if user else 'false' }},
     completed: {{ 'true' if completed else 'false' }}

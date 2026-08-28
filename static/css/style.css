@@ -1199,3 +1199,45 @@ h1 .icon, h2 .icon, h3 .icon { color: var(--accent); }
   .nav-search { padding: .42rem; }
   .nav-inner { gap: 1rem; }
 }
+
+/* ═══════════════════ v7: touch targets & tablet ════════════════════ */
+
+/* Sized by input device, not viewport: a 30px button is fine with a mouse
+   and too small for a thumb, and a large phone is still a touch device.
+   ~44px is the Apple HIG minimum, 48dp the Material one. */
+@media (pointer: coarse) {
+  .btn-sm { min-height: 42px; padding-inline: 1rem; }
+  .chip { min-height: 42px; display: inline-flex; align-items: center; }
+  .nav-search { width: 44px; height: 44px; justify-content: center; }
+  .theme-toggle, .nav-burger { width: 44px; height: 44px; }
+  .copy-btn { min-height: 40px; padding: .5rem .9rem; }
+  .to-top { width: 50px; height: 50px; }
+  .nav-links a { min-height: 44px; display: flex; align-items: center; }
+  .quiz-opt { min-height: 46px; }
+  .side-lesson { min-height: 42px; }
+  .palette-item { min-height: 52px; }
+  .review-actions .btn { min-height: 56px; }
+  /* editor bars get roomier so Run/Hint/Solution don't crowd */
+  .editor-bar { gap: .55rem; padding: .8rem 1rem; }
+}
+
+/* ── tablet: the 2-column grids are roomy at 768–1024, but the hero,
+   lesson sidebar and walkthrough all want a single column ────────── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .section { padding-inline: 1.75rem; }
+  .page-head { padding-inline: 1.75rem; }
+  .hero { padding-inline: 1.75rem; }
+  .lesson-layout { padding-inline: 1.75rem; }
+  /* the sidebar sits below the lesson on tablet, so let it breathe wide */
+  .lesson-side { max-width: none; }
+  .side-lessons { display: grid; grid-template-columns: repeat(2, 1fr); gap: .2rem; }
+  .hero-demo { max-width: 640px; }
+  .resume-card { max-width: none; }
+}
+
+/* the brand wordmark is longer than it was; keep it from squeezing nav */
+.brand { flex-shrink: 0; }
+@media (max-width: 380px) {
+  .brand-name { font-size: .88em; }
+  .brand-mark { width: 30px; height: 30px; }
+}

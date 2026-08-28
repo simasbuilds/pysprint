@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "_icons.html" as ic %}
-{% block title %}{{ lesson.title }} — {{ course.title }} | PySprint{% endblock %}
+{% block title %}{{ lesson.title }} — {{ course.title }} | LearnwithPython{% endblock %}
 {% block description %}Interactive Python lesson: {{ lesson.title }}. Learn, run real code in your browser, and pass the challenge to earn {{ lesson.xp }} XP.{% endblock %}
 
 {% block content %}
@@ -146,7 +146,7 @@
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script id="challengeSpec" type="application/json">{{ {"expected": lesson.challenge.expected_output}|tojson }}</script>
 <script>
-  PySprint.initLesson({
+  LearnwithPython.initLesson({
     course: {{ course.slug|tojson }},
     lesson: {{ lesson.slug|tojson }},
     starter: {{ lesson.challenge.starter|tojson }},

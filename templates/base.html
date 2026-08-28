@@ -5,14 +5,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}PySprint — Learn Python Interactively{% endblock %}</title>
+  <title>{% block title %}LearnwithPython — Learn Python Interactively{% endblock %}</title>
   <meta name="description" content="{% block description %}Learn Python for free with interactive lessons, in-browser coding challenges, quizzes, XP and achievements. From absolute beginner to building your own APIs.{% endblock %}">
   <meta name="keywords" content="learn python, python course, interactive python, python for beginners, python API tutorial, coding challenges, free python course">
   <meta name="author" content="simasbuilds">
   <link rel="canonical" href="{{ site_url }}{{ request.path }}">
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="PySprint">
+  <meta property="og:site_name" content="LearnwithPython">
   <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
   <meta property="og:description" content="{{ self.description() }}">
   <meta property="og:url" content="{{ site_url }}{{ request.path }}">
@@ -38,7 +38,7 @@
   {% block structured_data %}
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "WebSite",
-   "name": "PySprint", "url": "{{ site_url }}",
+   "name": "LearnwithPython", "url": "{{ site_url }}",
    "description": "Interactive Python courses with in-browser coding, XP and achievements."}
   </script>
   {% endblock %}
@@ -50,8 +50,8 @@
 
   <header class="nav">
     <div class="nav-inner">
-      <a href="{{ url_for('home') }}" class="brand" aria-label="PySprint home">
-        {{ brand.brand_mark('nav', 34) }}<span class="brand-name">Py<em>Sprint</em></span>
+      <a href="{{ url_for('home') }}" class="brand" aria-label="LearnwithPython home">
+        {{ brand.brand_mark('nav', 34) }}<span class="brand-name">Learnwith<em>Python</em></span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="{{ url_for('courses') }}" {% if request.path.startswith('/courses') %}class="active"{% endif %}>Courses</a>
@@ -105,7 +105,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="footer-brand-row">{{ brand.brand_mark('foot', 28) }} <strong>PySprint</strong></span>
+        <span class="footer-brand-row">{{ brand.brand_mark('foot', 28) }} <strong>LearnwithPython</strong></span>
         <p>Learn Python by writing Python. Free, interactive, forever.</p>
       </div>
       <div class="footer-col">
@@ -124,7 +124,7 @@
         <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">GitHub</a>
       </div>
     </div>
-    <p class="footer-copy">© {{ now_year }} PySprint by simasbuilds · Built with Flask & Pyodide</p>
+    <p class="footer-copy">© {{ now_year }} LearnwithPython by simasbuilds · Built with Flask & Pyodide</p>
   </footer>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
@@ -141,7 +141,7 @@
   </div>
 
   <!-- Command palette (⌘K / Ctrl+K) -->
-  <div id="palette" class="palette" hidden role="dialog" aria-modal="true" aria-label="Search PySprint">
+  <div id="palette" class="palette" hidden role="dialog" aria-modal="true" aria-label="Search LearnwithPython">
     <div class="palette-card">
       <div class="palette-head">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true">

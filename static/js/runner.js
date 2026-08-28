@@ -1,4 +1,4 @@
-/* PySprint code runner — real Python 3 in the browser via Pyodide.
+/* LearnwithPython code runner — real Python 3 in the browser via Pyodide.
    Exposes:
      PyRunner.run(code) -> {ok, output}
      PyRunner.wireSimple(runBtnId, codeId, outId)
