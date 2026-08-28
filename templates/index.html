@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_art.html" as art %}
 {% block title %}PySprint — Learn Python Interactively, Free{% endblock %}
 {% block description %}Master Python with {{ n_lessons }} interactive lessons across 6 courses — from your first print() to building real APIs. Code in your browser, earn XP, unlock achievements.{% endblock %}
 
@@ -17,37 +18,95 @@
     <div class="hero-grid"></div>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
   </div>
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="pill stagger d1"><span class="pulse-dot"></span> 100% free · No installs · Code in your browser</span>
-      <h1 class="stagger d2">Learn Python by<br><span class="grad">actually writing Python</span></h1>
-      <p class="hero-sub stagger d3">From zero to building <span class="word-rotate" id="wordRotate"><span>real APIs</span></span><br>{{ n_lessons }} interactive lessons, real-life projects, {{ n_challenges }} arena challenges and a spaced-repetition review engine — with real Python running in your browser.</p>
+    {% if user and next_up %}
+      {# ── returning learner: lead with their next step, not a pitch ── #}
+      <span class="pill stagger d1">
+        {{ ic.icon('flame', 14, 'i-inline') }}
+        {% if user.streak > 1 %}{{ user.streak }}-day streak — keep it alive
+        {% else %}Welcome back, {{ user.username }}{% endif %}
+      </span>
+      <h1 class="stagger d2">Pick up where<br><span class="grad">you left off</span></h1>
+
+      <a href="{{ url_for('lesson', slug=next_up.course.slug, lesson_slug=next_up.lesson.slug) }}"
+         class="resume-card card stagger d3" style="--accent: {{ next_up.course.color }}">
+        <span class="resume-art">{{ art.art(next_up.course.slug, next_up.course.color, 54) }}</span>
+        <span class="resume-body">
+          <span class="resume-kicker">{{ next_up.course.title }} · Lesson {{ next_up.index }} of {{ next_up.total }}</span>
+          <strong class="resume-title">{{ next_up.lesson.title }}</strong>
+          <span class="progress-track"><span class="progress-fill" style="width: {{ next_up.pct }}%"></span></span>
+          <span class="resume-meta">
+            {{ ic.icon('clock', 13, 'i-inline') }} {{ next_up.lesson.minutes }} min
+            <span>{{ ic.icon('bolt', 13, 'i-inline') }} +{{ next_up.lesson.xp }} XP</span>
+          </span>
+        </span>
+        <span class="resume-go">{{ ic.icon('arrow-right', 20, '') }}</span>
+      </a>
+
       <div class="hero-cta stagger d4">
-        {% if user %}
-          <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Continue learning →</a>
-        {% else %}
-          <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start learning free →</a>
-        {% endif %}
-        <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Browse courses</a>
+        <a href="{{ url_for('lesson', slug=next_up.course.slug, lesson_slug=next_up.lesson.slug) }}"
+           class="btn btn-primary btn-lg">Resume lesson</a>
+        <a href="{{ url_for('review') }}" class="btn btn-ghost btn-lg">Review</a>
       </div>
-      <div class="hero-stats stagger d5">
-        <div><strong data-count="{{ n_lessons }}">0</strong><span>Interactive lessons</span></div>
-        <div><strong data-count="{{ n_challenges }}">0</strong><span>Coding challenges</span></div>
-        <div><strong data-count="{{ n_achievements }}">0</strong><span>Achievements</span></div>
+      <p class="hero-note stagger d5">{{ next_up.done }} of {{ n_lessons }} lessons complete ·
+        <a href="{{ url_for('dashboard') }}">See your dashboard</a></p>
+
+    {% elif user %}
+      {# ── finished everything ── #}
+      <span class="pill stagger d1">{{ ic.icon('trophy', 14, 'i-inline') }} All {{ n_lessons }} lessons complete</span>
+      <h1 class="stagger d2">You finished<br><span class="grad">the curriculum</span></h1>
+      <p class="hero-sub stagger d3">Keep the knowledge sharp with spaced repetition, or prove it in the arena.</p>
+      <div class="hero-cta stagger d4">
+        <a href="{{ url_for('review') }}" class="btn btn-primary btn-lg">Review what you know</a>
+        <a href="{{ url_for('challenges') }}" class="btn btn-ghost btn-lg">Challenge arena</a>
       </div>
+
+    {% else %}
+      {# ── first-time visitor ── #}
+      <span class="pill stagger d1"><span class="pulse-dot"></span> Free · No signup to start · No installs</span>
+      <h1 class="stagger d2">Learn Python by<br><span class="grad">actually writing Python</span></h1>
+      <p class="hero-sub stagger d3">Real Python 3 runs in your browser, so you write code from the
+        first minute — no setup, no video lectures. Six courses take you from
+        <code>print()</code> to shipping your own APIs.</p>
+      <div class="hero-cta stagger d4">
+        <a href="{{ url_for('lesson', slug=courses[0].slug, lesson_slug=courses[0].lessons[0].slug) }}"
+           class="btn btn-primary btn-lg">Start lesson 1</a>
+        <a href="#try" class="btn btn-ghost btn-lg">Try it right here</a>
+      </div>
+      <div class="hero-outcomes stagger d5">
+        <span class="hero-outcomes-label">Projects you'll finish</span>
+        <div class="outcome-row">
+          {% for p in projects[:3] %}
+          <a class="outcome" href="{{ url_for('project_detail', slug=p.slug) }}" style="--accent: {{ p.color }}">
+            {{ art.art(p.slug, p.color, 28, 'out-' ~ p.slug) }} {{ p.title }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
     </div>
-    <div class="hero-demo card">
-      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py — try me!</span></div>
-      <textarea id="heroCode" class="code-input" rows="6" spellcheck="false" aria-label="Python code editor">name = "world"
-for i in range(3):
-    print(f"Hello, {name}! ({i + 1})")</textarea>
-      <div class="editor-bar">
-        <button class="btn btn-run" id="heroRun">▶ Run Python</button>
-        <span class="editor-hint">Real Python 3, right here</span>
+
+    {# ── the demo is a real graded task, not a snippet to look at ── #}
+    <div class="hero-demo card" id="try">
+      <div class="try-head">
+        <span class="try-step">{{ ic.icon('play', 13, 'i-inline') }} Try it now</span>
+        <p class="try-task">Swap <code>world</code> for your own name, then run it.</p>
       </div>
-      <pre id="heroOut" class="code-output" aria-live="polite">Click Run to execute ↑</pre>
+      <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">hello.py</span></div>
+      <textarea id="heroCode" class="code-input" rows="4" spellcheck="false" aria-label="Python code editor">name = "world"
+print(f"Hello, {name}!")</textarea>
+      <div class="editor-bar">
+        <button class="btn btn-run" id="heroRun">{{ ic.icon('play', 14, 'i-inline') }} Run Python</button>
+        <span class="editor-hint">Ctrl/⌘ + Enter</span>
+      </div>
+      <pre id="heroOut" class="code-output" aria-live="polite">Your output appears here.</pre>
+      <div id="heroWin" class="try-win" hidden>
+        <p>{{ ic.icon('check-circle', 17, 'i-inline') }} <strong>That was real Python</strong> — executed in your browser, nothing sent to a server.</p>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('lesson', slug=courses[0].slug, lesson_slug=courses[0].lessons[0].slug) }}">
+          Start lesson 1 · {{ courses[0].lessons[0].minutes }} min</a>
+      </div>
     </div>
   </div>
 </section>
@@ -59,14 +118,14 @@ for i in range(3):
     {% for c in courses %}
     <a href="{{ url_for('course_detail', slug=c.slug) }}" class="course-card card" style="--accent: {{ c.color }}">
       <div class="course-top">
-        <span class="course-icon">{{ c.icon }}</span>
+        <span class="course-icon">{{ art.art(c.slug, c.color, 48) }}</span>
         <span class="level-badge level-{{ c.level|lower }}">{{ c.level }}</span>
       </div>
       <h3>{{ c.title }}</h3>
       <p>{{ c.tagline }}</p>
       <div class="course-meta">
         <span>{{ c.lessons|length }} lessons</span>
-        <span>⚡ {{ c.lessons|sum(attribute='xp') }} XP</span>
+        <span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ c.lessons|sum(attribute='xp') }} XP</span>
       </div>
     </a>
     {% endfor %}
@@ -79,7 +138,7 @@ for i in range(3):
   <div class="how-grid">
     <div class="how-card card">
       <span class="how-num">1</span>
-      <h3>📖 Learn the concept</h3>
+      <h3>{{ ic.icon('book', 18, 'i-inline') }} Learn the concept</h3>
       <div class="how-demo how-demo-learn" aria-hidden="true">
         <span class="how-line w80"></span>
         <span class="how-line w60"></span>
@@ -90,19 +149,19 @@ for i in range(3):
     </div>
     <div class="how-card card">
       <span class="how-num">2</span>
-      <h3>⌨️ Code it live</h3>
+      <h3>{{ ic.icon('code', 18, 'i-inline') }} Code it live</h3>
       <div class="how-demo how-demo-code" aria-hidden="true">
         <code class="type-line">print("I am coding")<span class="caret"></span></code>
-        <code class="type-result">✓ Correct! Output matches.</code>
+        <code class="type-result">OK  Correct! Output matches.</code>
       </div>
       <p>Every lesson ends with a graded challenge. Real Python 3 runs in your browser and checks your output the instant you hit Run.</p>
     </div>
     <div class="how-card card">
       <span class="how-num">3</span>
-      <h3>🏆 Level up</h3>
+      <h3>{{ ic.icon('trophy', 18, 'i-inline') }} Level up</h3>
       <div class="how-demo how-demo-xp" aria-hidden="true">
         <div class="how-xp-track"><div class="how-xp-fill"></div></div>
-        <span class="how-badge">⚡ +40 XP</span>
+        <span class="how-badge">{{ ic.icon('bolt', 14, 'i-inline') }} +40 XP</span>
       </div>
       <p>XP, streaks and achievements track every win — and the Smart Review engine brings each concept back right before you'd forget it.</p>
     </div>
@@ -116,12 +175,12 @@ for i in range(3):
     {% for p in projects %}
     <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card" style="--accent: {{ p.color }}">
       <div class="project-card-top">
-        <span class="project-icon">{{ p.icon }}</span>
+        <span class="project-icon">{{ art.art(p.slug, p.color, 48) }}</span>
         <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
       </div>
       <h3>{{ p.title }}</h3>
       <p>{{ p.summary }}</p>
-      <div class="course-meta"><span>🧩 {{ p.steps|length }} steps</span><span>⚡ {{ p.xp }} XP</span></div>
+      <div class="course-meta"><span>{{ ic.icon('layers', 14, 'i-inline') }} {{ p.steps|length }} steps</span><span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ p.xp }} XP</span></div>
       <span class="project-go">Build it →</span>
     </a>
     {% endfor %}
@@ -131,12 +190,12 @@ for i in range(3):
 <section class="section alt">
   <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
   <div class="feature-grid">
-    <div class="feature card"><span class="feature-icon">⚡</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
-    <div class="feature card"><span class="feature-icon">🧠</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
-    <div class="feature card"><span class="feature-icon">🏆</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
-    <div class="feature card"><span class="feature-icon">🎯</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
-    <div class="feature card"><span class="feature-icon">⚔️</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
-    <div class="feature card"><span class="feature-icon">📈</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('bolt', 24, '') }}</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('brain', 24, '') }}</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('trophy', 24, '') }}</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('target', 24, '') }}</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('swords', 24, '') }}</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
+    <div class="feature card"><span class="feature-icon">{{ ic.icon('bar-chart', 24, '') }}</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
   </div>
 </section>
 
@@ -153,23 +212,41 @@ for i in range(3):
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
 <script>
-  PyRunner.wireSimple('heroRun', 'heroCode', 'heroOut');
+/* The hero is a graded first task, not a demo reel: we check the learner
+   actually edited the name before celebrating, so the win is earned. */
+(function () {
+  var btn  = document.getElementById('heroRun');
+  var code = document.getElementById('heroCode');
+  var out  = document.getElementById('heroOut');
+  var win  = document.getElementById('heroWin');
+  if (!btn || !code || !out) return;
 
-  // Rotating word in the hero
-  (function () {
-    var words = ['real APIs', 'automation bots', 'data pipelines', 'your own tools', 'real projects'];
-    var el = document.getElementById('wordRotate');
-    if (!el) return;
-    var i = 0;
-    setInterval(function () {
-      i = (i + 1) % words.length;
-      var span = el.querySelector('span');
-      span.classList.add('out');
-      setTimeout(function () {
-        span.textContent = words[i];
-        span.classList.remove('out');
-      }, 260);
-    }, 2600);
-  })();
+  var solved = false;
+  PyRunner.enableEditor(code);   // Tab indents, Ctrl/Cmd+Enter runs
+
+  async function go() {
+    btn.disabled = true;
+    var label = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>' +
+                    (window.PySprintEngineReady ? 'Running…' : 'Starting Python…');
+    out.classList.remove('error');
+    var res = await PyRunner.run(code.value);
+    out.textContent = res.output;
+    out.classList.toggle('error', !res.ok);
+    btn.disabled = false;
+    btn.innerHTML = label;
+
+    if (!res.ok || solved) return;
+    var m = /^Hello,\s*(.+?)!\s*$/.exec(res.output.trim());
+    if (m && m[1].toLowerCase() !== 'world') {
+      solved = true;
+      win.hidden = false;
+      if (window.toast) toast('Nice — that ran real Python 3 in your browser.', 'success');
+    }
+  }
+
+  btn.addEventListener('click', go);
+  code.addEventListener('pysprint:run', go);
+})();
 </script>
 {% endblock %}

@@ -1,0 +1,23 @@
+{#
+  Icons are emitted once per page as a <symbol> sprite and referenced with
+  <use>, so a page with 40 icons carries 40 short <use> tags, not 40 copies
+  of the path data. Symbols inherit currentColor through <use>.
+#}
+{% macro sprite() -%}
+<svg class="icon-sprite" aria-hidden="true" focusable="false"
+     style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+  {%- for name, body in icons.items() %}
+    <symbol id="i-{{ name }}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{{ body|safe }}</symbol>
+  {%- endfor %}
+  </defs>
+</svg>
+{%- endmacro %}
+
+{# One icon. `cls` adds modifier classes; `label` makes it non-decorative. #}
+{% macro icon(name, size=20, cls='', label='') -%}
+<svg class="icon {{ cls }}" width="{{ size }}" height="{{ size }}"
+     {% if label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true" focusable="false"{% endif %}
+><use href="#i-{{ name }}"/></svg>
+{%- endmacro %}

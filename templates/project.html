@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% import "_art.html" as art %}
 {% block title %}{{ project.title }} — Real-Life Python Project | PySprint{% endblock %}
 {% block description %}{{ project.summary }}{% endblock %}
 
@@ -6,16 +8,16 @@
 <section class="page-head" style="--accent: {{ project.color }}">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('projects') }}">Projects</a> / <span>{{ project.title }}</span></nav>
   <div class="course-head-row">
-    <span class="course-icon xl">{{ project.icon }}</span>
+    <span class="course-icon xl">{{ art.art(project.slug, project.color, 76) }}</span>
     <div>
       <h1>{{ project.title }}</h1>
       <p>{{ project.summary }}</p>
       <div class="course-meta">
         <span class="level-badge level-{{ project.level|lower }}">{{ project.level }}</span>
-        <span>🧩 {{ project.steps|length }} steps</span>
-        <span>⚡ {{ project.xp }} XP</span>
-        <span>⏱ ~{{ project.minutes }} min</span>
-        {% if completed %}<span class="done-badge">✓ Shipped</span>{% endif %}
+        <span>{{ ic.icon('layers', 14, 'i-inline') }} {{ project.steps|length }} steps</span>
+        <span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ project.xp }} XP</span>
+        <span>{{ ic.icon('clock', 14, 'i-inline') }} ~{{ project.minutes }} min</span>
+        {% if completed %}<span class="done-badge">{{ ic.icon('check', 14, 'i-inline') }} Shipped</span>{% endif %}
       </div>
     </div>
   </div>
@@ -23,7 +25,7 @@
 
 <section class="section narrow">
   <div class="card pad how-works-card" style="--accent: {{ project.color }}">
-    <h2>🧠 How it works in the real world</h2>
+    <h2>{{ ic.icon('brain', 18, 'i-inline') }} How it works in the real world</h2>
     {{ project.how_it_works|safe }}
   </div>
 
@@ -38,7 +40,7 @@
       <div class="step-head">
         <span class="step-num">{{ loop.index }}</span>
         <h3>{{ step.title }}</h3>
-        <span class="step-state" id="state-{{ loop.index0 }}">🔒</span>
+        <span class="step-state" id="state-{{ loop.index0 }}">{{ ic.icon('lock', 16, 'i-inline') }}</span>
       </div>
       <div class="step-body">
         <p class="challenge-prompt">{{ step.prompt|safe }}</p>
@@ -46,11 +48,11 @@
           <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">step_{{ loop.index }}.py</span></div>
           <textarea id="code-{{ loop.index0 }}" class="code-input" rows="10" spellcheck="false" aria-label="Step {{ loop.index }} code editor">{{ step.starter }}</textarea>
           <div class="editor-bar">
-            <button class="btn btn-run" id="run-{{ loop.index0 }}">▶ Run & Check</button>
-            <button class="btn btn-ghost btn-sm" data-toggle="hint-{{ loop.index0 }}">💡 Hint</button>
-            <button class="btn btn-ghost btn-sm" data-toggle="sol-{{ loop.index0 }}">👀 Solution</button>
+            <button class="btn btn-run" id="run-{{ loop.index0 }}">{{ ic.icon('play', 14, 'i-inline') }} Run & Check</button>
+            <button class="btn btn-ghost btn-sm" data-toggle="hint-{{ loop.index0 }}">{{ ic.icon('lightbulb', 15, 'i-inline') }} Hint</button>
+            <button class="btn btn-ghost btn-sm" data-toggle="sol-{{ loop.index0 }}">{{ ic.icon('eye', 15, 'i-inline') }} Solution</button>
           </div>
-          <p id="hint-{{ loop.index0 }}" class="hint-box" hidden>💡 {{ step.hint }}</p>
+          <p id="hint-{{ loop.index0 }}" class="hint-box" hidden>{{ ic.icon('lightbulb', 15, 'i-inline') }} {{ step.hint }}</p>
           <pre id="sol-{{ loop.index0 }}" class="code-output solution-box" hidden>{{ step.solution }}</pre>
           <pre id="out-{{ loop.index0 }}" class="code-output" aria-live="polite">Run your code to check this step…</pre>
           <div id="result-{{ loop.index0 }}" class="check-result" hidden></div>
@@ -61,7 +63,7 @@
   </div>
 
   <div class="card pad project-finish" id="projectFinish" hidden>
-    <span class="finish-icon">🎉</span>
+    <span class="finish-icon">{{ ic.icon('trophy', 36, '') }}</span>
     <h2>Project shipped!</h2>
     <p>You just built a complete, working <strong>{{ project.title|lower }}</strong> — the same architecture running in production software. <a href="{{ url_for('projects') }}">Pick your next build →</a></p>
   </div>

@@ -28,6 +28,7 @@ No migrations, no seed step.
 app.py               Flask app: all routes, auth, progress API, SEO routes
 database.py          SQLite layer (stdlib sqlite3, no ORM). Schema lives here.
 data/
+  icons.py           ICONS: the whole SVG icon set (name -> path markup)
   courses.py         THE CURRICULUM. 6 courses × lessons (content/example/
                      challenge/quiz). This is where 90% of edits happen.
   lesson_extras.py   Per-lesson deep-dive callouts (real_world / pitfalls /
@@ -35,11 +36,17 @@ data/
   challenges.py      Standalone arena challenges (10)
   achievements.py    Achievement defs; each has a `check(stats)` lambda
 templates/           Jinja pages, all extend base.html
+  _brand.html        brand_mark() macro — the inline SVG logo (nav + footer)
+  _icons.html        sprite() renders the <symbol> set once; icon(name) uses it
+  _art.html          art(slug, color) — the per-course/project artwork
 static/css/style.css Whole design system, CSS custom properties, dark theme
+static/img/
+  favicon.svg        Standalone copy of the logo mark
 static/js/
-  main.js            Nav, toasts, achievement modal queue
+  main.js            Nav (incl. mobile menu), toasts, achievement modal queue
   runner.js          Pyodide loader + code execution + challenge grading +
                      lesson/challenge/playground page initialisers
+  palette.js         ⌘K command palette (fed by /api/search-index)
   review.js          Spaced-repetition engine (SM-2-lite, localStorage)
 ```
 
@@ -61,7 +68,33 @@ static/js/
    `data/achievements.py`.
 6. **No frontend build step.** Vanilla JS + CSS, CDN only for fonts and
    Pyodide. Keep it that way — it's a feature.
-7. **Light theme is the default**; dark mode via `data-theme="dark"` on
+7. **The logo is inline SVG, not an emoji or an image file.** It lives in
+   `templates/_brand.html` as a macro so the nav and footer share one
+   source; `uid` keeps its gradient ids unique per instance. Inline is what
+   lets it animate on hover and stay crisp in both themes. `favicon.svg`
+   is a hand-kept copy — change one, change the other.
+8. **The ⌘K palette index is a public endpoint** (`/api/search-index`),
+   cached for 10 minutes and again in `sessionStorage`. It carries titles
+   and URLs only, never lesson bodies, so it stays small and needs no auth.
+   New courses, lessons, projects and challenges appear in it automatically.
+9. **Pyodide is pre-warmed on idle** on any page with an editor, so the
+   first Run is instant. Skipped on save-data/2g. Editor bars get a status
+   chip fed by the `pysprint:engine` event.
+10. **No emoji anywhere in the UI.** Every glyph is an SVG from
+   `data/icons.py`, rendered once per page as a `<symbol>` sprite and
+   referenced with `<use>` — so JS (`window.psIcon(name, size)`) and Jinja
+   (`ic.icon(name, size)`) draw from one set. Data files store icon *names*
+   (`"icon": "terminal"`), never glyphs. Courses and projects additionally
+   get bespoke artwork from `_art.html`, keyed by slug and tinted with the
+   subject's `color`. Adding a course means adding an `art()` branch.
+11. **The home page is a product surface, not a brochure.** `next_lesson_for()`
+   in `app.py` finds the first uncompleted lesson in curriculum order, and
+   the hero renders one of three states: resume (returning learner, leads
+   with their next lesson), finished (whole curriculum done), or marketing
+   (first visit). The hero editor is a *graded* first task — it checks the
+   learner actually edited the name before showing the success panel — so
+   time-to-first-real-Python is about ten seconds with no signup.
+12. **Light theme is the default**; dark mode via `data-theme="dark"` on
    `<html>`, toggled in the nav and persisted in localStorage. All colors
    come from CSS custom properties in `:root` / `[data-theme="dark"]` —
    never hardcode a color in a component rule. Code editors deliberately

@@ -3,11 +3,23 @@
 (function () {
   'use strict';
 
+  // ── icons ───────────────────────────────────────────────────────
+  // Markup pointing at the <symbol> sprite base.html renders once, so JS
+  // and Jinja draw from the same icon set.
+  function psIcon(name, size, cls) {
+    var s = size || 16;
+    return '<svg class="icon ' + (cls || '') + '" width="' + s + '" height="' + s +
+           '" aria-hidden="true" focusable="false"><use href="#i-' + name + '"/></svg>';
+  }
+  window.psIcon = psIcon;
+
   // ── theme toggle (light default; persisted) ─────────────────────
   const themeBtn = document.getElementById('themeToggle');
+  // The button holds both icons; CSS shows whichever matches the theme.
   function applyThemeIcon() {
     if (!themeBtn) return;
-    themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+    const dark = document.documentElement.dataset.theme === 'dark';
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
   }
   applyThemeIcon();
   if (themeBtn) {
@@ -37,13 +49,28 @@
   if (toTop) toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
   // ── mobile nav ──────────────────────────────────────────────────
+  // Closes on link click, Escape, outside click and on resize back to
+  // desktop, and locks body scroll while open.
   const burger = document.getElementById('navBurger');
   const links = document.getElementById('navLinks');
   if (burger && links) {
-    burger.addEventListener('click', () => {
-      const open = links.classList.toggle('open');
+    const setMenu = (open) => {
+      links.classList.toggle('open', open);
+      burger.classList.toggle('open', open);
       burger.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('nav-open', open);
+    };
+    const isOpen = () => links.classList.contains('open');
+
+    burger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(!isOpen()); });
+    links.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !links.contains(e.target) && !burger.contains(e.target)) setMenu(false);
     });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) { setMenu(false); burger.focus(); }
+    });
+    window.addEventListener('resize', () => { if (window.innerWidth > 900 && isOpen()) setMenu(false); });
   }
 
   // ── scroll-reveal: cards & rows animate in as they enter view ───
@@ -96,7 +123,7 @@
     btn.textContent = 'Copy';
     btn.addEventListener('click', () => {
       navigator.clipboard.writeText(source.value).then(() => {
-        btn.textContent = '✓ Copied';
+        btn.innerHTML = psIcon('check', 13) + ' Copied';
         setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
       }).catch(() => {});
     });
@@ -119,18 +146,35 @@
   }
 
   // ── toasts ──────────────────────────────────────────────────────
+  const TOAST_ICONS = { success: 'check-circle', error: 'alert', '': 'sparkles' };
   window.toast = function (msg, type) {
     const wrap = document.getElementById('toasts');
     if (!wrap) return;
     const el = document.createElement('div');
     el.className = 'toast ' + (type || '');
-    el.textContent = msg;
-    wrap.appendChild(el);
-    setTimeout(() => {
+    el.setAttribute('role', 'status');
+    el.title = 'Click to dismiss';
+
+    const icon = document.createElement('span');
+    icon.className = 'toast-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = psIcon(TOAST_ICONS[type || ''] || TOAST_ICONS[''], 17);
+    const body = document.createElement('span');
+    body.className = 'toast-msg';
+    body.textContent = msg;
+    el.append(icon, body);
+
+    const dismiss = () => {
       el.style.opacity = '0';
-      el.style.transition = 'opacity .3s';
+      el.style.transform = 'translateX(40px)';
+      el.style.transition = 'opacity .3s, transform .3s';
       setTimeout(() => el.remove(), 350);
-    }, 3800);
+    };
+    el.addEventListener('click', dismiss);
+    wrap.appendChild(el);
+    // Keep at most four on screen so a burst of XP toasts cannot bury the page.
+    while (wrap.children.length > 4) wrap.firstElementChild.remove();
+    setTimeout(dismiss, 3800);
   };
 
   // ── achievement modal queue ─────────────────────────────────────
@@ -142,7 +186,7 @@
     if (!queue.length) { showing = false; modal.hidden = true; return; }
     showing = true;
     const a = queue.shift();
-    document.getElementById('achieveIcon').textContent = a.icon;
+    document.getElementById('achieveIcon').innerHTML = psIcon(a.icon, 40);
     document.getElementById('achieveTitle').textContent = a.title;
     document.getElementById('achieveDesc').textContent = a.desc;
     modal.hidden = false;

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
 {% block title %}Log in — PySprint{% endblock %}
 {% block description %}Log in to PySprint to continue your Python journey — your XP, streak and achievements are waiting.{% endblock %}
 
 {% block content %}
 <section class="auth-wrap">
   <form class="card auth-card" method="post" novalidate>
-    <h1>Welcome back 👋</h1>
+    <h1>Welcome back</h1>
     <p class="muted">Log in to keep your streak alive.</p>
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
     <label>Username or email

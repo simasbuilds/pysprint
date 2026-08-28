@@ -1,0 +1,95 @@
+{#
+  Course and project artwork — a distinct geometric "logo" per subject,
+  drawn in that subject's accent color. These replace the emoji that used
+  to stand in for each course. The slug doubles as the gradient id, which
+  is unique per page since a course never renders twice.
+#}
+{% macro art(slug, color, size=56, uid='') -%}
+  {%- set gid = uid or slug -%}
+<svg class="art" width="{{ size }}" height="{{ size }}" viewBox="0 0 64 64"
+     aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="art-{{ gid }}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="{{ color }}"/>
+      <stop offset="1" stop-color="{{ color }}" stop-opacity=".62"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="17" fill="url(#art-{{ gid }})"/>
+  <rect x=".9" y=".9" width="62.2" height="62.2" rx="16.2" fill="none" stroke="#fff" stroke-opacity=".26" stroke-width="1.4"/>
+  <g fill="none" stroke="#fff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+  {%- if slug == 'python-fundamentals' %}
+    {# a terminal: window bar, prompt chevron, command line #}
+    <rect x="13" y="15" width="38" height="34" rx="5" stroke-opacity=".55"/>
+    <path d="M13 24h38" stroke-opacity=".55"/>
+    <path d="m22 32 5 4.5-5 4.5"/>
+    <path d="M32 41.5h10"/>
+  {%- elif slug == 'data-structures' %}
+    {# three stacked layers, front one solid #}
+    <path d="m32 12 17 8-17 8-17-8z" stroke-opacity=".5"/>
+    <path d="m15 30 17 8 17-8" stroke-opacity=".72"/>
+    <path d="m15 40 17 8 17-8"/>
+  {%- elif slug == 'functions-oop' %}
+    {# a call graph: one parent, two children #}
+    <circle cx="32" cy="16" r="5.5"/>
+    <circle cx="17" cy="46" r="5.5" stroke-opacity=".6"/>
+    <circle cx="47" cy="46" r="5.5" stroke-opacity=".6"/>
+    <path d="M32 21.5v7a4 4 0 0 1-4 4h-7a4 4 0 0 0-4 4v3.5" stroke-opacity=".72"/>
+    <path d="M32 21.5v7a4 4 0 0 0 4 4h7a4 4 0 0 1 4 4v3.5" stroke-opacity=".72"/>
+  {%- elif slug == 'practical-python' %}
+    {# a toolkit grid, one tile lit #}
+    <rect x="14" y="14" width="15" height="15" rx="4" stroke-opacity=".55"/>
+    <rect x="35" y="14" width="15" height="15" rx="4"/>
+    <rect x="14" y="35" width="15" height="15" rx="4"/>
+    <rect x="35" y="35" width="15" height="15" rx="4" stroke-opacity=".55"/>
+    <path d="M39.5 42.5h6" stroke-opacity=".55"/>
+  {%- elif slug == 'apis-with-python' %}
+    {# a hub with four endpoints #}
+    <circle cx="32" cy="32" r="8"/>
+    <circle cx="32" cy="13" r="3.6" stroke-opacity=".62"/>
+    <circle cx="32" cy="51" r="3.6" stroke-opacity=".62"/>
+    <circle cx="13" cy="32" r="3.6" stroke-opacity=".62"/>
+    <circle cx="51" cy="32" r="3.6" stroke-opacity=".62"/>
+    <path d="M32 16.6V24" stroke-opacity=".72"/><path d="M32 40v7.4" stroke-opacity=".72"/>
+    <path d="M16.6 32H24" stroke-opacity=".72"/><path d="M40 32h7.4" stroke-opacity=".72"/>
+  {%- elif slug == 'automation' %}
+    {# a closed loop driving a gear #}
+    <path d="M46 24a17 17 0 1 0 3 12" stroke-opacity=".62"/>
+    <path d="M40.5 14.5 47 24l-10 2.5" stroke-opacity=".62"/>
+    <circle cx="32" cy="34" r="7"/>
+    <path d="M32 23.5v3.5"/><path d="M32 41v3.5"/>
+    <path d="M21.5 34H25"/><path d="M39 34h3.5"/>
+  {%- elif slug == 'personal-budget' %}
+    {# spend bars beside a coin #}
+    <path d="M16 48V36" stroke-opacity=".6"/><path d="M25 48V26"/>
+    <path d="M34 48V32" stroke-opacity=".8"/>
+    <path d="M13 48h25" stroke-opacity=".6"/>
+    <circle cx="46" cy="21" r="8"/><path d="M46 17.5v7"/>
+  {%- elif slug == 'password-auditor' %}
+    {# a shield with a keyhole and strength meter #}
+    <path d="M32 12 18 17.5v10c0 8.4 5.6 15.2 14 18.6 8.4-3.4 14-10.2 14-18.6v-10z"/>
+    <circle cx="32" cy="26" r="3.4" stroke-opacity=".85"/><path d="M32 29.4v5" stroke-opacity=".85"/>
+    <path d="M20 53h9" stroke-opacity=".85"/><path d="M33 53h9" stroke-opacity=".4"/>
+  {%- elif slug == 'todo-manager' %}
+    {# a checklist, last item unticked #}
+    <path d="m14 19 3 3 5.5-5.5"/><path d="M29 20h21" stroke-opacity=".62"/>
+    <path d="m14 32 3 3 5.5-5.5"/><path d="M29 33h21" stroke-opacity=".62"/>
+    <rect x="13.5" y="42" width="9" height="9" rx="2.5" stroke-opacity=".55"/>
+    <path d="M29 46.5h21" stroke-opacity=".4"/>
+  {%- elif slug == 'sales-dashboard' %}
+    {# a rising trend over an axis #}
+    <path d="M15 49V15" stroke-opacity=".55"/><path d="M15 49h34" stroke-opacity=".55"/>
+    <path d="m20 41 8-8 6 5 12-14"/>
+    <path d="M46 19h5v5" />
+    <circle cx="28" cy="33" r="2.4" stroke-opacity=".8"/>
+  {%- elif slug == 'webhook-processor' %}
+    {# an event firing from one node into another #}
+    <circle cx="16" cy="32" r="6" stroke-opacity=".62"/>
+    <circle cx="48" cy="32" r="6" stroke-opacity=".62"/>
+    <path d="M22.5 32h6" stroke-opacity=".72"/><path d="M35.5 32h6" stroke-opacity=".72"/>
+    <path d="M34 18.5 27.5 31h5.5l-1.5 9.5L39 28h-5.5z" stroke-linejoin="round"/>
+  {%- else %}
+    <circle cx="32" cy="32" r="12"/><path d="m27 32 4 4 7-8"/>
+  {%- endif %}
+  </g>
+</svg>
+{%- endmacro %}

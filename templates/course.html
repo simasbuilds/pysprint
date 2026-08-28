@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% import "_art.html" as art %}
 {% block title %}{{ course.title }} — Python Course | PySprint{% endblock %}
 {% block description %}{{ course.description }}{% endblock %}
 
@@ -17,15 +19,15 @@
 <section class="page-head course-head" style="--accent: {{ course.color }}">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('courses') }}">Courses</a> / <span>{{ course.title }}</span></nav>
   <div class="course-head-row">
-    <span class="course-icon xl">{{ course.icon }}</span>
+    <span class="course-icon xl">{{ art.art(course.slug, course.color, 76) }}</span>
     <div>
       <h1>{{ course.title }}</h1>
       <p>{{ course.description }}</p>
       <div class="course-meta">
         <span class="level-badge level-{{ course.level|lower }}">{{ course.level }}</span>
-        <span>📚 {{ course.lessons|length }} lessons</span>
-        <span>⚡ {{ total_xp }} XP</span>
-        <span>⏱ ~{{ course.lessons|sum(attribute='minutes') }} min</span>
+        <span>{{ ic.icon('book', 14, 'i-inline') }} {{ course.lessons|length }} lessons</span>
+        <span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ total_xp }} XP</span>
+        <span>{{ ic.icon('clock', 14, 'i-inline') }} ~{{ course.lessons|sum(attribute='minutes') }} min</span>
       </div>
     </div>
   </div>
@@ -43,11 +45,11 @@
     <li>
       <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
          class="lesson-row card {% if l.slug in done %}is-done{% endif %}">
-        <span class="lesson-num">{% if l.slug in done %}✓{% else %}{{ loop.index }}{% endif %}</span>
+        <span class="lesson-num">{% if l.slug in done %}{{ ic.icon('check', 15, 'i-inline') }}{% else %}{{ loop.index }}{% endif %}</span>
         <div class="lesson-row-body">
           <h3>{{ l.title }}</h3>
-          <div class="course-meta"><span>⏱ {{ l.minutes }} min</span><span>⚡ {{ l.xp }} XP</span>
-            {% if l.quiz %}<span>❓ {{ l.quiz|length }} quiz</span>{% endif %}
+          <div class="course-meta"><span>{{ ic.icon('clock', 14, 'i-inline') }} {{ l.minutes }} min</span><span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ l.xp }} XP</span>
+            {% if l.quiz %}<span>{{ ic.icon('help', 14, 'i-inline') }} {{ l.quiz|length }} quiz</span>{% endif %}
           </div>
         </div>
         <span class="course-row-go">{% if l.slug in done %}Review{% else %}Start{% endif %} →</span>
@@ -57,7 +59,7 @@
   </ol>
   {% if not user %}
   <div class="card notice">
-    <p>💡 You can take every lesson without an account — but <a href="{{ url_for('register') }}">create a free account</a> to save progress, earn XP and unlock achievements.</p>
+    <p>{{ ic.icon('lightbulb', 15, 'i-inline') }} You can take every lesson without an account — but <a href="{{ url_for('register') }}">create a free account</a> to save progress, earn XP and unlock achievements.</p>
   </div>
   {% endif %}
 </section>

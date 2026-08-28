@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
 {% block title %}Create your free account — PySprint{% endblock %}
 {% block description %}Join PySprint free: save your progress, earn XP, keep streaks and unlock achievements while you master Python.{% endblock %}
 
 {% block content %}
 <section class="auth-wrap">
   <form class="card auth-card" method="post" novalidate>
-    <h1>Start learning free 🚀</h1>
+    <h1>Start learning free</h1>
     <p class="muted">30 seconds to set up. Free forever.</p>
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
     <label>Username

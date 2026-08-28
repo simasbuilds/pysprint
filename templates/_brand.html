@@ -1,0 +1,34 @@
+{#
+  PySprint brand mark.
+
+  The glyph is a double chevron — a leading and a trailing "»" — set on a
+  slight forward skew so it reads as motion (sprint) and as a shell prompt
+  (code). It is drawn inline rather than as an <img> so it can inherit the
+  page theme and animate on hover. `uid` keeps gradient ids unique when the
+  mark appears more than once on a page.
+#}
+{% macro brand_mark(uid='nav', size=34) -%}
+<svg class="brand-mark" width="{{ size }}" height="{{ size }}" viewBox="0 0 32 32"
+     role="img" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="psg-{{ uid }}" x1="2" y1="0" x2="30" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7c85f6"/>
+      <stop offset=".48" stop-color="#5b5ff0"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="psh-{{ uid }}" x1="16" y1="0" x2="16" y2="20" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="9.5" fill="url(#psg-{{ uid }})"/>
+  <rect width="32" height="32" rx="9.5" fill="url(#psh-{{ uid }})"/>
+  <rect x=".6" y=".6" width="30.8" height="30.8" rx="9" fill="none"
+        stroke="#fff" stroke-opacity=".28" stroke-width="1.2"/>
+  <g class="bm-glyph" transform="skewX(-8) translate(2.3 0)"
+     fill="none" stroke="#fff" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round">
+    <path class="bm-trail" d="M8 10.6 13.2 16 8 21.4" opacity=".45"/>
+    <path class="bm-lead" d="M16.4 10.6 21.6 16l-5.2 5.4"/>
+  </g>
+</svg>
+{%- endmacro %}

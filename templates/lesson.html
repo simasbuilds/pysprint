@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
 {% block title %}{{ lesson.title }} — {{ course.title }} | PySprint{% endblock %}
 {% block description %}Interactive Python lesson: {{ lesson.title }}. Learn, run real code in your browser, and pass the challenge to earn {{ lesson.xp }} XP.{% endblock %}
 
@@ -14,7 +15,7 @@
       {% for l in course.lessons %}
       <a href="{{ url_for('lesson', slug=course.slug, lesson_slug=l.slug) }}"
          class="side-lesson {% if l.slug == lesson.slug %}current{% endif %} {% if l.slug in done %}is-done{% endif %}">
-        <span>{% if l.slug in done %}✓{% else %}{{ loop.index }}{% endif %}</span> {{ l.title }}
+        <span>{% if l.slug in done %}{{ ic.icon('check', 13, 'i-inline') }}{% else %}{{ loop.index }}{% endif %}</span> {{ l.title }}
       </a>
       {% endfor %}
     </nav>
@@ -23,7 +24,7 @@
   <article class="lesson-main">
     <header class="lesson-header">
       <h1>{{ lesson.title }}</h1>
-      <div class="course-meta"><span>⏱ {{ lesson.minutes }} min</span><span>⚡ {{ lesson.xp }} XP</span></div>
+      <div class="course-meta"><span>{{ ic.icon('clock', 14, 'i-inline') }} {{ lesson.minutes }} min</span><span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ lesson.xp }} XP</span></div>
     </header>
 
     <section class="lesson-content">{{ lesson.content|safe }}</section>
@@ -32,19 +33,19 @@
     <section class="callout-grid">
       {% if extras.real_world %}
       <div class="callout card world">
-        <h3>🌍 Where you'll use this</h3>
+        <h3>{{ ic.icon('globe', 17, 'i-inline') }} Where you'll use this</h3>
         <p>{{ extras.real_world|safe }}</p>
       </div>
       {% endif %}
       {% if extras.pitfalls %}
       <div class="callout card mistakes">
-        <h3>⚠️ Common mistakes</h3>
+        <h3>{{ ic.icon('alert', 17, 'i-inline') }} Common mistakes</h3>
         <ul>{% for p in extras.pitfalls %}<li>{{ p|safe }}</li>{% endfor %}</ul>
       </div>
       {% endif %}
       {% if extras.pro_tip %}
       <div class="callout card protip">
-        <h3>💎 Pro tip</h3>
+        <h3>{{ ic.icon('gem', 17, 'i-inline') }} Pro tip</h3>
         <p>{{ extras.pro_tip|safe }}</p>
       </div>
       {% endif %}
@@ -53,15 +54,15 @@
 
     {% if walkthrough %}
     <section class="card walkthrough" id="walkthrough">
-      <h2 class="block-title">🎬 Watch how it runs <span class="muted">— line by line</span></h2>
+      <h2 class="block-title">{{ ic.icon('film', 19, 'i-inline') }} Watch how it runs <span class="muted">— line by line</span></h2>
       <div class="wl-body">
         <pre class="wl-code" id="wlCode" aria-label="Code being explained"></pre>
         <div class="wl-explain">
           <p id="wlText">Press play to watch Python execute this code, one line at a time.</p>
           <div class="wl-controls">
-            <button class="btn btn-primary btn-sm" id="wlPlay">▶ Play</button>
-            <button class="btn btn-ghost btn-sm" id="wlStep">⏭ Step</button>
-            <button class="btn btn-ghost btn-sm" id="wlRestart">↺ Restart</button>
+            <button class="btn btn-primary btn-sm" id="wlPlay">{{ ic.icon('play', 14, 'i-inline') }} Play</button>
+            <button class="btn btn-ghost btn-sm" id="wlStep">{{ ic.icon('arrow-right', 14, 'i-inline') }} Step</button>
+            <button class="btn btn-ghost btn-sm" id="wlRestart">{{ ic.icon('refresh', 14, 'i-inline') }} Restart</button>
             <span class="wl-count" id="wlCount"></span>
           </div>
         </div>
@@ -70,27 +71,27 @@
     {% endif %}
 
     <section class="card editor-block">
-      <h2 class="block-title">💻 Try it — live example</h2>
+      <h2 class="block-title">{{ ic.icon('code', 19, 'i-inline') }} Try it — live example</h2>
       <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">example.py</span></div>
       <textarea id="exampleCode" class="code-input" rows="8" spellcheck="false" aria-label="Example code editor">{{ lesson.example }}</textarea>
       <div class="editor-bar">
-        <button class="btn btn-run" id="exampleRun">▶ Run</button>
+        <button class="btn btn-run" id="exampleRun">{{ ic.icon('play', 14, 'i-inline') }} Run</button>
         <button class="btn btn-ghost btn-sm" id="exampleReset">Reset</button>
       </div>
       <pre id="exampleOut" class="code-output" aria-live="polite">Output appears here…</pre>
     </section>
 
     <section class="card editor-block challenge-block">
-      <h2 class="block-title">🎯 Challenge <span class="xp-tag">+{{ lesson.xp }} XP</span></h2>
+      <h2 class="block-title">{{ ic.icon('target', 19, 'i-inline') }} Challenge <span class="xp-tag">+{{ lesson.xp }} XP</span></h2>
       <p class="challenge-prompt">{{ lesson.challenge.prompt|safe }}</p>
       <div class="editor-chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-title">challenge.py</span></div>
       <textarea id="challengeCode" class="code-input" rows="10" spellcheck="false" aria-label="Challenge code editor">{{ lesson.challenge.starter }}</textarea>
       <div class="editor-bar">
-        <button class="btn btn-run" id="challengeRun">▶ Run & Check</button>
-        <button class="btn btn-ghost btn-sm" id="hintBtn">💡 Hint</button>
-        <button class="btn btn-ghost btn-sm" id="solutionBtn">👀 Solution</button>
+        <button class="btn btn-run" id="challengeRun">{{ ic.icon('play', 14, 'i-inline') }} Run & Check</button>
+        <button class="btn btn-ghost btn-sm" id="hintBtn">{{ ic.icon('lightbulb', 15, 'i-inline') }} Hint</button>
+        <button class="btn btn-ghost btn-sm" id="solutionBtn">{{ ic.icon('eye', 15, 'i-inline') }} Solution</button>
       </div>
-      <p id="hintBox" class="hint-box" hidden>💡 {{ lesson.challenge.hint }}</p>
+      <p id="hintBox" class="hint-box" hidden>{{ ic.icon('lightbulb', 15, 'i-inline') }} {{ lesson.challenge.hint }}</p>
       <pre id="solutionBox" class="code-output solution-box" hidden>{{ lesson.challenge.solution }}</pre>
       <pre id="challengeOut" class="code-output" aria-live="polite">Run your code to check it…</pre>
       <div id="challengeResult" class="check-result" hidden></div>
@@ -98,7 +99,7 @@
 
     {% if lesson.quiz %}
     <section class="card quiz-block" id="quizBlock">
-      <h2 class="block-title">❓ Quick quiz</h2>
+      <h2 class="block-title">{{ ic.icon('help', 19, 'i-inline') }} Quick quiz</h2>
       {% for q in lesson.quiz %}
       <fieldset class="quiz-q" data-answer="{{ q.answer }}">
         <legend>{{ loop.index }}. {{ q.q }}</legend>
@@ -118,7 +119,7 @@
     {% endif %}
 
     <section class="card notes-block">
-      <h2 class="block-title">📝 My notes <span class="muted">(saved on this device)</span></h2>
+      <h2 class="block-title">{{ ic.icon('pencil', 19, 'i-inline') }} My notes <span class="muted">(saved on this device)</span></h2>
       <textarea id="lessonNotes" class="notes-input" rows="4" placeholder="Write anything you want to remember from this lesson…"></textarea>
     </section>
 
@@ -129,7 +130,7 @@
       <button class="btn btn-primary btn-lg" id="completeBtn"
               data-course="{{ course.slug }}" data-lesson="{{ lesson.slug }}"
               {% if lesson.slug in done %}data-done="1"{% endif %}>
-        {% if lesson.slug in done %}✓ Completed — mark again{% else %}Complete lesson (+{{ lesson.xp }} XP){% endif %}
+        {% if lesson.slug in done %}{{ ic.icon('check', 15, 'i-inline') }} Completed — mark again{% else %}Complete lesson (+{{ lesson.xp }} XP){% endif %}
       </button>
       {% if next %}
       <a class="btn btn-ghost" href="{{ url_for('lesson', slug=course.slug, lesson_slug=next.slug) }}">{{ next.title }} →</a>

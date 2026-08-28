@@ -1,4 +1,4 @@
-# 🐍 PySprint — Learn Python by Actually Writing Python
+# PySprint — Learn Python by Actually Writing Python
 
 A full-stack, interactive Python learning platform. Six structured courses,
 34 lessons, 10 arena challenges, real Python 3 running **in your browser**
@@ -7,7 +7,7 @@ spaced-repetition study engine.
 
 > Inspired by the best of Codecademy, DataCamp and Anki — free and open source.
 
-## ✨ Features
+## Features
 
 - **Interactive lessons** — every lesson has a live editor and ends with a
   graded coding challenge, checked instantly against expected output
@@ -28,7 +28,7 @@ spaced-repetition study engine.
 - **Fully responsive** — designed mobile-first; great on phone, tablet and
   desktop; respects `prefers-reduced-motion`
 
-## 🚀 Quick start
+## Quick start
 
 ```bash
 git clone https://github.com/simasbuilds/pysprint.git
@@ -43,7 +43,7 @@ python app.py
 Open **http://127.0.0.1:5000** — the SQLite database is created
 automatically.
 
-## 🧱 Stack
+## Stack
 
 | Layer | Tech |
 |-------|------|
@@ -52,7 +52,7 @@ automatically.
 | Code execution | Pyodide (client-side WebAssembly CPython) — user code **never** runs on the server |
 | Study engine | SM-2-lite spaced repetition in `localStorage` |
 
-## 📁 Project layout
+## Project layout
 
 ```
 app.py                # routes, auth, progress API, sitemap/robots
@@ -66,7 +66,7 @@ CLAUDE.md             # how the codebase works (for AI pair-programmers & humans
 SKILL.md              # curriculum-authoring playbook (pedagogy rules)
 ```
 
-## 🔐 Environment
+## Environment
 
 Copy `.env.example` → `.env`:
 
@@ -77,7 +77,7 @@ Copy `.env.example` → `.env`:
 | `DATABASE_PATH` | SQLite file location |
 | `FLASK_DEBUG` / `PORT` | Dev server settings |
 
-## 🧭 Deploying
+## Deploying
 
 Any host that runs Python works (Render, Railway, Fly.io, a VPS):
 
@@ -85,13 +85,13 @@ Any host that runs Python works (Render, Railway, Fly.io, a VPS):
 FLASK_DEBUG=0 SECRET_KEY=<strong> SITE_URL=https://yourdomain gunicorn app:app
 ```
 
-## 🤝 Contributing content
+## Contributing content
 
 Read **SKILL.md** first — it encodes the teaching method (code-first,
 one concept per lesson, deterministic challenges, explained quizzes).
 New lessons are pure data: add a dict to `data/courses.py` and every page,
 flashcard and progress bar updates automatically.
 
-## 📄 License
+## License
 
 MIT © [simasbuilds](https://github.com/simasbuilds)

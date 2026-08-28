@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
 {% block title %}Python Playground — Run Python Online | PySprint{% endblock %}
 {% block description %}A free online Python 3 playground. Write and run real Python in your browser — no installation, no signup. Powered by WebAssembly.{% endblock %}
 
 {% block content %}
 <section class="page-head">
-  <h1>🛝 Playground</h1>
+  <h1>Playground</h1>
   <p>A blank canvas running real Python 3 in your browser. Experiment freely — your code autosaves on this device.</p>
 </section>
 
@@ -21,7 +22,7 @@ print("2 ** 32 =", 2 ** 32)
 print("sqrt(2)  =", round(math.sqrt(2), 6))
 print(Counter("pysprint").most_common(2))</textarea>
     <div class="editor-bar">
-      <button class="btn btn-run" id="pgRun">▶ Run (Ctrl+Enter)</button>
+      <button class="btn btn-run" id="pgRun">{{ ic.icon('play', 14, 'i-inline') }} Run (Ctrl+Enter)</button>
       <button class="btn btn-ghost btn-sm" id="pgClear">Clear output</button>
       <span class="editor-hint">stdlib included: math, json, csv, re, datetime, collections…</span>
     </div>

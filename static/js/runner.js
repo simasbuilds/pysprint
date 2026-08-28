@@ -9,9 +9,18 @@
 
   const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
   let pyodideReady = null;
+  let engineState = 'idle';   // idle → loading → ready | failed
+
+  // Engine state is broadcast so any status chip on the page can follow it.
+  function setEngineState(state) {
+    engineState = state;
+    window.PySprintEngineReady = (state === 'ready');
+    document.dispatchEvent(new CustomEvent('pysprint:engine', { detail: { state: state } }));
+  }
 
   function loadPyodideOnce() {
     if (pyodideReady) return pyodideReady;
+    setEngineState('loading');
     pyodideReady = new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.src = PYODIDE_URL;
@@ -21,8 +30,54 @@
       s.onerror = () => reject(new Error('Could not load the Python engine. Check your connection.'));
       document.head.appendChild(s);
     });
+    pyodideReady.then(() => setEngineState('ready'), () => setEngineState('failed'));
     return pyodideReady;
   }
+
+  // Warm the engine while the learner is still reading, so the first Run
+  // feels instant instead of stalling for ~5s. Skipped on save-data and
+  // 2g connections, where the ~10MB download is not a free bet.
+  function prewarmEngine() {
+    const c = navigator.connection;
+    if (c && (c.saveData || /(^|\W)2g$/.test(c.effectiveType || ''))) return;
+    const start = () => loadPyodideOnce().catch(() => {});
+    if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2500 });
+    else setTimeout(start, 1200);
+  }
+
+  // ── engine status chip: one per editor bar ─────────────────────────
+  const CHIP_TEXT = {
+    idle: 'Python ready to load',
+    loading: 'Starting Python…',
+    ready: 'Python ready',
+    failed: 'Python unavailable',
+  };
+
+  function mountEngineChips() {
+    const bars = document.querySelectorAll('.editor-bar');
+    if (!bars.length) return;
+    const chips = [];
+    bars.forEach(bar => {
+      const chip = document.createElement('span');
+      chip.className = 'engine-chip';
+      chip.innerHTML = '<span class="engine-dot" aria-hidden="true"></span><span class="engine-label"></span>';
+      const hintEl = bar.querySelector('.editor-hint');
+      bar.insertBefore(chip, hintEl || null);
+      chips.push(chip);
+    });
+    const paint = (state) => chips.forEach(chip => {
+      chip.className = 'engine-chip ' + state;
+      chip.querySelector('.engine-label').textContent = CHIP_TEXT[state] || CHIP_TEXT.idle;
+      chip.title = state === 'ready'
+        ? 'Real Python 3 is loaded and running in your browser.'
+        : 'Your code runs as real Python 3 in your browser — nothing is sent to a server.';
+    });
+    paint(engineState);
+    document.addEventListener('pysprint:engine', (e) => paint(e.detail.state));
+    prewarmEngine();
+  }
+
+  document.addEventListener('DOMContentLoaded', mountEngineChips);
 
   async function run(code) {
     const py = await loadPyodideOnce();
@@ -81,15 +136,19 @@
 
   async function execInto(codeEl, outEl, btn) {
     btn.disabled = true;
-    const original = btn.textContent;
-    btn.textContent = '⏳ Running…';
+    const original = btn.innerHTML;
+    const waitingOnEngine = engineState !== 'ready';
+    btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>' +
+                    (waitingOnEngine ? 'Starting Python…' : 'Running…');
     outEl.classList.remove('error');
-    if (!pyodideReady) outEl.textContent = 'Loading Python engine (first run only, ~5s)…';
+    if (waitingOnEngine) {
+      outEl.textContent = 'Starting the Python engine — this only happens once per visit…';
+    }
     const result = await run(codeEl.value);
     outEl.textContent = result.output;
     if (!result.ok) outEl.classList.add('error');
     btn.disabled = false;
-    btn.textContent = original;
+    btn.innerHTML = original;
     return result;
   }
 
@@ -101,6 +160,8 @@
   // ── public: simple runner (hero, examples) ─────────────────────────
   const PyRunner = {
     run: run,
+    // Tab-to-indent and Ctrl/Cmd+Enter, for editors wired by hand.
+    enableEditor: enableTabKey,
     wireSimple(runId, codeId, outId) {
       const btn = document.getElementById(runId);
       const code = document.getElementById(codeId);
@@ -134,14 +195,14 @@
       resultBox.hidden = false;
       if (result.ok && normalize(result.output) === normalize(opts.expected)) {
         resultBox.className = 'check-result pass';
-        resultBox.innerHTML = '✅ <strong>Correct!</strong> Output matches exactly.';
+        resultBox.innerHTML = (window.psIcon ? window.psIcon('check-circle', 16) : '') + ' <strong>Correct!</strong> Output matches exactly.';
         opts.onPass && opts.onPass();
       } else {
         resultBox.className = 'check-result fail';
         resultBox.innerHTML = result.ok
-          ? '❌ Not quite — your output doesn\'t match.<small>Expected:\n' +
+          ? (window.psIcon ? window.psIcon('x-circle', 16) : '') + ' Not quite — your output doesn\'t match.<small>Expected:\n' +
             escapeHtml(opts.expected) + '</small>'
-          : '❌ Your code raised an error — read the traceback above, fix it, and run again.';
+          : (window.psIcon ? window.psIcon('x-circle', 16) : '') + ' Your code raised an error — read the traceback above, fix it, and run again.';
       }
     }
     btn.addEventListener('click', check);
@@ -163,13 +224,13 @@
 
   function reportProgress(url, body, loggedIn, passedMsg) {
     if (!loggedIn) {
-      toast('✅ ' + passedMsg + ' — log in to bank the XP!', 'success');
+      toast(passedMsg + ' — log in to bank the XP!', 'success');
       return;
     }
     postJSON(url, body).then(({ status, data }) => {
       if (status !== 200) return;
       if (data.first_time && data.xp_gained) {
-        toast('⚡ +' + data.xp_gained + ' XP earned!', 'success');
+        toast('+' + data.xp_gained + ' XP earned!', 'success');
       }
       celebrateAchievements(data.new_achievements);
     }).catch(() => {});
@@ -233,7 +294,7 @@
 
     function stop() {
       if (timer) { clearInterval(timer); timer = null; }
-      playBtn.textContent = '▶ Play';
+      playBtn.innerHTML = (window.psIcon ? window.psIcon('play', 14) : '') + ' Play';
     }
 
     function advance() {
@@ -245,7 +306,7 @@
     playBtn.addEventListener('click', () => {
       if (timer) { stop(); return; }
       if (idx < 0 || idx + 1 >= steps.length) show(0); else advance();
-      playBtn.textContent = '⏸ Pause';
+      playBtn.innerHTML = (window.psIcon ? window.psIcon('play', 14) : '') + ' Pause';
       timer = setInterval(advance, 2600);
     });
     stepBtn.addEventListener('click', () => { stop(); advance(); });
@@ -307,7 +368,7 @@
       const completeBtn = document.getElementById('completeBtn');
       completeBtn.addEventListener('click', () => {
         if (!challengePassed && !completeBtn.dataset.done) {
-          toast('Pass the challenge first — that\'s where the learning happens! 💪', 'error');
+          toast('Pass the challenge first — that\'s where the learning happens.', 'error');
           return;
         }
         if (!cfg.loggedIn) {
@@ -319,11 +380,11 @@
           .then(({ status, data }) => {
             if (status !== 200) { toast('Could not save progress.', 'error'); return; }
             if (data.first_time) {
-              toast('⚡ +' + data.xp_gained + ' XP — lesson complete!', 'success');
-              completeBtn.textContent = '✓ Completed';
+              toast('+' + data.xp_gained + ' XP — lesson complete!', 'success');
+              completeBtn.innerHTML = (window.psIcon ? window.psIcon('check', 15) : '') + ' Completed';
               completeBtn.dataset.done = '1';
             } else {
-              toast('Already completed — nice revision session! 🔁', '');
+              toast('Already completed — nice revision session.', '');
             }
             celebrateAchievements(data.new_achievements);
           })
@@ -362,7 +423,8 @@
           const isOpen = i <= unlocked;
           card.classList.toggle('locked', !isOpen);
           card.classList.toggle('done', isDone);
-          state.textContent = isDone ? '✅' : (isOpen ? '🔓' : '🔒');
+          state.innerHTML = window.psIcon(
+            isDone ? 'check-circle' : (isOpen ? 'unlock' : 'lock'), 16);
         }
         bar.style.width = (unlocked / total * 100) + '%';
         count.textContent = unlocked + ' / ' + total + ' steps';
@@ -390,8 +452,8 @@
           resultBox.hidden = false;
           if (result.ok && normalize(result.output) === normalize(spec.steps[i])) {
             resultBox.className = 'check-result pass';
-            resultBox.innerHTML = '✅ <strong>Step complete!</strong>' +
-              (i + 1 < total ? ' The next step is unlocked.' : ' That was the last one — project shipped! 🎉');
+            resultBox.innerHTML = (window.psIcon ? window.psIcon('check-circle', 16) : '') + ' <strong>Step complete!</strong>' +
+              (i + 1 < total ? ' The next step is unlocked.' : ' That was the last one — project shipped.');
             confetti(resultBox);
             if (i + 1 > unlocked) {
               unlocked = i + 1;
@@ -410,8 +472,8 @@
           } else {
             resultBox.className = 'check-result fail';
             resultBox.innerHTML = result.ok
-              ? '❌ Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
-              : '❌ Your code raised an error — read the traceback above and try again.';
+              ? (window.psIcon ? window.psIcon('x-circle', 16) : '') + ' Not quite — output doesn\'t match.<small>Expected:\n' + escapeHtml(spec.steps[i]) + '</small>'
+              : (window.psIcon ? window.psIcon('x-circle', 16) : '') + ' Your code raised an error — read the traceback above and try again.';
           }
         };
         btn.addEventListener('click', check);

@@ -18,6 +18,7 @@ import database as db
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.courses import COURSES, get_course, get_lesson, total_lessons
+from data.icons import ICONS
 from data.lesson_extras import get_extras
 from data.projects import PROJECTS, get_project
 from data.walkthroughs import get_walkthrough
@@ -91,6 +92,32 @@ def award_new_achievements(user):
              "desc": a["desc"]} for a in new]
 
 
+def next_lesson_for(user):
+    """The lesson a returning learner should resume: the first one they have
+    not completed, in curriculum order. None once everything is done.
+
+    This is what makes the home page a product surface rather than a
+    brochure — a logged-in learner lands on their own next step.
+    """
+    if not user:
+        return None
+    lessons_by_course, _ = db.get_progress(user["id"])
+    for course in COURSES:
+        done = lessons_by_course.get(course["slug"], set())
+        for i, lesson in enumerate(course["lessons"], 1):
+            if lesson["slug"] not in done:
+                return {
+                    "course": course,
+                    "lesson": lesson,
+                    "index": i,
+                    "total": len(course["lessons"]),
+                    "done": len(done),
+                    "pct": round(len(done) / len(course["lessons"]) * 100),
+                    "started": bool(lessons_by_course),
+                }
+    return None
+
+
 @app.context_processor
 def inject_globals():
     user = current_user()
@@ -98,6 +125,7 @@ def inject_globals():
         "user": user,
         "level": level_info(user["xp"]) if user else None,
         "site_url": app.config["SITE_URL"],
+        "icons": ICONS,
         "now_year": datetime.now(timezone.utc).year,
     }
 
@@ -108,6 +136,7 @@ def inject_globals():
 def home():
     return render_template("index.html", courses=COURSES,
                            projects=PROJECTS,
+                           next_up=next_lesson_for(current_user()),
                            n_lessons=total_lessons(),
                            n_challenges=len(CHALLENGES),
                            n_achievements=len(ACHIEVEMENTS))
@@ -386,6 +415,51 @@ def api_me():
     return jsonify({"logged_in": True, "username": user["username"],
                     "xp": user["xp"], "streak": user["streak"],
                     "level": level_info(user["xp"])})
+
+
+@app.get("/api/search-index")
+def api_search_index():
+    """Flat index powering the ⌘K command palette.
+
+    Everything here is public content, so it is cacheable and needs no auth.
+    Kept deliberately small — title/subtitle/url only, no lesson bodies.
+    """
+    items = []
+    for c in COURSES:
+        items.append({"kind": "Course", "title": c["title"],
+                      "sub": c["tagline"], "icon": c["icon"],
+                      "url": url_for("course_detail", slug=c["slug"])})
+        for i, l in enumerate(c["lessons"], 1):
+            items.append({"kind": "Lesson", "title": l["title"],
+                          "sub": "%s · lesson %d" % (c["title"], i),
+                          "icon": c["icon"],
+                          "url": url_for("lesson", slug=c["slug"],
+                                         lesson_slug=l["slug"])})
+    for pr in PROJECTS:
+        items.append({"kind": "Project", "title": pr["title"],
+                      "sub": "%s · %d min" % (pr["level"], pr["minutes"]),
+                      "icon": pr["icon"],
+                      "url": url_for("project_detail", slug=pr["slug"])})
+    for ch in CHALLENGES:
+        items.append({"kind": "Challenge", "title": ch["title"],
+                      "sub": "%s · %d XP" % (ch["difficulty"], ch["xp"]),
+                      "icon": "swords",
+                      "url": url_for("challenge_detail", slug=ch["slug"])})
+    for title, sub, icon, endpoint in [
+        ("All courses", "Browse the full curriculum", "book", "courses"),
+        ("Real-life projects", "Build something end to end", "blocks", "projects"),
+        ("Challenge arena", "Graded standalone problems", "swords", "challenges"),
+        ("Playground", "A blank Python scratchpad", "beaker", "playground"),
+        ("Flashcard review", "Spaced repetition practice", "brain", "review"),
+        ("Dashboard", "Your XP, streak and achievements", "bar-chart", "dashboard"),
+        ("About PySprint", "How the platform works", "info", "about"),
+    ]:
+        items.append({"kind": "Page", "title": title, "sub": sub,
+                      "icon": icon, "url": url_for(endpoint)})
+
+    resp = jsonify({"items": items})
+    resp.headers["Cache-Control"] = "public, max-age=600"
+    return resp
 
 
 # ── SEO ──────────────────────────────────────────────────────────────

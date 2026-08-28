@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% import "_art.html" as art %}
 {% block title %}Real-Life Python Projects — PySprint{% endblock %}
 {% block description %}Build 5 real-world Python projects step by step: budget analyzer, password auditor, to-do app with persistence, sales report generator and a webhook processor.{% endblock %}
 
 {% block content %}
 <section class="page-head">
-  <h1>🏗️ Real-Life Projects</h1>
+  <h1>Real-Life Projects</h1>
   <p>Guided builds of the software you actually use — each explained first (<em>how it works in the real world</em>), then constructed step by graded step. Finish one and you've shipped something real.</p>
 </section>
 
@@ -13,16 +15,16 @@
     {% for p in projects %}
     <a href="{{ url_for('project_detail', slug=p.slug) }}" class="project-card card {% if p.slug in done %}is-done{% endif %}" style="--accent: {{ p.color }}">
       <div class="project-card-top">
-        <span class="project-icon">{{ p.icon }}</span>
+        <span class="project-icon">{{ art.art(p.slug, p.color, 54) }}</span>
         <span class="level-badge level-{{ p.level|lower }}">{{ p.level }}</span>
       </div>
       <h2>{{ p.title }}</h2>
       <p>{{ p.summary }}</p>
       <div class="course-meta">
-        <span>🧩 {{ p.steps|length }} steps</span>
-        <span>⚡ {{ p.xp }} XP</span>
-        <span>⏱ ~{{ p.minutes }} min</span>
-        {% if p.slug in done %}<span class="done-badge">✓ Shipped</span>{% endif %}
+        <span>{{ ic.icon('layers', 14, 'i-inline') }} {{ p.steps|length }} steps</span>
+        <span>{{ ic.icon('bolt', 14, 'i-inline') }} {{ p.xp }} XP</span>
+        <span>{{ ic.icon('clock', 14, 'i-inline') }} ~{{ p.minutes }} min</span>
+        {% if p.slug in done %}<span class="done-badge">{{ ic.icon('check', 14, 'i-inline') }} Shipped</span>{% endif %}
       </div>
       <span class="project-go">Build it →</span>
     </a>
