@@ -109,7 +109,18 @@ static/js/
    differ from their URL.
 14. **Auto-fill grids use `minmax(min(Npx, 100%), 1fr)`** — a bare
    `minmax(Npx, 1fr)` forces horizontal overflow below N px.
-15. **Light theme is the default**; dark mode via `data-theme="dark"` on
+15. **`[hidden]` is globally `display: none !important`.** Every reveal on
+   the site is an attribute toggle — hints, solutions, pass/fail results,
+   the flashcard answer, the grade buttons. Component rules that set
+   `display` silently defeat the attribute, which had been leaking hints
+   and answers before the learner asked. Never test a reveal by reading
+   `el.hidden`; assert on computed `display`.
+16. **The mobile drawer is a menu, not a stack of links** — 50px rows with
+   an icon each (`.nav-icon`, drawer-only), actions as a footer grid, and
+   the theme toggle as a labelled full-width row. Touch minimums are the
+   row height, never a minimum *plus* padding, which is what left it
+   sprawling.
+17. **Light theme is the default**; dark mode via `data-theme="dark"` on
    `<html>`, toggled in the nav and persisted in localStorage. All colors
    come from CSS custom properties in `:root` / `[data-theme="dark"]` —
    never hardcode a color in a component rule. Code editors deliberately

@@ -54,13 +54,25 @@
         {{ brand.brand_mark('nav', 34) }}<span class="brand-name">Learnwith<em>Python</em></span>
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-        <a href="{{ url_for('courses') }}" {% if request.path.startswith('/courses') %}class="active"{% endif %}>Courses</a>
-        <a href="{{ url_for('projects') }}" {% if request.path.startswith('/projects') %}class="active"{% endif %}>Projects</a>
-        <a href="{{ url_for('challenges') }}" {% if request.path.startswith('/challenges') %}class="active"{% endif %}>Challenges</a>
-        <a href="{{ url_for('playground') }}" {% if request.path == '/playground' %}class="active"{% endif %}>Playground</a>
-        <a href="{{ url_for('review') }}" {% if request.path == '/review' %}class="active"{% endif %}>Review</a>
+        {# Icons render always but only show in the mobile drawer, where they
+           give each row an anchor so the list reads as a menu, not floating text. #}
+        {% set nav_items = [
+          ('courses',    'Courses',    'book',      '/courses'),
+          ('projects',   'Projects',   'blocks',    '/projects'),
+          ('challenges', 'Challenges', 'swords',    '/challenges'),
+          ('playground', 'Playground', 'beaker',    '/playground'),
+          ('review',     'Review',     'brain',     '/review'),
+        ] %}
+        {% for endpoint, label, icon_name, prefix in nav_items %}
+          <a href="{{ url_for(endpoint) }}"
+             {% if request.path == prefix or (prefix in ['/courses', '/projects', '/challenges'] and request.path.startswith(prefix)) %}class="active"{% endif %}>
+            {{ ic.icon(icon_name, 18, 'nav-icon') }}<span>{{ label }}</span>
+          </a>
+        {% endfor %}
         {% if user %}
-          <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}>Dashboard</a>
+          <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}>
+            {{ ic.icon('bar-chart', 18, 'nav-icon') }}<span>Dashboard</span>
+          </a>
         {% endif %}
         <div class="nav-mobile-actions">
           {% if user %}
@@ -73,6 +85,8 @@
           <button class="theme-toggle theme-toggle-drawer" type="button"
                   aria-label="Toggle light/dark theme" title="Toggle theme">
             {{ ic.icon('moon', 18, 'theme-moon') }}{{ ic.icon('sun', 18, 'theme-sun') }}
+            <span class="theme-label theme-moon">Dark mode</span>
+            <span class="theme-label theme-sun">Light mode</span>
           </button>
         </div>
       </nav>

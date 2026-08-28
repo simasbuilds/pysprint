@@ -55,6 +55,13 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* The `hidden` attribute is how every reveal on this site works — hints,
+   solutions, pass/fail results, the flashcard answer, the grade buttons.
+   Any component rule that sets `display` silently defeats it, which had
+   been giving away hints and answers before the learner asked. Make the
+   attribute always win. */
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font);
@@ -1313,4 +1320,137 @@ h1 .icon, h2 .icon, h3 .icon { color: var(--accent); }
 @media (max-width: 360px) {
   .brand-name { font-size: .85em; }
   .nav-inner { padding-inline: .7rem; }
+}
+
+/* ═══════════════════ v9: the mobile drawer as a real menu ══════════ */
+
+/* Icons are drawer-only; the desktop bar stays text. */
+.nav-icon { display: none; }
+
+@media (max-width: 900px) {
+  .nav-links {
+    padding: .5rem .6rem .75rem;
+    gap: 0;
+    max-height: calc(100dvh - 62px);
+  }
+  /* One consistent 50px row. The touch minimum is the row height itself,
+     not a minimum *plus* padding — that stacking is what left the list
+     sprawling with dead space. */
+  .nav-links > a {
+    display: flex; align-items: center; gap: .8rem;
+    min-height: 50px; padding: 0 .75rem;
+    font-size: 1rem; font-weight: 600; border-radius: 12px;
+  }
+  .nav-links > a + a { margin-top: 2px; }
+  .nav-icon { display: block; color: var(--text-dim); flex-shrink: 0; }
+  .nav-links > a.active .nav-icon { color: var(--brand-1); }
+  .nav-links > a:active { background: var(--surface-2); }
+
+  /* actions read as a footer to the menu, not a stray row */
+  .nav-mobile-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: .55rem;
+    margin-top: .7rem; padding-top: .75rem; border-top: 1px solid var(--border);
+  }
+  .nav-mobile-actions .btn {
+    min-height: 46px; width: 100%; justify-content: center; font-size: .95rem;
+  }
+  .nav-mobile-actions .nav-stats {
+    grid-column: 1 / -1; display: none;
+    justify-content: center; gap: 1.2rem; padding: .2rem 0 .45rem;
+  }
+  /* theme becomes a labelled full-width row instead of a floating circle */
+  .theme-toggle-drawer {
+    grid-column: 1 / -1; width: 100%; height: auto; min-height: 46px;
+    border-radius: 12px; gap: .6rem; margin-left: 0;
+    background: var(--surface-2); border: 1px solid var(--border);
+    font-family: var(--font); font-weight: 700; font-size: .95rem; color: var(--text);
+    position: relative;
+  }
+  .theme-toggle-drawer:hover { transform: none; }
+  .theme-toggle-drawer .icon { position: static; }
+  .theme-label { font-weight: 700; }
+  /* mirror the icon show/hide so label and glyph always agree */
+  span.theme-label.theme-moon { display: inline; }
+  span.theme-label.theme-sun { display: none; }
+  [data-theme="dark"] span.theme-label.theme-moon { display: none; }
+  [data-theme="dark"] span.theme-label.theme-sun { display: inline; }
+  .theme-toggle-drawer .theme-sun { transform: none; }
+}
+
+@media (max-width: 900px) and (pointer: coarse) {
+  /* the generic touch rule would re-add padding on top of the row height */
+  .nav-links a { min-height: 50px; }
+  .theme-toggle-drawer { width: 100%; height: auto; }
+}
+
+@media (max-width: 420px) {
+  .nav-mobile-actions .nav-stats { display: flex; }
+}
+
+/* ── mobile density: cards that were mostly air ───────────────────── */
+@media (max-width: 640px) {
+  /* An arena card carried a badge row, a title row and an XP row with a
+     gap between each — three lines of chrome for two words of content.
+     Collapse it into title + one meta line. */
+  .challenge-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "title title" "meta done";
+    align-items: center;
+    gap: .3rem .6rem;
+    padding: .85rem 1rem;
+  }
+  .challenge-card h3 { grid-area: title; font-size: 1rem; }
+  .challenge-card .challenge-top { display: contents; }
+  .challenge-card .diff-badge { grid-area: meta; justify-self: start; }
+  .challenge-card .done-badge { grid-area: done; }
+  .challenge-card .course-meta {
+    grid-area: done; justify-self: end; font-size: .8rem;
+  }
+  .challenge-card.is-done .course-meta { display: none; }
+  .challenge-grid { gap: .55rem; }
+
+  /* course cards: the icon sat alone on a line with the level badge far
+     right; pair them with the title instead */
+  .course-card { padding: 1.1rem; gap: .45rem; }
+  .course-card .course-top { align-items: flex-start; }
+  .course-card h3 { font-size: 1.05rem; }
+  .course-card p { font-size: .88rem; }
+  .course-meta { font-size: .8rem; gap: .75rem; }
+
+  /* project + course rows */
+  .project-card { padding: 1.15rem; gap: .45rem; }
+  .project-card h2, .project-card h3 { font-size: 1.05rem; }
+  .project-card p { font-size: .88rem; }
+  .course-row { padding: 1.1rem 1.15rem; gap: .7rem; }
+
+  /* page headers ate a lot of vertical space before any content */
+  .page-head { padding-top: 1.75rem; }
+  .page-head p { font-size: .93rem; }
+  .section-sub { margin-bottom: 1.75rem; }
+}
+
+/* ── course rows on mobile: the artwork sat alone on its own line with
+   dead space beside it. Pair it with the title instead. ──────────── */
+@media (max-width: 640px) {
+  .course-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "art head" "body body";
+    align-items: center;
+    column-gap: .85rem; row-gap: .6rem;
+  }
+  .course-row .course-icon { grid-area: art; }
+  .course-row .course-icon .art { width: 46px; height: 46px; }
+  .course-row-body { grid-area: body; display: contents; }
+  .course-row-top {
+    grid-area: head; display: flex; flex-direction: column;
+    align-items: flex-start; gap: .3rem;
+  }
+  .course-row-top h2 { font-size: 1.08rem; line-height: 1.25; }
+  .course-row-body > p,
+  .course-row-body > .course-meta,
+  .course-row-body > .progress-track,
+  .course-row-body > .progress-label { grid-column: 1 / -1; }
+  .course-row-body > p { font-size: .89rem; }
 }
