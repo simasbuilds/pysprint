@@ -3581,9 +3581,17 @@ body.cmdk-open { overflow: hidden; }
 .auth-context { position: relative; overflow: hidden; isolation: isolate; }
 .auth-context::after {
   content: ''; position: absolute; z-index: -1;
-  right: -6%; bottom: -8%; width: min(74%, 420px); aspect-ratio: 16 / 9;
+  right: -7%; bottom: -9%; width: min(76%, 440px); aspect-ratio: 16 / 9;
   background: url('/static/images/auth-visual.png') center / contain no-repeat;
-  opacity: .5; pointer-events: none;
+  /* The artwork has a flat navy field. Laying it over the panel at partial
+     opacity just lightened that rectangle, leaving a visible seam. `screen`
+     drops near-black to nothing and keeps only the lit tiles, and the mask
+     dissolves the edges so nothing ends on a straight line. */
+  mix-blend-mode: screen;
+  opacity: .9;
+  -webkit-mask-image: radial-gradient(closest-side at 62% 58%, #000 42%, transparent 92%);
+  mask-image: radial-gradient(closest-side at 62% 58%, #000 42%, transparent 92%);
+  pointer-events: none;
 }
 @media (max-width: 900px) { .auth-context::after { display: none; } }
 
@@ -3596,7 +3604,7 @@ body.cmdk-open { overflow: hidden; }
   content: ''; position: absolute; inset: 0; z-index: -1;
   background-image: url('/static/images/mesh-bg.jpg');
   background-size: cover; background-position: center;
-  opacity: .5;
+  mix-blend-mode: screen; opacity: .55;
 }
 
 /* ═══════════ /start — onboarding for absolute beginners ════════════ */
@@ -3799,3 +3807,38 @@ body.cmdk-open { overflow: hidden; }
 }
 .practice-go .ui-icon { width: 16px; height: 16px; transition: transform .18s; }
 .practice-card:hover .practice-go .ui-icon { transform: translateX(4px); }
+
+/* ── curated external resources ───────────────────────────────────── */
+.resources-section { border-top: 1px solid var(--border); margin-top: 1rem; }
+.resource-group {
+  font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-dim); margin: 2rem 0 .9rem;
+}
+.resource-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1rem;
+}
+.resource-card {
+  display: flex; flex-direction: column; gap: .5rem; padding: 1.3rem;
+  color: var(--text); transition: transform .16s, box-shadow .16s, border-color .16s;
+}
+.resource-card:hover {
+  text-decoration: none; transform: translateY(-3px);
+  box-shadow: var(--shadow); border-color: var(--brand-1);
+}
+.resource-top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+.resource-icon {
+  width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--tint-1); color: var(--brand-1);
+}
+.resource-icon .ui-icon { width: 19px; height: 19px; }
+.resource-cost {
+  font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-dim); background: var(--surface-2);
+  border: 1px solid var(--border); padding: .22rem .55rem; border-radius: 99px;
+  white-space: nowrap;
+}
+.resource-name { display: flex; align-items: center; gap: .4rem; font-size: 1.02rem; }
+.resource-out { width: 14px; height: 14px; color: var(--text-dim); transition: transform .16s; }
+.resource-card:hover .resource-out { transform: translate(3px, -3px); color: var(--brand-1); }
+.resource-card p { color: var(--text-dim); font-size: .9rem; }

@@ -120,6 +120,15 @@ which `initPlayground` applies after the saved draft is restored and then
 strips from the URL, so a refresh does not silently overwrite what the
 learner has since typed.
 
+## Artwork on coloured panels
+
+Generated art has a flat navy field. Laying it over a gradient panel at
+partial opacity lightens that rectangle and leaves a visible seam — which
+is what the login page looked like. Composite it with `mix-blend-mode:
+screen` plus a radial `mask-image` instead: screen drops near-black to
+nothing so only the lit tiles show, and the mask stops anything ending on
+a straight edge.
+
 ## /start
 
 Onboarding for someone who has never written code. The rest of the site

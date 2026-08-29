@@ -70,7 +70,7 @@
     const i = text.indexOf('Traceback');
     const trace = i >= 0 ? text.slice(i) : text;
     const hint = friendlyErrorHint(trace);
-    return hint ? trace + '\n\n\u{1F4A1} In plain English: ' + hint : trace;
+    return hint ? trace + '\n\nIn plain English: ' + hint : trace;
   }
 
   // Plain-English translations of the errors beginners hit most.

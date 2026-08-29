@@ -13,7 +13,7 @@
        copy it, or open it in the playground and change it.</p>
     <div class="directory-actions">
       <a href="#cheatBoard" class="btn btn-primary btn-lg">Browse the sheet →</a>
-      <a href="{{ url_for('playground') }}" class="btn btn-ghost btn-lg">Open the playground</a>
+      <a href="#resources" class="btn btn-ghost btn-lg">Free resources elsewhere</a>
     </div>
   </div>
   <div class="arena-visual" aria-hidden="true">
@@ -60,6 +60,33 @@
   </div>
   <p class="cheat-empty" id="cheatEmpty" hidden>Nothing matches that. Try a shorter word — the snippets are searched by title, description and code.</p>
 </section>
+
+<section class="section resources-section" id="resources">
+  <div class="catalog-head">
+    <div>
+      <span class="eyebrow">Beyond this site</span>
+      <h2>Where to go when you need more</h2>
+    </div>
+    <p>No site teaches everything, and pretending otherwise wastes your time. These are the free
+       resources worth knowing about, with an honest note on what each is actually for.</p>
+  </div>
+  {% for group in resources %}
+  <h3 class="resource-group">{{ group.group }}</h3>
+  <div class="resource-grid">
+    {% for r in group['items'] %}
+    <a class="resource-card card" href="{{ r.url }}" target="_blank" rel="noopener noreferrer">
+      <span class="resource-top">
+        <span class="resource-icon">{{ icon(r.icon) }}</span>
+        <span class="resource-cost">{{ r.cost }}</span>
+      </span>
+      <strong class="resource-name">{{ r.name }} {{ icon('arrow-right', 'resource-out') }}</strong>
+      <p>{{ r.note }}</p>
+    </a>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+
 {% endblock %}
 
 {% block scripts %}

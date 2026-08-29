@@ -18,6 +18,7 @@ import database as db
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.cheatsheet import CHEATSHEET, categories as cheat_categories
+from data.resources import RESOURCES
 from data.courses import COURSES, get_course, get_lesson, total_lessons
 from data.glossary import get_glossary
 from data.lesson_extras import get_extras
@@ -375,7 +376,8 @@ def cheatsheet():
     """
     return render_template("cheatsheet.html",
                            entries=CHEATSHEET,
-                           cats=cheat_categories())
+                           cats=cheat_categories(),
+                           resources=RESOURCES)
 
 
 @app.get("/start")
