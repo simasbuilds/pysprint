@@ -159,6 +159,7 @@ def inject_globals():
         "n_projects": len(PROJECTS),
         "n_project_steps": sum(len(pr["steps"]) for pr in PROJECTS),
         "n_challenges": len(CHALLENGES),
+        "n_cheats": len(CHEATSHEET),
         "nav_courses": [{"slug": c["slug"], "title": c["title"],
                          "color": c["color"]} for c in COURSES],
         "nav_lessons": [{"title": l["title"], "course": c["title"],

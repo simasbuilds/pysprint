@@ -30,8 +30,8 @@
         {% else %}You've finished every lesson. Sharpen it in the arena, or revisit anything in Smart Review.{% endif %}
       </p>
       {% else %}
-      <span class="pill stagger d1"><span class="pulse-dot"></span> Real Python · Free forever · Zero setup</span>
-      <h1 class="stagger d2">Learn Python by building <span class="word-rotate" data-words='["real things.","games.","APIs.","data tools.","habits."]'><span class="grad">real things.</span></span></h1>
+      <span class="pill stagger d1">{{ n_lessons }} lessons · {{ n_projects }} projects · nothing to install</span>
+      <h1 class="stagger d2">Learn Python by <span class="grad">writing it</span>—not watching it.</h1>
       <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
       {% endif %}
       <div class="hero-cta stagger d4">
@@ -130,12 +130,6 @@ for i in range(3):
   </div>
 </section>
 
-<section class="proof-strip" aria-label="Platform benefits">
-  <div><span class="proof-icon">{{ icon('terminal') }}</span><p><strong>Real Python 3</strong><span>Full CPython via WebAssembly</span></p></div>
-  <div><span class="proof-icon">{{ icon('target') }}</span><p><strong>Practice first</strong><span>Write code in every lesson</span></p></div>
-  <div><span class="proof-icon">{{ icon('brain') }}</span><p><strong>Keep the skill</strong><span>Built-in spaced repetition</span></p></div>
-  <div><span class="proof-icon">{{ icon('lock') }}</span><p><strong>Own your progress</strong><span>Free learning, optional account</span></p></div>
-</section>
 
 <section class="section section-enter">
   <div class="section-kicker"><span>01</span><p>Structured curriculum</p></div>
@@ -145,7 +139,7 @@ for i in range(3):
          width="1600" height="900" loading="lazy" data-reveal="left">
     <div class="path-feature-copy" data-reveal="right">
       <span class="eyebrow">A route you can trust</span>
-      <h2>A complete path, <span class="grad">beginner to expert</span></h2>
+      <h2>A complete path, beginner to expert</h2>
       <p>{{ n_courses }} courses build on one another. Start with zero experience and finish by designing APIs, automating real work, and writing the generators, decorators and dataclasses that professionals write.</p>
       <div class="path-checks"><span>{{ icon('check') }} {{ n_lessons }} focused lessons</span><span>{{ icon('check') }} {{ n_projects }} portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
       <a href="{{ url_for('courses') }}" class="text-cta">Explore the curriculum <span>→</span></a>
@@ -219,7 +213,7 @@ for i in range(3):
          width="1600" height="900" loading="lazy" data-reveal="left">
     <div data-reveal="right">
       <span class="eyebrow">From lesson to shipped</span>
-      <h2>Build <span class="grad">real software</span>, step by step</h2>
+      <h2>Build real software, step by step</h2>
       <p>{{ n_projects }} guided builds model production systems. Understand the architecture, complete each graded stage, then ship something you can explain.</p>
       <a href="{{ url_for('projects') }}" class="btn btn-primary">View all projects →</a>
     </div>
@@ -245,7 +239,7 @@ for i in range(3):
   <div class="catalog-head">
     <div>
       <span class="eyebrow">How to actually learn Python</span>
-      <h2>Four habits separate people who <span class="grad">finish</span> from people who restart.</h2>
+      <h2>Four habits separate people who finish from people who restart.</h2>
     </div>
     <p>Every mechanic on LearnWithPython exists to enforce one of these evidence-backed habits. Steal them — they work everywhere, not just here.</p>
   </div>
@@ -286,7 +280,7 @@ for i in range(3):
   <div class="usecase-head">
     <div>
       <span class="eyebrow">Every concept has a job</span>
-      <h2>See where each skill <span class="grad">earns its keep</span></h2>
+      <h2>See where each skill earns its keep</h2>
     </div>
     <p>Nothing here is abstract. Each course is anchored to the software people actually get paid to write — pick the outcome that excites you and start there.</p>
   </div>
@@ -304,15 +298,41 @@ for i in range(3):
   </div>
 </section>
 
-<section class="section alt section-enter">
-  <h2 class="section-title">Built to make learning <span class="grad">stick</span></h2>
-  <div class="feature-grid">
-    <div class="feature card"><span class="feature-icon">{{ icon('terminal') }}</span><h3>Code, don't watch</h3><p>Every lesson ends with a graded challenge running real Python 3 in your browser via WebAssembly. No setup, no excuses.</p></div>
-    <div class="feature card"><span class="feature-icon">{{ icon('brain') }}</span><h3>Spaced-repetition review</h3><p>Our built-in flashcard engine resurfaces every concept you've learned at scientifically-timed intervals, so nothing fades.</p></div>
-    <div class="feature card"><span class="feature-icon">{{ icon('trophy') }}</span><h3>XP, streaks & achievements</h3><p>Earn XP for every lesson, keep daily streaks alive and unlock {{ n_achievements }} achievements on the road to Python Legend.</p></div>
-    <div class="feature card"><span class="feature-icon">{{ icon('target') }}</span><h3>Instant feedback</h3><p>Quizzes explain <em>why</em> each answer is right. Challenges diff your output and offer hints before showing solutions.</p></div>
-    <div class="feature card"><span class="feature-icon">{{ icon('swords') }}</span><h3>Challenge arena</h3><p>{{ n_challenges }} standalone problems from Easy to Hard — including real interview classics like FizzBuzz, primes and rate limiters.</p></div>
-    <div class="feature card"><span class="feature-icon">{{ icon('chart') }}</span><h3>A dashboard that motivates</h3><p>Track per-course progress, compare on the leaderboard and watch your level climb from Newcomer to Legend.</p></div>
+
+<section class="section practice-section section-enter">
+  <div class="section-kicker"><span>06</span><p>Keep it sharp</p></div>
+  <div class="catalog-head">
+    <div>
+      <span class="eyebrow">Beyond the lessons</span>
+      <h2>Three ways to keep what you learn</h2>
+    </div>
+    <p>Lessons teach a concept once. These are the surfaces that stop it fading — all free, all open without an account.</p>
+  </div>
+  <div class="practice-grid">
+    <a class="practice-card card" href="{{ url_for('challenges') }}">
+      <span class="practice-icon">{{ icon('swords') }}</span>
+      <strong class="practice-stat">{{ n_challenges }}</strong>
+      <span class="practice-label">graded problems</span>
+      <h3>Challenge arena</h3>
+      <p>Standalone problems from Easy to Hard, including interview classics like two-sum, merge intervals and edit distance. Blank workspace, instant output check.</p>
+      <span class="practice-go">Enter the arena {{ icon('arrow-right') }}</span>
+    </a>
+    <a class="practice-card card" href="{{ url_for('review') }}">
+      <span class="practice-icon">{{ icon('brain') }}</span>
+      <strong class="practice-stat">5</strong>
+      <span class="practice-label">minutes a day</span>
+      <h3>Smart Review</h3>
+      <p>Every concept you meet becomes a flashcard, scheduled by spaced repetition. Cards you find hard come back sooner; ones you know come back later.</p>
+      <span class="practice-go">Start reviewing {{ icon('arrow-right') }}</span>
+    </a>
+    <a class="practice-card card" href="{{ url_for('cheatsheet') }}">
+      <span class="practice-icon">{{ icon('note') }}</span>
+      <strong class="practice-stat">{{ n_cheats }}</strong>
+      <span class="practice-label">snippets</span>
+      <h3>Cheatsheet</h3>
+      <p>The Python you keep looking up, by topic — every snippet showing the output it genuinely produces, because it was executed to get it. Copy it, or open it in the playground.</p>
+      <span class="practice-go">Browse the sheet {{ icon('arrow-right') }}</span>
+    </a>
   </div>
 </section>
 
@@ -418,8 +438,10 @@ for i in range(3):
             if (!autoplay) return;
             setStatus('Complete · exit 0', 'is-complete');
             later(function () {
-              if (autoplay) playScenario((i + 1) % scenarios.length);
-            }, 3600);
+              // One run is enough to show it is live; cycling every file
+              // forever turns the hero into a carousel.
+              stopAutoplay();
+            }, 2600);
           }, s.out.length * 240 + 250);
         }, 620);
       })();
@@ -460,11 +482,11 @@ for i in range(3):
           if (!started && entries[0].isIntersecting) {
             started = true;
             io.disconnect();
-            later(function () { if (autoplay) playScenario(1); }, 1100);
+            later(function () { if (autoplay) playScenario(0); }, 1100);
           }
         }, { threshold: 0.4 }).observe(codeEl);
       } else {
-        later(function () { if (autoplay) playScenario(1); }, 1100);
+        later(function () { if (autoplay) playScenario(0); }, 1100);
       }
     }
   })();

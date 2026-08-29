@@ -246,24 +246,6 @@
     setTimeout(() => el.remove(), 1600);
   };
 
-  // ── rotating word in the hero headline ──────────────────────────
-  const rotator = document.querySelector('.word-rotate[data-words]');
-  if (rotator && !reduceMotion) {
-    let words = [];
-    try { words = JSON.parse(rotator.dataset.words) || []; } catch (_) {}
-    const inner = rotator.querySelector('span');
-    if (inner && words.length > 1) {
-      let i = 0;
-      setInterval(() => {
-        inner.classList.add('out');
-        setTimeout(() => {
-          i = (i + 1) % words.length;
-          inner.textContent = words[i];
-          inner.classList.remove('out');
-        }, 260);
-      }, 2800);
-    }
-  }
 
   // ── ⌘K command palette ──────────────────────────────────────────
   (function initCmdk() {
