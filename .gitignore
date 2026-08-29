@@ -16,3 +16,6 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Project-scoped MCP config holds a Supabase access token
+.mcp.json
