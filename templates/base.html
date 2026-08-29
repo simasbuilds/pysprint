@@ -98,7 +98,7 @@
         <div class="nav-menu-wrap">
           <button class="nav-menu-trigger {% if request.path.startswith('/courses') or request.path.startswith('/challenges') or request.path == '/review' %}active{% endif %}"
                   id="learnMenuBtn" data-menu="learnMenu" aria-expanded="false" aria-controls="learnMenu">
-            Learn <span aria-hidden="true">⌄</span>
+            <span class="nav-lead">{{ icon('graduation') }}Learn</span><span aria-hidden="true">⌄</span>
           </button>
           <div class="mega-menu" id="learnMenu" hidden>
             <div class="mega-intro">
@@ -124,7 +124,7 @@
         <div class="nav-menu-wrap">
           <button class="nav-menu-trigger {% if request.path.startswith('/projects') or request.path == '/playground' %}active{% endif %}"
                   id="buildMenuBtn" data-menu="buildMenu" aria-expanded="false" aria-controls="buildMenu">
-            Build <span aria-hidden="true">⌄</span>
+            <span class="nav-lead">{{ icon('tools') }}Build</span><span aria-hidden="true">⌄</span>
           </button>
           <div class="mega-menu build-menu" id="buildMenu" hidden>
             <div class="mega-intro build-intro">
@@ -145,9 +145,9 @@
             </div>
           </div>
         </div>
-        <a href="{{ url_for('about') }}" {% if request.path == '/about' %}class="active"{% endif %}>How it works</a>
+        <a href="{{ url_for('about') }}" {% if request.path == '/about' %}class="active"{% endif %}><span class="nav-lead">{{ icon('info') }}How it works</span></a>
         {% if user %}
-          <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}>Dashboard</a>
+          <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}><span class="nav-lead">{{ icon('chart') }}Dashboard</span></a>
         {% endif %}
         {% if user and user.is_admin %}
           <a href="{{ url_for('admin') }}" class="nav-admin {% if request.path.startswith('/admin') %}active{% endif %}">{{ icon('shield') }} Admin</a>
@@ -157,6 +157,7 @@
           <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Continue learning →</a>
           {% else %}
           <a href="{{ url_for('register') }}" class="btn btn-primary">Start learning free →</a>
+          <a href="{{ url_for('login') }}" class="btn btn-ghost mobile-nav-secondary">Log in</a>
           {% endif %}
         </div>
       </nav>
