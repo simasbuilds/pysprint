@@ -466,6 +466,24 @@
     });
   });
 
+  // ── password reveal ─────────────────────────────────────────────
+  // A typo in a masked field is invisible, which is worst on a phone
+  // keyboard. Never leaves the field revealed on submit.
+  document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+    var input = btn.parentElement.querySelector('input');
+    if (!input) return;
+    btn.addEventListener('click', function () {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.textContent = show ? 'Hide' : 'Show';
+      btn.setAttribute('aria-pressed', String(show));
+      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      input.focus();
+    });
+    var form = input.closest('form');
+    if (form) form.addEventListener('submit', function () { input.type = 'password'; });
+  });
+
   // ── toasts (optional inline action, e.g. Undo) ──────────────────
   window.toast = function (msg, type, action) {
     const wrap = document.getElementById('toasts');
