@@ -17,6 +17,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import database as db
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
+from data.cheatsheet import CHEATSHEET, categories as cheat_categories
 from data.courses import COURSES, get_course, get_lesson, total_lessons
 from data.glossary import get_glossary
 from data.lesson_extras import get_extras
@@ -364,6 +365,18 @@ def about():
                            n_challenges=len(CHALLENGES))
 
 
+@app.get("/cheatsheet")
+def cheatsheet():
+    """A browsable reference of the Python worth knowing, by category.
+
+    Every snippet carries the output it actually produces, so the page can
+    be trusted as a reference rather than skimmed as decoration.
+    """
+    return render_template("cheatsheet.html",
+                           entries=CHEATSHEET,
+                           cats=cheat_categories())
+
+
 @app.get("/start")
 def start():
     """Onboarding for someone who has never written a line of code.
@@ -672,7 +685,8 @@ def admin_member(uid):
 def sitemap():
     base = app.config["SITE_URL"].rstrip("/")
     today = date.today().isoformat()
-    urls = [("", "1.0"), ("/start", "0.9"), ("/courses", "0.9"),
+    urls = [("", "1.0"), ("/start", "0.9"), ("/cheatsheet", "0.8"),
+            ("/courses", "0.9"),
             ("/projects", "0.9"), ("/challenges", "0.8"),
             ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5")]
     for p in PROJECTS:

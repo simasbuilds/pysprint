@@ -113,10 +113,12 @@
               <a href="{{ url_for('courses') }}"><span class="menu-icon">{{ icon('book') }}</span><div><strong>Course path</strong><small>{{ n_lessons }} focused lessons from syntax to expert Python</small></div><b>→</b></a>
               <a href="{{ url_for('challenges') }}"><span class="menu-icon">{{ icon('swords') }}</span><div><strong>Challenge arena</strong><small>Practice with graded, interview-style problems</small></div><b>→</b></a>
               <a href="{{ url_for('review') }}"><span class="menu-icon">{{ icon('brain') }}</span><div><strong>Smart Review</strong><small>Keep concepts with spaced repetition</small></div><b>→</b></a>
+              <a href="{{ url_for('cheatsheet') }}"><span class="menu-icon">{{ icon('note') }}</span><div><strong>Cheatsheet</strong><small>The Python you keep looking up, with real output</small></div><b>→</b></a>
             </div>
             <div class="mega-foot">
               <span class="mega-foot-label">Quick start</span>
               <a href="{{ url_for('start') }}">{{ icon('graduation') }} New to coding</a>
+              <a href="{{ url_for('cheatsheet') }}">{{ icon('note') }} Cheatsheet</a>
               <a href="{{ url_for('course_detail', slug='python-fundamentals') }}">{{ icon('spark') }} Lesson one</a>
               <a href="{{ url_for('review') }}">{{ icon('clock') }} Today's review</a>
               <span class="mega-kbd"><kbd><span class="mod-key">⌘</span>K</kbd> jump anywhere</span>
@@ -228,6 +230,7 @@
       <div class="footer-col">
         <h4>Platform</h4>
         <a href="{{ url_for('start') }}">Start here</a>
+        <a href="{{ url_for('cheatsheet') }}">Cheatsheet</a>
         <a href="{{ url_for('about') }}">About</a>
         {% if user %}<a href="{{ url_for('dashboard') }}">Dashboard</a>
         {% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}

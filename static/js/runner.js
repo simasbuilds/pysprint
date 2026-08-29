@@ -656,6 +656,20 @@
         blankId: 'pgBlank',
         stateId: 'pgSaveState',
       });
+
+      // ?code=… lets the cheatsheet hand a snippet straight to the editor.
+      // Applied after setupWorkspace so it wins over the restored draft,
+      // and the param is dropped so a refresh does not silently re-apply it
+      // over whatever the learner has since typed.
+      try {
+        const incoming = new URLSearchParams(location.search).get('code');
+        if (incoming) {
+          code.value = incoming;
+          code.dispatchEvent(new Event('input', { bubbles: true }));
+          history.replaceState(null, '', location.pathname);
+        }
+      } catch (_) {}
+
       enableTabKey(code);
 
       const recipes = {

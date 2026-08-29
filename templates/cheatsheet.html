@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Python Cheatsheet — {{ entries|length }} things worth knowing | LearnWithPython{% endblock %}
+{% block description %}A browsable Python cheatsheet: {{ entries|length }} copy-paste snippets across {{ cats|length }} categories — strings, lists, dicts, files, dates, regex and more. Every one shows the output it actually produces.{% endblock %}
+
+{% block content %}
+<section class="directory-hero cheat-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">{{ entries|length }} snippets · {{ cats|length }} categories</span>
+    <h1>The Python you keep <span class="grad">looking up.</span></h1>
+    <p>Every snippet here shows the output it genuinely produces — they are executed
+       and checked, not written from memory. Filter by topic, search for what you need,
+       copy it, or open it in the playground and change it.</p>
+    <div class="directory-actions">
+      <a href="#cheatBoard" class="btn btn-primary btn-lg">Browse the sheet →</a>
+      <a href="{{ url_for('playground') }}" class="btn btn-ghost btn-lg">Open the playground</a>
+    </div>
+  </div>
+  <div class="arena-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/playground-visual.png') }}" alt="" width="1600" height="914">
+  </div>
+</section>
+
+<section class="section" id="cheatBoard">
+  <div class="cheat-controls">
+    <label class="cheat-search">
+      {{ icon('search') }}
+      <input type="search" id="cheatSearch" placeholder="Search {{ entries|length }} snippets — try 'sort', 'json', 'date'…"
+             autocomplete="off" aria-label="Search the cheatsheet">
+      <button type="button" id="cheatClear" class="cheat-clear" aria-label="Clear search" hidden>{{ icon('warning') }}</button>
+    </label>
+    <div class="cheat-chips" role="tablist" aria-label="Filter by category">
+      <button class="chip on" data-cat="all" role="tab" aria-selected="true">All</button>
+      {% for c in cats %}
+      <button class="chip" data-cat="{{ c }}" role="tab" aria-selected="false">{{ c }}</button>
+      {% endfor %}
+    </div>
+    <p class="cheat-count" id="cheatCount" aria-live="polite">{{ entries|length }} snippets</p>
+  </div>
+
+  <div class="cheat-grid" id="cheatGrid">
+    {% for e in entries %}
+    <article class="cheat-card card" data-cat="{{ e.cat }}"
+             data-search="{{ (e.title ~ ' ' ~ e.blurb ~ ' ' ~ e.code ~ ' ' ~ e.cat)|lower }}">
+      <header class="cheat-card-head">
+        <h3>{{ e.title }}</h3>
+        <span class="cheat-cat">{{ e.cat }}</span>
+      </header>
+      <p class="cheat-blurb">{{ e.blurb }}</p>
+      <pre class="cheat-code"><code>{{ e.code }}</code></pre>
+      {% if e.out %}
+      <pre class="cheat-out" aria-label="Output"><code>{{ e.out }}</code></pre>
+      {% endif %}
+      <div class="cheat-actions">
+        <button class="cheat-btn" data-copy type="button">{{ icon('note') }} Copy</button>
+        <a class="cheat-btn" href="{{ url_for('playground') }}?code={{ e.code|urlencode }}">{{ icon('play') }} Try it</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <p class="cheat-empty" id="cheatEmpty" hidden>Nothing matches that. Try a shorter word — the snippets are searched by title, description and code.</p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* Filter by category and free text together, so a search inside a chosen
+   category behaves the way people expect. */
+(function () {
+  var grid = document.getElementById('cheatGrid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.cheat-card'));
+  var search = document.getElementById('cheatSearch');
+  var clear = document.getElementById('cheatClear');
+  var count = document.getElementById('cheatCount');
+  var empty = document.getElementById('cheatEmpty');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.cheat-chips .chip'));
+  var cat = 'all';
+
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var okCat = cat === 'all' || c.dataset.cat === cat;
+      var okText = !q || c.dataset.search.indexOf(q) !== -1;
+      var show = okCat && okText;
+      c.hidden = !show;
+      if (show) shown++;
+    });
+    count.textContent = shown + (shown === 1 ? ' snippet' : ' snippets');
+    empty.hidden = shown !== 0;
+    if (clear) clear.hidden = !q;
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) {
+        c.classList.toggle('on', c === chip);
+        c.setAttribute('aria-selected', c === chip ? 'true' : 'false');
+      });
+      cat = chip.dataset.cat;
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+  if (clear) clear.addEventListener('click', function () { search.value = ''; apply(); search.focus(); });
+
+  grid.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('[data-copy]');
+    if (!btn) return;
+    var code = btn.closest('.cheat-card').querySelector('.cheat-code code').textContent;
+    navigator.clipboard.writeText(code).then(function () {
+      var was = btn.innerHTML;
+      btn.textContent = 'Copied';
+      setTimeout(function () { btn.innerHTML = was; }, 1400);
+    }).catch(function () {});
+  });
+})();
+</script>
+{% endblock %}

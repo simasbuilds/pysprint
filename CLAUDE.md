@@ -109,6 +109,17 @@ composite a flat navy over the image through a mask built from luminance
 edges untouched. `mesh-bg.jpg` is blurred and damped before use so white
 text stays readable on top of it.
 
+## /cheatsheet
+
+A browsable reference: 92 snippets across 13 categories, filterable by
+category and free text together. Each entry's `out` in `data/cheatsheet.py`
+was produced by executing its `code`, so the page cannot display a result
+the snippet does not actually produce — re-run the verification loop after
+editing it. "Try it" hands the snippet to the playground via `?code=`,
+which `initPlayground` applies after the saved draft is restored and then
+strips from the URL, so a refresh does not silently overwrite what the
+learner has since typed.
+
 ## /start
 
 Onboarding for someone who has never written code. The rest of the site

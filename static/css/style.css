@@ -3710,3 +3710,88 @@ body.cmdk-open { overflow: hidden; }
   border: 1px solid var(--border); flex-shrink: 0;
 }
 @media (max-width: 900px) { .playground-art, .dash-art { display: none; } }
+
+/* ═══════════ /cheatsheet ═══════════════════════════════════════════ */
+.cheat-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .9rem;
+  margin-bottom: 1.6rem;
+}
+.cheat-search {
+  position: relative; display: flex; align-items: center; gap: .55rem;
+  flex: 1 1 320px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: .1rem .9rem;
+}
+.cheat-search:focus-within { border-color: var(--brand-1); box-shadow: 0 0 0 3px var(--tint-1); }
+.cheat-search .ui-icon { width: 18px; height: 18px; color: var(--text-dim); flex-shrink: 0; }
+#cheatSearch {
+  flex: 1; min-width: 0; border: none; background: none; outline: none;
+  font-family: var(--font); font-size: 1rem; color: var(--text);
+  padding: .75rem 0;
+}
+.cheat-clear { background: none; border: none; cursor: pointer; color: var(--text-dim); padding: .3rem; }
+.cheat-clear .ui-icon { width: 16px; height: 16px; }
+.cheat-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.cheat-count { color: var(--text-dim); font-size: .88rem; font-weight: 600; margin-left: auto; }
+
+.cheat-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+  gap: 1.1rem; align-items: start;
+}
+.cheat-card { padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+.cheat-card[hidden] { display: none; }
+.cheat-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
+.cheat-card-head h3 { font-size: 1.02rem; letter-spacing: -.01em; }
+.cheat-cat {
+  font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--brand-1); background: var(--tint-1);
+  padding: .2rem .5rem; border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+}
+.cheat-blurb { color: var(--text-dim); font-size: .9rem; }
+.cheat-code, .cheat-out {
+  margin: 0; padding: .8rem .95rem; border-radius: 12px; overflow-x: auto;
+  font-family: var(--mono); font-size: .84rem; line-height: 1.55;
+  white-space: pre; tab-size: 4;
+}
+.cheat-code { background: #0d1322; color: #dbeafe; border: 1px solid #263049; }
+.cheat-out {
+  background: #080c16; color: #a7f3d0; border: 1px solid #1b2740;
+  position: relative;
+}
+.cheat-out::before {
+  content: 'output'; position: absolute; top: .35rem; right: .6rem;
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: #4b5b78;
+}
+.cheat-actions { display: flex; gap: .5rem; margin-top: auto; padding-top: .2rem; }
+.cheat-btn {
+  display: inline-flex; align-items: center; gap: .35rem;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--font); font-weight: 700; font-size: .8rem;
+  padding: .45rem .8rem; border-radius: 9px; cursor: pointer;
+  text-decoration: none !important;
+}
+.cheat-btn:hover { border-color: var(--brand-1); color: var(--brand-1); }
+.cheat-btn .ui-icon { width: 14px; height: 14px; }
+.cheat-empty { text-align: center; color: var(--text-dim); padding: 3rem 1rem; }
+
+@media (max-width: 640px) {
+  .cheat-controls { gap: .7rem; }
+  .cheat-count { margin-left: 0; }
+  .cheat-chips { overflow-x: auto; flex-wrap: nowrap; padding-bottom: .25rem; }
+  .cheat-chips .chip { flex: 0 0 auto; }
+  .cheat-card { padding: 1rem; }
+  .cheat-code, .cheat-out { font-size: .8rem; }
+}
+
+/* The playground hero is a space-between row; adding artwork to it pushed
+   the capability chips past the viewport at ~1280px. Let it wrap instead. */
+.playground-hero { flex-wrap: wrap; }
+.playground-hero > * { min-width: 0; }
+.playground-proof { flex-wrap: wrap; }
+.playground-art { width: 220px; }
+@media (max-width: 1180px) { .playground-art { display: none; } }
+
+@media (pointer: coarse) {
+  .cheat-btn { min-height: 42px; padding-inline: .95rem; }
+  #cheatSearch { font-size: 16px; }   /* 16px stops iOS zoom-on-focus */
+}
