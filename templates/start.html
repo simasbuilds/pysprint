@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Start here — learn Python from absolute zero | LearnWithPython{% endblock %}
+{% block description %}Never written a line of code? Start here. What Python actually is, what your first hour looks like, and how to begin — free, in your browser, no installing anything.{% endblock %}
+
+{% block content %}
+<section class="directory-hero start-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">Start here · no experience needed</span>
+    <h1>You have never coded. <span class="grad">Good.</span></h1>
+    <p>That is the easiest place to begin from — nothing to unlearn. This page explains
+       what Python is, what your first hour here looks like, and why we ask you to type
+       instead of watch. It takes three minutes to read.</p>
+    <div class="directory-actions">
+      <a href="#firstline" class="btn btn-primary btn-lg">Write your first line →</a>
+      <a href="{{ url_for('lesson', slug=first_course.slug, lesson_slug=first_lesson.slug) }}"
+         class="btn btn-ghost btn-lg">Skip to lesson 1</a>
+    </div>
+  </div>
+  <div class="arena-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/how-it-works.png') }}" alt="" width="1600" height="914">
+  </div>
+</section>
+
+<section class="section narrow">
+  <span class="eyebrow">First, the honest answers</span>
+  <h2 class="start-h2">Questions you are too polite to ask</h2>
+  <div class="faq-grid">
+    <div class="faq-card card">
+      <h3>{{ icon('info') }} What is Python, really?</h3>
+      <p>A way of writing instructions a computer will follow. You write a line like
+         <code>print("hello")</code>, the computer reads it top to bottom and does what it says.
+         That is the whole idea. Everything else is detail.</p>
+    </div>
+    <div class="faq-card card">
+      <h3>{{ icon('tools') }} Do I need to install anything?</h3>
+      <p>No. Real Python runs inside this page. There is no setup step to get stuck on —
+         which is where most people quit before they have written anything.</p>
+    </div>
+    <div class="faq-card card">
+      <h3>{{ icon('clock') }} How long until I can make something?</h3>
+      <p>About ten minutes for your first working program. A few hours for something you would
+         actually use — a budget report, a password checker, a file organiser.</p>
+    </div>
+    <div class="faq-card card">
+      <h3>{{ icon('warning') }} What if I break something?</h3>
+      <p>You cannot. The code runs in your browser, on your machine, touching nothing else.
+         Breaking things on purpose is one of the fastest ways to learn.</p>
+    </div>
+    <div class="faq-card card">
+      <h3>{{ icon('brain') }} I'm bad at maths.</h3>
+      <p>Mostly irrelevant. Programming is closer to writing clear instructions than to algebra.
+         If you can explain a recipe, you can do this.</p>
+    </div>
+    <div class="faq-card card">
+      <h3>{{ icon('lock') }} Do I need an account?</h3>
+      <p>Not to learn. Every lesson is open. An account only saves your progress and streak
+         so you can pick up where you stopped.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section narrow" id="firstline">
+  <span class="eyebrow">Now the fun part</span>
+  <h2 class="start-h2">Write a line of Python, right now</h2>
+  <p class="start-lede">Change <code>world</code> to your own name, then press Run. That is
+     genuinely all it takes — and it is real Python, not a simulation.</p>
+  <div class="card start-editor">
+    <div class="editor-chrome">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="editor-title">hello.py</span>
+    </div>
+    <textarea id="startCode" class="code-input" rows="3" spellcheck="false"
+              aria-label="Python code editor">name = "world"
+print(f"Hello, {name}!")</textarea>
+    <div class="editor-bar">
+      <button class="btn btn-run" id="startRun">{{ icon('play') }} Run Python</button>
+      <span class="editor-hint">Nothing installs. Nothing is sent anywhere.</span>
+    </div>
+    <pre id="startOut" class="code-output" aria-live="polite">Your output will appear here.</pre>
+    <div id="startWin" class="try-win" hidden>
+      <p>{{ icon('check') }} <strong>That was real Python.</strong> You just did the thing most
+         people never get past the install screen to try.</p>
+      <a class="btn btn-primary btn-sm"
+         href="{{ url_for('lesson', slug=first_course.slug, lesson_slug=first_lesson.slug) }}">
+        Start lesson 1 · {{ first_lesson.minutes }} min</a>
+    </div>
+  </div>
+</section>
+
+<section class="section narrow">
+  <span class="eyebrow">How we teach</span>
+  <h2 class="start-h2">Four things this site does differently</h2>
+  <p class="start-lede">Not opinions — these are the study methods with the strongest evidence
+     behind them, built into the pages so you do not have to organise anything yourself.</p>
+  <ol class="method-list">
+    <li class="method card">
+      <span class="method-num">1</span>
+      <div>
+        <h3>You type in every single lesson</h3>
+        <p><strong>Active recall.</strong> Reading code creates a feeling of understanding that
+           disappears the moment you face a blank editor. Every lesson ends with a challenge you
+           have to actually write, and it is checked instantly against the expected output.</p>
+      </div>
+    </li>
+    <li class="method card">
+      <span class="method-num">2</span>
+      <div>
+        <h3>You guess before you run</h3>
+        <p><strong>Prediction.</strong> Each lesson asks what you think the code will print before
+           you press Run. Being wrong is the point — a surprise is what makes the correction stick.</p>
+      </div>
+    </li>
+    <li class="method card">
+      <span class="method-num">3</span>
+      <div>
+        <h3>Concepts come back on a schedule</h3>
+        <p><strong>Spaced repetition.</strong> Everything you learn becomes a flashcard in
+           <a href="{{ url_for('review') }}">Smart Review</a>, resurfacing just before you would
+           have forgotten it. Cards you find hard return sooner.</p>
+      </div>
+    </li>
+    <li class="method card">
+      <span class="method-num">4</span>
+      <div>
+        <h3>You build things that do a job</h3>
+        <p><strong>Project-based learning.</strong> {{ n_projects }} guided builds — a budget
+           analyser, a password auditor, a log analyser — each explained as a real system first,
+           then constructed step by graded step.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section class="section narrow">
+  <span class="eyebrow">Your first week</span>
+  <h2 class="start-h2">What to actually do</h2>
+  <ol class="week-plan">
+    <li class="card"><b>Today</b><span>Lesson 1. Ten minutes. Print something, change it, break it.</span></li>
+    <li class="card"><b>This week</b><span>Finish {{ first_course.title }} — {{ first_course.lessons|length }} lessons, about {{ first_course.lessons|sum(attribute='minutes') }} minutes total.</span></li>
+    <li class="card"><b>Next</b><span>Your first real build, then five minutes of review a day to keep it.</span></li>
+  </ol>
+  <div class="start-final">
+    <a href="{{ url_for('lesson', slug=first_course.slug, lesson_slug=first_lesson.slug) }}"
+       class="btn btn-primary btn-lg">Begin: {{ first_lesson.title }} →</a>
+    <span class="muted">No account needed. Nothing to install.</span>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+<script>
+/* A graded first win: we check the learner actually edited the name before
+   congratulating them, so the moment is earned rather than automatic. */
+(function () {
+  var btn = document.getElementById('startRun'),
+      code = document.getElementById('startCode'),
+      out = document.getElementById('startOut'),
+      win = document.getElementById('startWin'),
+      solved = false;
+  if (!btn || !code || !out) return;
+  if (window.PyRunner && PyRunner.enableEditor) PyRunner.enableEditor(code);
+
+  btn.addEventListener('click', async function () {
+    btn.disabled = true;
+    var label = btn.innerHTML;
+    btn.textContent = 'Running…';
+    var res = await PyRunner.run(code.value);
+    out.textContent = res.output;
+    out.classList.toggle('error', !res.ok);
+    btn.disabled = false;
+    btn.innerHTML = label;
+    if (!res.ok || solved) return;
+    var m = /^Hello,\s*(.+?)!\s*$/.exec(res.output.trim());
+    if (m && m[1].toLowerCase() !== 'world') { solved = true; win.hidden = false; }
+  });
+})();
+</script>
+{% endblock %}

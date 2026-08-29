@@ -364,6 +364,23 @@ def about():
                            n_challenges=len(CHALLENGES))
 
 
+@app.get("/start")
+def start():
+    """Onboarding for someone who has never written a line of code.
+
+    The rest of the site assumes you know what a lesson or a challenge is.
+    This page assumes nothing: it explains what Python is, what an hour
+    here actually looks like, and why the site is built the way it is —
+    then hands over to lesson one.
+    """
+    first = COURSES[0]
+    return render_template("start.html",
+                           first_course=first,
+                           first_lesson=first["lessons"][0],
+                           beginner_courses=[c for c in COURSES
+                                             if c["level"] == "Beginner"][:3])
+
+
 # ── auth ─────────────────────────────────────────────────────────────
 
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,24}$")
@@ -655,8 +672,8 @@ def admin_member(uid):
 def sitemap():
     base = app.config["SITE_URL"].rstrip("/")
     today = date.today().isoformat()
-    urls = [("", "1.0"), ("/courses", "0.9"), ("/projects", "0.9"),
-            ("/challenges", "0.8"),
+    urls = [("", "1.0"), ("/start", "0.9"), ("/courses", "0.9"),
+            ("/projects", "0.9"), ("/challenges", "0.8"),
             ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5")]
     for p in PROJECTS:
         urls.append((f"/projects/{p['slug']}", "0.7"))

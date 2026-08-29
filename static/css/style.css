@@ -3619,3 +3619,94 @@ body.cmdk-open { overflow: hidden; }
 @media (max-width: 1024px) {
   .lesson-layout { grid-template-columns: minmax(0, 1fr); max-width: 900px; }
 }
+
+/* ── generated artwork placements ─────────────────────────────────── */
+.auth-art {
+  display: block; width: 100%; max-width: 380px; margin-top: 1.6rem;
+  border-radius: 18px; border: 1px solid var(--border);
+}
+@media (max-width: 900px) { .auth-art { display: none; } }
+
+/* An atmospheric wash behind the closing call to action — damped and
+   blurred so white text still reads cleanly on top. */
+.cta-band {
+  position: relative; overflow: hidden; isolation: isolate;
+}
+.cta-band::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background-image: url('/static/images/mesh-bg.jpg');
+  background-size: cover; background-position: center;
+  opacity: .5;
+}
+
+/* ═══════════ /start — onboarding for absolute beginners ════════════ */
+.start-h2 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); letter-spacing: -.03em; margin: .3rem 0 .6rem; }
+.start-lede { color: var(--text-dim); max-width: 60ch; margin-bottom: 1.6rem; }
+
+.faq-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 1rem; margin-top: 1.5rem;
+}
+.faq-card { padding: 1.4rem; }
+.faq-card h3 {
+  display: flex; align-items: center; gap: .55rem;
+  font-size: 1.02rem; margin-bottom: .5rem;
+}
+.faq-card h3 .ui-icon { width: 20px; height: 20px; color: var(--brand-1); flex-shrink: 0; }
+.faq-card p { color: var(--text-dim); font-size: .94rem; }
+
+.start-editor { overflow: hidden; margin-top: 1rem; }
+.start-editor .editor-chrome { border-radius: var(--radius) var(--radius) 0 0; }
+.start-editor .code-output { border-radius: 0 0 var(--radius) var(--radius); }
+.start-editor:has(.try-win:not([hidden])) .code-output { border-radius: 0; }
+
+.method-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+.method { display: flex; gap: 1.1rem; padding: 1.5rem; align-items: flex-start; }
+.method-num {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 900;
+  background: var(--tint-1); color: var(--brand-1);
+}
+.method h3 { font-size: 1.08rem; margin-bottom: .4rem; }
+.method p { color: var(--text-dim); font-size: .95rem; }
+.method strong { color: var(--text); }
+
+.week-plan { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 1rem; margin-top: 1.4rem; }
+.week-plan li { padding: 1.3rem; display: flex; flex-direction: column; gap: .4rem; }
+.week-plan b {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-1);
+}
+.week-plan span { color: var(--text-dim); font-size: .93rem; }
+.start-final { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+
+/* the zero-experience door on the home hero */
+.hero-beginner {
+  display: flex; align-items: center; gap: .85rem;
+  max-width: 560px; margin-top: 1.1rem; padding: .95rem 1.1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--brand-1); border-radius: 14px;
+  color: var(--text); font-size: .92rem; line-height: 1.45;
+  transition: transform .16s, box-shadow .16s, border-color .16s;
+}
+.hero-beginner:hover {
+  text-decoration: none; transform: translateY(-2px);
+  box-shadow: var(--shadow); border-color: var(--brand-1);
+}
+.hero-beginner .ui-icon { width: 26px; height: 26px; color: var(--brand-1); flex-shrink: 0; }
+.hero-beginner span { flex: 1; color: var(--text-dim); }
+.hero-beginner b { color: var(--text); }
+.hero-beginner-go { color: var(--brand-1); font-size: 1.1rem; transition: transform .16s; }
+.hero-beginner:hover .hero-beginner-go { transform: translateX(4px); }
+@media (max-width: 640px) { .hero-beginner { font-size: .88rem; padding: .85rem .9rem; } }
+
+.playground-art {
+  width: 260px; height: auto; border-radius: 16px;
+  border: 1px solid var(--border); flex-shrink: 0; align-self: center;
+}
+.dashboard-head { display: flex; align-items: center; gap: 2rem; justify-content: space-between; }
+.dash-head-copy { min-width: 0; }
+.dash-art {
+  width: 300px; height: auto; border-radius: 18px;
+  border: 1px solid var(--border); flex-shrink: 0;
+}
+@media (max-width: 900px) { .playground-art, .dash-art { display: none; } }

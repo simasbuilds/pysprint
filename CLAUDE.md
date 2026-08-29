@@ -98,6 +98,28 @@ capturing stdout, so the two cannot drift. Re-run the verification snippet
 below over lessons, `data/challenges.py` and every step in
 `data/projects.py` after touching content.
 
+## Generated artwork
+
+`static/images/*.png` feature art is generated (Recraft via Higgsfield) and
+then colour-matched in post to the navy the hand-made pieces already use,
+`#07152f` — the model will not hit an exact background, and mismatched
+navies read as sloppy when two panels sit near each other. The recipe:
+composite a flat navy over the image through a mask built from luminance
+(`255 - v*6`), which repaints the dark field and leaves tiles and glow
+edges untouched. `mesh-bg.jpg` is blurred and damped before use so white
+text stays readable on top of it.
+
+## /start
+
+Onboarding for someone who has never written code. The rest of the site
+assumes you know what a lesson or a challenge is; `/start` assumes nothing.
+It carries a graded first-line editor that checks the learner actually
+edited the code before congratulating them, and names the four study
+methods the product is built on (active recall, prediction, spaced
+repetition, project-based). It is the first entry in the Learn menu and a
+top-level nav item, because the visitor with the least context needs the
+clearest door.
+
 ## Touch targets
 
 Controls are sized by input device, not viewport (`@media (pointer:

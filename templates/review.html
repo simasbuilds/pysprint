@@ -9,13 +9,22 @@
 {% endblock %}
 
 {% block content %}
-<section class="page-head review-head">
-  <span class="eyebrow">Five minutes a day</span>
-  <h1>Smart Review {{ icon('brain', 'heading-icon') }}</h1>
-  <p>Every quiz concept on LearnWithPython, turned into flashcards and scheduled with <strong>spaced repetition</strong> — cards you find hard come back sooner, cards you know come back later. Five minutes a day keeps everything fresh.</p>
+<section class="directory-hero review-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">Five minutes a day</span>
+    <h1>Remember what you <span class="grad">learned.</span></h1>
+    <p>Every concept you meet in a lesson becomes a flashcard, scheduled by <strong>spaced repetition</strong> — hard cards come back sooner, easy ones later. It is the difference between having read Python and knowing it.</p>
+    <div class="directory-actions">
+      <a href="#reviewDeck" class="btn btn-primary btn-lg">Start today's review →</a>
+      <a href="{{ url_for('courses') }}" class="btn btn-ghost btn-lg">Back to lessons</a>
+    </div>
+  </div>
+  <div class="arena-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/smart-review.png') }}" alt="" width="1600" height="914">
+  </div>
 </section>
 
-<section class="section narrow">
+<section class="section narrow" id="reviewDeck">
   <div class="review-stats card" id="reviewStats">
     <div><strong id="statDue">0</strong><span>Due now</span></div>
     <div><strong id="statNew">0</strong><span>New</span></div>

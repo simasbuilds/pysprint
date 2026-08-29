@@ -209,6 +209,9 @@
   // ── public: simple runner (hero, examples) ─────────────────────────
   const PyRunner = {
     run: run,
+    // Tab-to-indent and Cmd/Ctrl+Enter for editors wired by hand, where the
+    // page grades the result itself instead of using wireSimple.
+    enableEditor: enableTabKey,
     wireSimple(runId, codeId, outId) {
       const btn = document.getElementById(runId);
       const code = document.getElementById(codeId);

@@ -6,9 +6,13 @@
 
 {% block content %}
 <section class="page-head dashboard-head">
-  <span class="eyebrow">Learning command center</span>
-  <h1>Welcome back, {{ user.username }}.</h1>
-  <p>Level {{ level.level }} — <strong>{{ level.title }}</strong>. {{ level.needed - level.into }} XP to the next level.</p>
+  <div class="dash-head-copy">
+    <span class="eyebrow">Learning command center</span>
+    <h1>Welcome back, {{ user.username }}.</h1>
+    <p>Level {{ level.level }} — <strong>{{ level.title }}</strong>. {{ level.needed - level.into }} XP to the next level.</p>
+  </div>
+  <img class="dash-art" src="{{ url_for('static', filename='images/dashboard-visual.png') }}"
+       alt="" width="1600" height="914" loading="lazy">
 </section>
 
 <section class="section">

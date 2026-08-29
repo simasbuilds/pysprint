@@ -9,13 +9,18 @@
 {% endblock %}
 
 {% block content %}
-<section class="page-head about-head">
-  <span class="eyebrow">Why LearnWithPython exists</span>
-  <h1>Python is learned at the keyboard.</h1>
-  <p>LearnWithPython turns that principle into a complete, free learning system: understand a concept, run it immediately, build with it, then review it before it fades.</p>
-  <div class="page-head-actions">
-    <a class="btn btn-primary" href="{{ url_for('courses') }}">Explore the learning path →</a>
-    <a class="btn btn-ghost" href="{{ url_for('playground') }}">Try the playground</a>
+<section class="directory-hero about-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">Why LearnWithPython exists</span>
+    <h1>Python is learned at the <span class="grad">keyboard.</span></h1>
+    <p>Reading about code feels like progress and rarely is. This site turns the opposite principle into a system: meet a concept, run it immediately, build something with it, then review it before it fades.</p>
+    <div class="directory-actions">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('courses') }}">Explore the learning path →</a>
+      <a class="btn btn-ghost btn-lg" href="{{ url_for('playground') }}">Try the playground</a>
+    </div>
+  </div>
+  <div class="arena-visual" aria-hidden="true">
+    <img src="{{ url_for('static', filename='images/how-it-works.png') }}" alt="" width="1600" height="914">
   </div>
 </section>
 

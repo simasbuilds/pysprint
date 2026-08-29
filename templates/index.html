@@ -51,6 +51,13 @@
         <span>{{ icon('check') }} Try every lesson without an account</span>
         <span>{{ icon('lock') }} Code stays on your device</span>
       </div>
+      {# The visitor with the least context needs the clearest door. #}
+      <a class="hero-beginner stagger d4" href="{{ url_for('start') }}">
+        {{ icon('graduation') }}
+        <span><b>Never written code before?</b> Start from absolute zero — what Python is,
+          what your first hour looks like, and a line you run yourself.</span>
+        <b class="hero-beginner-go">→</b>
+      </a>
       {% endif %}
       <div id="resumeSlot" class="resume-slot stagger d4" hidden></div>
       {% if me %}
@@ -140,7 +147,7 @@ for i in range(3):
       <span class="eyebrow">A route you can trust</span>
       <h2>A complete path, <span class="grad">beginner to expert</span></h2>
       <p>{{ n_courses }} courses build on one another. Start with zero experience and finish by designing APIs, automating real work, and writing the generators, decorators and dataclasses that professionals write.</p>
-      <div class="path-checks"><span>{{ icon('check') }} {{ n_lessons }} focused lessons</span><span>{{ icon('check') }} 5 portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
+      <div class="path-checks"><span>{{ icon('check') }} {{ n_lessons }} focused lessons</span><span>{{ icon('check') }} {{ n_projects }} portfolio projects</span><span>{{ icon('check') }} Real-world context throughout</span></div>
       <a href="{{ url_for('courses') }}" class="text-cta">Explore the curriculum <span>→</span></a>
     </div>
   </div>
