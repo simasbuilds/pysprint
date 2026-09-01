@@ -30,9 +30,8 @@
         {% else %}You've finished every lesson. Sharpen it in the arena, or revisit anything in Smart Review.{% endif %}
       </p>
       {% else %}
-      <span class="pill stagger d1">{{ n_lessons }} lessons · {{ n_projects }} projects · nothing to install</span>
-      <h1 class="stagger d2">Learn Python by <span class="grad">writing it</span>—not watching it.</h1>
-      <p class="hero-sub stagger d3">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
+      <h1 class="stagger d1">Learn Python by <span class="grad">writing it</span>—not watching it.</h1>
+      <p class="hero-sub stagger d2">Go from your first line to useful APIs, data tools, and automations through {{ n_lessons }} focused lessons—each with real Python running directly in your browser.</p>
       {% endif %}
       <div class="hero-cta stagger d4">
         {% if me and me.resume %}

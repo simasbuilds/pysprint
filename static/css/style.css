@@ -3016,11 +3016,13 @@ body.cmdk-open { overflow: hidden; }
   .save-nudge-actions .btn { flex: 1; justify-content: center; }
 }
 
-/* ═══════════ v15: close the 761–900px nav gap (h-overflow fix) ══════ */
-/* The desktop nav stops fitting around 900px but only collapsed at 760px,
-   which pushed .nav-right past the viewport and caused horizontal scroll
-   on small tablets. Collapse to the burger for that range too. */
-@media (min-width: 761px) and (max-width: 900px) {
+/* ═══════════ close the 761–1000px nav gap (h-overflow fix) ══════════ */
+/* The horizontal bar stops fitting around 1000px but only collapsed at
+   760px, leaving a band where it overflowed the viewport. An earlier pass
+   set this bound to 900px, which was still short: at 901px the page
+   scrolled 48px sideways. Measured across widths, 1000px is where the bar
+   genuinely fits, so the drawer holds until then. */
+@media (min-width: 761px) and (max-width: 1000px) {
   .nav-links {
     position: absolute; display: none; top: 100%; left: 0; right: 0; bottom: auto;
     width: 100%; height: auto; max-height: calc(100dvh - 99px); padding: 1.1rem;
@@ -3976,4 +3978,70 @@ body.cmdk-open { overflow: hidden; }
 .avatar-tag {
   font-size: .58rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
   color: var(--text-dim); line-height: 1;
+}
+
+/* ── Header hierarchy ──────────────────────────────────────────────────
+   Five identically-weighted text links gave a visitor no way to tell the
+   two section entrances from the three flat pages, so everything read as
+   equally important — which is the same as nothing being important. The
+   bar now resolves into two groups: the mega-menu triggers carry their
+   icon and full ink, the flat pages sit quieter behind a hairline rule.
+   Scoped to >=901px: the drawer runs all the way to 900px (see the
+   min-width:761/max-width:1000 block above), not 760 as the icon rule
+   beside it assumed, so anything lower leaks a vertical hairline and
+   shrunken link text into the drawer. */
+@media (min-width: 1001px) {
+  .nav-links { align-items: center; gap: .15rem; }
+
+  /* Primary — the two doors into the product */
+  .nav-menu-trigger { color: var(--text); font-weight: 700; }
+  .nav-menu-trigger .nav-lead { gap: .5rem; }
+  .nav-menu-trigger .ui-icon {
+    display: block; width: 18px; height: 18px; flex-shrink: 0;
+    color: var(--text-dim); transition: color .15s;
+  }
+  .nav-menu-trigger:hover .ui-icon,
+  .nav-menu-trigger.active .ui-icon,
+  .nav-menu-trigger[aria-expanded="true"] .ui-icon { color: var(--brand-1); }
+  /* the chevron is an affordance, not content — let it recede */
+  .nav-menu-trigger > span[aria-hidden] { font-size: .72em; opacity: .5; }
+
+  /* Secondary — flat pages, one step quieter than the menus */
+  .nav-links > a { font-weight: 600; font-size: .875rem; color: var(--text-dim); }
+  .nav-links > a:hover { color: var(--text); }
+
+  /* Hairline where the section menus end and the flat pages begin */
+  .nav-links > a.nav-start { margin-left: .5rem; padding-left: 1rem; position: relative; }
+  .nav-links > a.nav-start::before {
+    content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 18px; background: var(--border);
+  }
+
+  /* Where you are, unmistakably — colour carries it, not weight */
+  .nav-links > a.active, .nav-menu-trigger.active {
+    color: var(--brand-1); background: var(--tint-1);
+  }
+}
+
+/* The drawer spans two media blocks (<=760 and 761-1000) but only the first
+   turned its icons on, so the upper band rendered the same drawer as bare
+   text. The upper bound was 900px, but the horizontal bar does not actually
+   fit until ~1000px -- at 901px it overflowed the viewport by 48px even
+   before the icons were added -- so the drawer now holds until it does. */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .nav-lead .ui-icon {
+    display: block; width: 20px; height: 20px;
+    color: var(--text-dim); flex-shrink: 0;
+  }
+  .nav-links > a.active .nav-lead .ui-icon,
+  .nav-menu-trigger.active .nav-lead .ui-icon { color: var(--brand-1); }
+}
+
+/* Just above the drawer the bar fits, but only barely -- at 1001px it still
+   ran 5px past the viewport. Tighten the horizontal padding through that
+   band rather than hand another 100px of width back to the drawer. */
+@media (min-width: 1001px) and (max-width: 1100px) {
+  .nav-links > a, .nav-menu-trigger { padding-inline: .58rem; }
+  .nav-links > a.nav-start { margin-left: .3rem; padding-left: .72rem; }
+  .nav-inner { gap: .5rem; }
 }
