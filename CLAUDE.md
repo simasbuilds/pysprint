@@ -140,6 +140,24 @@ repetition, project-based). It is the first entry in the Learn menu and a
 top-level nav item, because the visitor with the least context needs the
 clearest door.
 
+## Connecting to Supabase
+
+Use the **session pooler**, not the direct host. `db.<ref>.supabase.co` is
+IPv6-only and refuses connections on free projects; the pooler answers over
+IPv4:
+
+    DATABASE_URL=postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres
+
+Note the username is `postgres.<project_ref>`, not `postgres` — the pooler
+routes on it, and a wrong region fails with `(ENOTFOUND) tenant/user not
+found`. If the dashboard is not to hand, the region can be derived by
+resolving the direct host's AAAA record and matching it against
+`https://ip-ranges.amazonaws.com/ip-ranges.json`.
+
+`init_db()` runs at import, so an unreachable database stops the app
+booting at all rather than degrading — worth remembering when a deploy
+suddenly 500s.
+
 ## Touch targets
 
 Controls are sized by input device, not viewport (`@media (pointer:
