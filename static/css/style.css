@@ -2340,17 +2340,13 @@ body {
   background: radial-gradient(circle, color-mix(in srgb, var(--brand-2) 10%, transparent), transparent 68%);
   filter: blur(16px);
 }
+/* The gradient already carries the emphasis. A rule under it was drawn from
+   the span's first inline fragment, so it struck through the following line
+   at desktop widths (line-height is .98, so line boxes overlap) and collapsed
+   to nothing wherever "writing it" wrapped. */
 .hero h1 .grad {
-  position: relative; display: inline;
   background-image: linear-gradient(100deg, #2563eb 0%, #1688bc 52%, #0f9f8f 100%);
 }
-.hero h1 .grad::after {
-  content: ''; position: absolute; left: 3%; right: 2%; bottom: -.05em; height: .08em;
-  background: linear-gradient(90deg, #2563eb, #2dd4bf); border-radius: 99px;
-  transform: scaleX(0); transform-origin: left; opacity: .55;
-  animation: heroUnderline 1s .9s cubic-bezier(.16, 1, .3, 1) forwards;
-}
-@keyframes heroUnderline { to { transform: scaleX(1); } }
 .hero-cta .btn-primary { position: relative; }
 .hero-cta .btn-primary span, .hero-cta .btn-primary::marker { transition: transform .2s; }
 .hero-cta .btn-primary:hover { transform: translateY(-3px); }
@@ -2492,7 +2488,6 @@ body {
 
 @media (max-width: 760px) {
   .hero-copy::before { width: 240px; height: 240px; left: -100px; }
-  .hero h1 .grad::after { display: none; }
   .hero-media { height: 310px; min-height: 310px; border-radius: 20px; }
   .hero-media > img { min-height: 0; height: 100%; object-position: 61% center; }
   .hero-media .visual-label { display: none; }
@@ -2508,10 +2503,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-grid, .hero h1 .grad::after, .hero-scan, .flow-signal, .flow-node,
+  .hero-grid, .hero-scan, .flow-signal, .flow-node,
   .hero-capabilities span, .hero-console, .hero-console .editor-live i,
   .hero-console .btn-run::before { animation: none !important; }
-  .hero h1 .grad::after { transform: scaleX(1); }
   .hero-media, .hero-media > img, .hero-console { transform: none !important; transition: none !important; }
 }
 
