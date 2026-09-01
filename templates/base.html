@@ -150,6 +150,7 @@
           </div>
         </div>
         <a href="{{ url_for('start') }}" class="nav-start{% if request.path == '/start' %} active{% endif %}"><span class="nav-lead">{{ icon('graduation') }}Start here</span></a>
+        <a href="{{ url_for('cheatsheet') }}" {% if request.path == '/cheatsheet' %}class="active"{% endif %}><span class="nav-lead">{{ icon('note') }}Cheatsheet</span></a>
         <a href="{{ url_for('about') }}" {% if request.path == '/about' %}class="active"{% endif %}><span class="nav-lead">{{ icon('info') }}How it works</span></a>
         {% if user %}
           <a href="{{ url_for('dashboard') }}" {% if request.path == '/dashboard' %}class="active"{% endif %}><span class="nav-lead">{{ icon('chart') }}Dashboard</span></a>
@@ -175,7 +176,43 @@
             <span class="nav-xp">{{ icon('bolt') }} {{ user.xp }} XP</span>
             <span class="nav-streak">{{ icon('flame') }} {{ user.streak }}</span>
           </div>
-          <a class="btn btn-ghost btn-sm" href="{{ url_for('logout') }}">Log out</a>
+          <div class="account-wrap">
+            <button class="account-btn" id="accountBtn" aria-haspopup="menu"
+                    aria-expanded="false" aria-controls="accountMenu"
+                    aria-label="Account menu for {{ user.username }}">
+              <span class="account-avatar">
+                {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="" width="32" height="32">
+                {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
+              </span>
+              <span aria-hidden="true" class="account-caret">⌄</span>
+            </button>
+            <div class="account-menu" id="accountMenu" role="menu" hidden>
+              <div class="account-id">
+                <span class="account-avatar lg">
+                  {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="" width="44" height="44">
+                  {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
+                </span>
+                <span class="account-id-text">
+                  <strong>{{ user.username }}</strong>
+                  <small>{{ user.email }}</small>
+                </span>
+              </div>
+              <div class="account-meta">
+                <span>{{ icon('bolt') }} {{ user.xp }} XP</span>
+                <span>{{ icon('flame') }} {{ user.streak }}</span>
+                <span>{{ icon('trophy') }} Lv {{ level.level }}</span>
+              </div>
+              <a role="menuitem" href="{{ url_for('dashboard') }}">{{ icon('chart') }} Dashboard</a>
+              <a role="menuitem" href="{{ url_for('profile') }}">{{ icon('note') }} Profile &amp; settings</a>
+              <a role="menuitem" href="{{ url_for('review') }}">{{ icon('brain') }} Smart Review</a>
+              {% if user.is_admin %}
+              <a role="menuitem" href="{{ url_for('admin') }}">{{ icon('shield') }} Admin</a>
+              {% endif %}
+              <div class="account-sep"></div>
+              <a role="menuitem" href="{{ url_for('terms') }}">{{ icon('info') }} Terms &amp; privacy</a>
+              <a role="menuitem" class="account-logout" href="{{ url_for('logout') }}">{{ icon('lock') }} Log out</a>
+            </div>
+          </div>
         {% else %}
           <a class="btn btn-ghost btn-sm" href="{{ url_for('login') }}">Log in</a>
           <a class="btn btn-primary btn-sm nav-cta" href="{{ url_for('register') }}">Start learning <span aria-hidden="true">→</span></a>
@@ -231,6 +268,8 @@
         <h4>Platform</h4>
         <a href="{{ url_for('start') }}">Start here</a>
         <a href="{{ url_for('cheatsheet') }}">Cheatsheet</a>
+        <a href="{{ url_for('terms') }}">Terms of use</a>
+        <a href="{{ url_for('privacy') }}">Privacy policy</a>
         <a href="{{ url_for('about') }}">About</a>
         {% if user %}<a href="{{ url_for('dashboard') }}">Dashboard</a>
         {% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}

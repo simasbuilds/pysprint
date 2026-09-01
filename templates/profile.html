@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Your profile — LearnWithPython{% endblock %}
+{% block description %}Manage your LearnWithPython profile: change your display name, pick an avatar, export your data or delete your account.{% endblock %}
+
+{% block content %}
+<section class="page-head profile-head">
+  <span class="eyebrow">Your account</span>
+  <h1>Profile</h1>
+  <p>Change how you appear, take a copy of your data, or close the account entirely.</p>
+</section>
+
+<section class="section narrow profile-wrap">
+
+  {% if saved %}<p class="form-ok" role="status">{{ icon('check') }} {{ saved }}</p>{% endif %}
+  {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+  <div class="profile-summary card">
+    <span class="profile-avatar-lg">
+      {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="" width="96" height="96">
+      {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
+    </span>
+    <div class="profile-summary-body">
+      <h2>{{ user.username }}</h2>
+      <p class="muted">{{ user.email }}</p>
+      <div class="profile-facts">
+        <span>{{ icon('bolt') }} {{ user.xp }} XP</span>
+        <span>{{ icon('flame') }} {{ user.streak }}-day streak</span>
+        <span>{{ icon('trophy') }} Level {{ level.level }} · {{ level.title }}</span>
+        <span>{{ icon('star') }} {{ earned }} achievements</span>
+      </div>
+      <p class="profile-since muted">
+        {% if user.google_sub %}Signed in with Google{% else %}Email and password account{% endif %}
+        · joined {{ user.created_at[:10] }}
+      </p>
+    </div>
+  </div>
+
+  <form class="card profile-card" method="post">
+    <h2>{{ icon('note') }} Display name</h2>
+    <p class="muted">This is the name shown on the leaderboard.</p>
+    <label>Username
+      <input type="text" name="username" value="{{ user.username }}" required
+             minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]+"
+             aria-describedby="nameHelp">
+    </label>
+    <p class="field-help" id="nameHelp">3–24 characters. Letters, numbers and underscores.</p>
+
+    <h2 class="profile-h2">{{ icon('spark') }} Avatar</h2>
+    <p class="muted">Pick one, or use your initial.</p>
+    <div class="avatar-grid" role="radiogroup" aria-label="Choose an avatar">
+      <label class="avatar-opt">
+        <input type="radio" name="avatar" value="none"
+               {% if not user.avatar_url %}checked{% endif %}>
+        <span class="avatar-swatch avatar-initial"><b>{{ user.username[0]|upper }}</b></span>
+        <span class="sr-only">No avatar, use my initial</span>
+      </label>
+      {% for a in avatars %}
+      <label class="avatar-opt">
+        <input type="radio" name="avatar" value="{{ a.key }}"
+               {% if user.avatar_url == a.url %}checked{% endif %}>
+        <img class="avatar-swatch" src="{{ a.url }}" alt="{{ a.key }}" width="72" height="72" loading="lazy">
+      </label>
+      {% endfor %}
+    </div>
+
+    <button class="btn btn-primary btn-lg" type="submit">Save changes</button>
+  </form>
+
+  <div class="card profile-card">
+    <h2>{{ icon('folder') }} Your data</h2>
+    <p class="muted">Download everything we hold about you — account details, every lesson,
+       challenge and achievement — as a JSON file.</p>
+    <a class="btn btn-ghost" href="{{ url_for('profile_export') }}">Download my data</a>
+  </div>
+
+  <div class="card profile-card danger-zone">
+    <h2>{{ icon('warning') }} Delete this account</h2>
+    <p>This erases your account, XP, streak, lesson and challenge progress, and every
+       achievement. <strong>It cannot be undone</strong> and we keep no backup copy of it.</p>
+    {% if request.args.get('delete_error') == 'name' %}
+      <p class="form-error" role="alert">The username didn't match, so nothing was deleted.</p>
+    {% elif request.args.get('delete_error') == 'password' %}
+      <p class="form-error" role="alert">That password was wrong, so nothing was deleted.</p>
+    {% endif %}
+    <details class="danger-details">
+      <summary>I want to delete my account</summary>
+      <form method="post" action="{{ url_for('profile_delete') }}" class="danger-form">
+        <label>Type <code>{{ user.username }}</code> to confirm
+          <input type="text" name="confirm_username" autocomplete="off" required
+                 placeholder="{{ user.username }}">
+        </label>
+        {% if not user.google_sub %}
+        <label>Your password
+          <span class="pw-field">
+            <input type="password" name="password" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+          </span>
+        </label>
+        {% endif %}
+        <button class="btn btn-danger" type="submit">Permanently delete my account</button>
+      </form>
+    </details>
+  </div>
+
+  <p class="profile-legal muted">
+    By using LearnWithPython you agree to our
+    <a href="{{ url_for('terms') }}">Terms</a> and
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>.
+  </p>
+</section>
+{% endblock %}

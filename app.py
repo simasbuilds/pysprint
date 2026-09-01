@@ -4,13 +4,14 @@ Flask backend: pages, auth, progress API, achievements, SEO routes.
 Run:  python app.py   (then open http://127.0.0.1:5000)
 """
 
+import json
 import os
 import re
 from datetime import date, datetime, timezone
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import (Flask, abort, jsonify, redirect, render_template, request,
+from flask import (Flask, Response, abort, jsonify, redirect, render_template, request,
                    session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -522,6 +523,92 @@ def google_callback():
     return redirect(session.pop("oauth_next", None) or url_for("dashboard"))
 
 
+AVATARS = ["bolt", "cat", "flame", "fox", "leaf", "moon",
+           "owl", "plane", "rocket", "summit", "terminal", "whale"]
+
+
+def avatar_choices():
+    return [{"key": a, "url": url_for("static", filename=f"images/avatars/{a}.png")}
+            for a in AVATARS]
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    user = current_user()
+    error = saved = None
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        avatar = request.form.get("avatar", "").strip()
+
+        if not USERNAME_RE.match(username):
+            error = "Username must be 3–24 characters: letters, numbers, underscores."
+        elif db.username_taken(username, exclude_user_id=user["id"]):
+            error = "That username is already taken."
+        else:
+            avatar_url = None
+            if avatar == "none":
+                avatar_url = ""
+            elif avatar in AVATARS:
+                avatar_url = url_for("static", filename=f"images/avatars/{avatar}.png")
+            db.update_profile(user["id"], username=username, avatar_url=avatar_url)
+            user = db.get_user(user["id"])
+            saved = "Profile updated."
+
+    stats = user_stats(user)
+    return render_template("profile.html", error=error, saved=saved,
+                           stats=stats, avatars=avatar_choices(),
+                           level=level_info(user["xp"]),
+                           earned=len(db.get_earned_achievements(user["id"])))
+
+
+@app.get("/profile/export")
+@login_required
+def profile_export():
+    """Download everything we hold about you, as JSON."""
+    data = db.export_user(current_user()["id"])
+    if not data:
+        abort(404)
+    payload = json.dumps(data, indent=2, default=str)
+    return Response(
+        payload, mimetype="application/json",
+        headers={"Content-Disposition":
+                 'attachment; filename="learnwithpython-my-data.json"'})
+
+
+@app.post("/profile/delete")
+@login_required
+def profile_delete():
+    """Permanently delete the signed-in account.
+
+    Requires the person to type their username, so a stray click cannot do
+    it. Password accounts must also confirm their password — without that,
+    anyone with a borrowed unlocked laptop could erase the account.
+    """
+    user = current_user()
+    typed = request.form.get("confirm_username", "").strip()
+    password = request.form.get("password", "")
+
+    if typed.lower() != user["username"].lower():
+        return redirect(url_for("profile", delete_error="name"))
+    if user["password_hash"] and not check_password_hash(user["password_hash"], password):
+        return redirect(url_for("profile", delete_error="password"))
+
+    db.delete_user(user["id"])
+    session.clear()
+    return redirect(url_for("home", deleted="1"))
+
+
+@app.get("/terms")
+def terms():
+    return render_template("legal.html", doc="terms")
+
+
+@app.get("/privacy")
+def privacy():
+    return render_template("legal.html", doc="privacy")
+
+
 # ── progress API ─────────────────────────────────────────────────────
 
 @app.post("/api/complete-lesson")
@@ -705,7 +792,8 @@ def sitemap():
     urls = [("", "1.0"), ("/start", "0.9"), ("/cheatsheet", "0.8"),
             ("/courses", "0.9"),
             ("/projects", "0.9"), ("/challenges", "0.8"),
-            ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5")]
+            ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5"),
+            ("/terms", "0.3"), ("/privacy", "0.3")]
     for p in PROJECTS:
         urls.append((f"/projects/{p['slug']}", "0.7"))
     for c in COURSES:

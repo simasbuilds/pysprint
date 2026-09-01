@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% set is_terms = doc == 'terms' %}
+{% block title %}{{ 'Terms of Use' if is_terms else 'Privacy Policy' }} — LearnWithPython{% endblock %}
+{% block description %}{{ 'The terms you agree to when using LearnWithPython.' if is_terms else 'What data LearnWithPython collects, why, and how to remove it.' }}{% endblock %}
+
+{% block content %}
+<section class="page-head legal-head">
+  <span class="eyebrow">Legal</span>
+  <h1>{{ 'Terms of Use' if is_terms else 'Privacy Policy' }}</h1>
+  <p>Last updated {{ now_year }}. Written to be read — if anything here is unclear, ask and we'll fix the wording.</p>
+  <div class="legal-switch">
+    <a href="{{ url_for('terms') }}" class="chip {% if is_terms %}on{% endif %}">Terms</a>
+    <a href="{{ url_for('privacy') }}" class="chip {% if not is_terms %}on{% endif %}">Privacy</a>
+  </div>
+</section>
+
+<section class="section narrow prose legal-body">
+{% if is_terms %}
+  <h2>The short version</h2>
+  <p>LearnWithPython is free to use. Don't attack it, don't scrape it wholesale, and don't
+     pass the lesson content off as your own. We provide it as-is and can't promise it will
+     never break. You can delete your account whenever you like.</p>
+
+  <h2>1. Using the site</h2>
+  <p>You may use LearnWithPython for personal learning and teaching, free of charge, with or
+     without an account. An account only exists to save your progress.</p>
+  <p>You agree not to: attempt to disrupt or overload the service; automate bulk requests
+     against it; attempt to access other people's accounts; or republish the lessons,
+     challenges or projects as your own work.</p>
+
+  <h2>2. Your account</h2>
+  <p>You're responsible for keeping access to your account secure. Pick a password you don't
+     use elsewhere, or sign in with Google. Tell us if you think someone else has got in.</p>
+  <p>We may suspend an account that is being used to attack or abuse the service.</p>
+
+  <h2>3. Your code</h2>
+  <p>Code you write in lessons, challenges and the playground runs <strong>in your own
+     browser</strong> and is not sent to us. Notes and drafts stay in your browser's local
+     storage. We store your <em>progress</em> — which lessons you finished — not your code.</p>
+
+  <h2>4. The content</h2>
+  <p>Lessons, challenges, projects and the cheatsheet are ours. You're welcome to use them to
+     learn and to teach individuals. Republishing them, or training a model on them wholesale,
+     is not permitted without asking.</p>
+  <p>Python itself, and the third-party resources we link to, belong to their own owners. Links
+     out are provided because they're useful, not because we control them.</p>
+
+  <h2>5. No warranty</h2>
+  <p>The service is provided "as is". It's a free learning tool, not a certified qualification,
+     and we don't guarantee it will be available, error-free, or that finishing it will get you
+     a job. To the extent the law allows, we're not liable for losses arising from using it.</p>
+
+  <h2>6. Changes and ending</h2>
+  <p>We may change these terms; material changes will be noted on this page with a new date.
+     You can stop using the service at any time and delete your account from your
+     <a href="{{ url_for('profile') }}">profile</a>.</p>
+
+{% else %}
+  <h2>The short version</h2>
+  <p>We collect the minimum needed to save your progress: a username, an email address, and
+     what you've completed. Your code never leaves your browser. We don't sell anything, we
+     don't run advertising trackers, and you can export or delete everything at any time.</p>
+
+  <h2>1. What we store</h2>
+  <table class="legal-table">
+    <thead><tr><th>Data</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Username</td><td>To identify your account and show you on the leaderboard.</td></tr>
+      <tr><td>Email address</td><td>To let you sign in and recover access.</td></tr>
+      <tr><td>Password (hashed)</td><td>To sign you in. Stored as a one-way hash — we cannot read it.</td></tr>
+      <tr><td>Google account ID and avatar</td><td>Only if you choose "Continue with Google".</td></tr>
+      <tr><td>Lessons, challenges and projects completed</td><td>To show progress, XP, streaks and achievements.</td></tr>
+      <tr><td>Last active date</td><td>To calculate your daily streak.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. What we don't store</h2>
+  <p>We don't store the code you write. It runs in your browser through WebAssembly and is
+     never sent to a server. Lesson notes and playground drafts live in your browser's local
+     storage, on your device.</p>
+  <p>There are no advertising trackers and no third-party analytics scripts on this site.</p>
+
+  <h2>3. Who else sees it</h2>
+  <p>Your data sits in a Postgres database hosted by <strong>Supabase</strong>, and the site is
+     served by <strong>Vercel</strong>. Both act as processors on our behalf. If you sign in
+     with Google, Google tells us your email, name, Google ID and avatar — nothing else, and
+     we don't get access to your Google account.</p>
+  <p>Your username, XP and streak appear on the public leaderboard. Your email never does.</p>
+
+  <h2>4. Cookies</h2>
+  <p>One cookie: the session that keeps you signed in. It's <code>HttpOnly</code> (scripts
+     can't read it) and <code>SameSite=Lax</code> (it isn't sent from other sites). There are
+     no tracking or advertising cookies, which is why there's no cookie banner.</p>
+
+  <h2>5. Your rights</h2>
+  <p>From your <a href="{{ url_for('profile') }}">profile</a> you can, at any time and without
+     asking us:</p>
+  <ul>
+    <li><strong>Access and port</strong> — download everything we hold as a JSON file.</li>
+    <li><strong>Rectify</strong> — change your display name and avatar.</li>
+    <li><strong>Erase</strong> — delete your account and all associated progress. This is
+        immediate and permanent; we keep no shadow copy.</li>
+  </ul>
+  <p>If you're in the UK or EU, these are your rights under UK GDPR / GDPR. You may also
+     complain to your data protection authority.</p>
+
+  <h2>6. Keeping it</h2>
+  <p>We keep your data for as long as your account exists. Delete the account and it goes
+     immediately. We don't have a separate archive to restore from.</p>
+
+  <h2>7. Children</h2>
+  <p>The site is suitable for all ages, but an account requires you to be 13 or older, in line
+     with common practice for online services. If you're younger, learn without an account —
+     every lesson is open.</p>
+{% endif %}
+
+  <h2>Contact</h2>
+  <p>Questions about {{ 'these terms' if is_terms else 'your data' }}?
+     Reach us via <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">GitHub</a>.</p>
+</section>
+{% endblock %}

@@ -158,6 +158,21 @@ resolving the direct host's AAAA record and matching it against
 booting at all rather than degrading — worth remembering when a deploy
 suddenly 500s.
 
+## Accounts, profile and deletion
+
+`/profile` lets someone change their display name and pick one of the 12
+avatars in `static/images/avatars/` (generated, then centre-cropped so none
+carries a baked-in frame). Presets and Google pictures share the same
+`users.avatar_url` column, so the rest of the UI never asks which it is.
+
+Deletion in `database.py` removes child rows explicitly rather than relying
+on `ON DELETE CASCADE`: Postgres declares it, the SQLite schema does not,
+and SQLite only enforces foreign keys when the pragma is on. `/profile/delete`
+requires the username typed back, plus the password for password accounts,
+so a borrowed unlocked laptop cannot erase an account in one click.
+`export_user()` and `delete_user()` are deliberately next to each other —
+the export must not describe data the delete leaves behind.
+
 ## Touch targets
 
 Controls are sized by input device, not viewport (`@media (pointer:

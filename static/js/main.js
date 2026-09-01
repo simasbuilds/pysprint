@@ -448,6 +448,35 @@
     });
   });
 
+  // ── account menu ────────────────────────────────────────────────
+  (function () {
+    var btn = document.getElementById('accountBtn');
+    var menu = document.getElementById('accountMenu');
+    if (!btn || !menu) return;
+    var open = function (state) {
+      menu.hidden = !state;
+      btn.setAttribute('aria-expanded', String(state));
+      btn.classList.toggle('on', state);
+    };
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      open(menu.hidden);
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) open(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !menu.hidden) { open(false); btn.focus(); }
+    });
+    // Arrow keys walk the menu, as a menu should.
+    menu.addEventListener('keydown', function (e) {
+      var items = Array.prototype.slice.call(menu.querySelectorAll('[role="menuitem"]'));
+      var i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+    });
+  })();
+
   // ── password reveal ─────────────────────────────────────────────
   // A typo in a masked field is invisible, which is worst on a phone
   // keyboard. Never leaves the field revealed on submit.

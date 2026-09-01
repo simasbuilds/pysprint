@@ -376,6 +376,76 @@ def leaderboard(limit=10):
         return [dict(r) for r in rows]
 
 
+def username_taken(username, exclude_user_id=None):
+    """True if the name belongs to somebody else. Case-insensitive on both
+    backends — citext on Postgres, COLLATE NOCASE on SQLite."""
+    with get_db() as db:
+        row = db.execute("SELECT id FROM users WHERE username = ?",
+                         (username,)).fetchone()
+    return bool(row) and row["id"] != exclude_user_id
+
+
+def update_profile(user_id, username=None, avatar_url=None):
+    """Update the fields a learner is allowed to change about themselves."""
+    sets, params = [], []
+    if username is not None:
+        sets.append("username = ?"); params.append(username)
+    if avatar_url is not None:
+        sets.append("avatar_url = ?"); params.append(avatar_url)
+    if not sets:
+        return False
+    params.append(user_id)
+    with get_db() as db:
+        db.execute("UPDATE users SET %s WHERE id = ?" % ", ".join(sets), tuple(params))
+    return True
+
+
+def export_user(user_id):
+    """Everything held about one person, for the data-export right.
+
+    Deliberately assembled here rather than in a route so the shape cannot
+    drift from what delete_user removes.
+    """
+    with get_db() as db:
+        u = db.execute(
+            "SELECT id, username, email, xp, streak, last_active, created_at, "
+            "google_sub, avatar_url, is_admin FROM users WHERE id = ?",
+            (user_id,)).fetchone()
+        if not u:
+            return None
+        lessons = db.execute(
+            "SELECT course_slug, lesson_slug, completed_at FROM lesson_progress "
+            "WHERE user_id = ? ORDER BY completed_at", (user_id,)).fetchall()
+        challenges = db.execute(
+            "SELECT challenge_slug, completed_at FROM challenge_progress "
+            "WHERE user_id = ? ORDER BY completed_at", (user_id,)).fetchall()
+        achievements = db.execute(
+            "SELECT achievement_id, earned_at FROM user_achievements "
+            "WHERE user_id = ? ORDER BY earned_at", (user_id,)).fetchall()
+    return {
+        "account": dict(u),
+        "lesson_progress": [dict(r) for r in lessons],
+        "challenge_progress": [dict(r) for r in challenges],
+        "achievements": [dict(r) for r in achievements],
+    }
+
+
+def delete_user(user_id):
+    """Erase a person and everything attached to them. Returns True if a
+    row went.
+
+    Children are removed explicitly rather than relying on ON DELETE
+    CASCADE: Postgres declares it, the SQLite schema does not, and SQLite
+    only enforces foreign keys when the pragma is on. Doing it by hand
+    behaves identically on both.
+    """
+    with get_db() as db:
+        for table in ("lesson_progress", "challenge_progress", "user_achievements"):
+            db.execute("DELETE FROM %s WHERE user_id = ?" % table, (user_id,))
+        cur = db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        return cur.rowcount > 0
+
+
 # ── admin portal ─────────────────────────────────────────────────────
 
 def set_admin(username_or_email, is_admin=True):
