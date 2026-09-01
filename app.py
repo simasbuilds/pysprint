@@ -162,6 +162,18 @@ def award_new_achievements(user):
              "desc": a["desc"]} for a in new]
 
 
+def display_name_for(user):
+    """What to call someone on screen.
+
+    `username` is a handle — URL-safe, unique, no spaces — so it cannot be
+    "Simas Bandzevicius". `display_name` is the free-form name, and falls
+    back to the handle when unset.
+    """
+    if not user:
+        return ""
+    return (user["display_name"] or "").strip() or user["username"]
+
+
 @app.context_processor
 def inject_globals():
     user = current_user()
@@ -169,6 +181,7 @@ def inject_globals():
         "user": user,
         "level": level_info(user["xp"]) if user else None,
         "site_url": app.config["SITE_URL"],
+        "display_name": display_name_for(user),
         "now_year": datetime.now(timezone.utc).year,
         "n_lessons": total_lessons(),
         "n_courses": len(COURSES),
@@ -507,6 +520,12 @@ def google_callback():
     avatar = info.get("picture")
 
     user = db.find_user_by_google(sub)
+    if user and avatar:
+        # Refresh the stored Google photo on every sign-in: people change it,
+        # and an account that predates the google_avatar column has none yet.
+        # This only touches google_avatar, never the avatar they chose.
+        db.update_google_avatar(user["id"], avatar)
+        user = db.get_user(user["id"])
     if not user:
         existing = db.find_user(email)          # link Google to a prior password account
         if existing:
@@ -540,8 +559,11 @@ def profile():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         avatar = request.form.get("avatar", "").strip()
+        display = request.form.get("display_name", "").strip()
 
-        if not USERNAME_RE.match(username):
+        if len(display) > 40:
+            error = "Display name must be 40 characters or fewer."
+        elif not USERNAME_RE.match(username):
             error = "Username must be 3–24 characters: letters, numbers, underscores."
         elif db.username_taken(username, exclude_user_id=user["id"]):
             error = "That username is already taken."
@@ -549,9 +571,12 @@ def profile():
             avatar_url = None
             if avatar == "none":
                 avatar_url = ""
+            elif avatar == "google" and user["google_avatar"]:
+                avatar_url = user["google_avatar"]
             elif avatar in AVATARS:
                 avatar_url = url_for("static", filename=f"images/avatars/{avatar}.png")
-            db.update_profile(user["id"], username=username, avatar_url=avatar_url)
+            db.update_profile(user["id"], username=username, avatar_url=avatar_url,
+                              display_name=display)
             user = db.get_user(user["id"])
             saved = "Profile updated."
 

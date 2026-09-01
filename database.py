@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TEXT NOT NULL DEFAULT to_char(now() AT TIME ZONE 'utc', 'YYYY-MM-DD HH24:MI:SS'),
     google_sub TEXT,
     avatar_url TEXT,
+    google_avatar TEXT,
+    display_name TEXT,
     is_admin INTEGER NOT NULL DEFAULT 0
 );
 
@@ -208,11 +210,20 @@ def get_db():
         conn.close()
 
 
+# Additive, idempotent, and safe to run on every boot.
+PG_MIGRATIONS = [
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS google_avatar TEXT",
+]
+
+
 def init_db():
     if IS_PG:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 cur.execute(SCHEMA_PG)
+                for stmt in PG_MIGRATIONS:
+                    cur.execute(stmt)
             conn.commit()
         return
     with get_db() as db:
@@ -225,6 +236,10 @@ def init_db():
             db.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
         if "is_admin" not in cols:
             db.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0")
+        if "display_name" not in cols:
+            db.execute("ALTER TABLE users ADD COLUMN display_name TEXT")
+        if "google_avatar" not in cols:
+            db.execute("ALTER TABLE users ADD COLUMN google_avatar TEXT")
 
 
 def _days_ago(n):
@@ -265,9 +280,9 @@ def create_google_user(username, email, google_sub, avatar_url=None):
     """Create a passwordless account linked to a Google identity."""
     with get_db() as db:
         cur = db.execute(
-            "INSERT INTO users (username, email, password_hash, google_sub, avatar_url) "
-            "VALUES (?, ?, '', ?, ?)",
-            (username, email, google_sub, avatar_url),
+            "INSERT INTO users (username, email, password_hash, google_sub, avatar_url, google_avatar) "
+            "VALUES (?, ?, '', ?, ?, ?)",
+            (username, email, google_sub, avatar_url, avatar_url),
         )
         return cur.lastrowid
 
@@ -275,9 +290,18 @@ def create_google_user(username, email, google_sub, avatar_url=None):
 def link_google_to_user(user_id, google_sub, avatar_url=None):
     with get_db() as db:
         db.execute(
-            "UPDATE users SET google_sub = ?, avatar_url = COALESCE(?, avatar_url) WHERE id = ?",
-            (google_sub, avatar_url, user_id),
+            "UPDATE users SET google_sub = ?, "
+            "avatar_url = COALESCE(?, avatar_url), "
+            "google_avatar = COALESCE(?, google_avatar) WHERE id = ?",
+            (google_sub, avatar_url, avatar_url, user_id),
         )
+
+
+def update_google_avatar(user_id, url):
+    """Store the latest Google profile picture without touching the avatar
+    the person actually chose."""
+    with get_db() as db:
+        db.execute("UPDATE users SET google_avatar = ? WHERE id = ?", (url, user_id))
 
 
 def get_user(user_id):
@@ -385,13 +409,15 @@ def username_taken(username, exclude_user_id=None):
     return bool(row) and row["id"] != exclude_user_id
 
 
-def update_profile(user_id, username=None, avatar_url=None):
+def update_profile(user_id, username=None, avatar_url=None, display_name=None):
     """Update the fields a learner is allowed to change about themselves."""
     sets, params = [], []
     if username is not None:
         sets.append("username = ?"); params.append(username)
     if avatar_url is not None:
         sets.append("avatar_url = ?"); params.append(avatar_url)
+    if display_name is not None:
+        sets.append("display_name = ?"); params.append(display_name)
     if not sets:
         return False
     params.append(user_id)
@@ -409,7 +435,8 @@ def export_user(user_id):
     with get_db() as db:
         u = db.execute(
             "SELECT id, username, email, xp, streak, last_active, created_at, "
-            "google_sub, avatar_url, is_admin FROM users WHERE id = ?",
+            "google_sub, avatar_url, google_avatar, display_name, is_admin "
+            "FROM users WHERE id = ?",
             (user_id,)).fetchone()
         if not u:
             return None

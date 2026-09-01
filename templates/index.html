@@ -8,7 +8,7 @@
 {"@context": "https://schema.org", "@type": "EducationalOrganization",
  "name": "LearnWithPython", "url": "{{ site_url }}",
  "description": "Free interactive Python courses: fundamentals, data structures, OOP, APIs and automation.",
- "sameAs": ["https://github.com/simasbuilds"]}
+ "sameAs": []}
 </script>
 {% endblock %}
 
@@ -23,7 +23,7 @@
   <div class="hero-inner">
     <div class="hero-copy">
       {% if me %}
-      <span class="pill stagger d1"><span class="pulse-dot"></span> Welcome back, {{ user.username }}</span>
+      <span class="pill stagger d1"><span class="pulse-dot"></span> Welcome back, {{ display_name }}</span>
       <h1 class="stagger d2">{% if me.done_today %}You've already shown up today.{% else %}Keep the <span class="grad">streak alive.</span>{% endif %}</h1>
       <p class="hero-sub stagger d3">
         {% if me.resume %}Next up: <strong>{{ me.resume.lesson.title }}</strong> in {{ me.resume.course.title }}. About {{ me.resume.lesson.minutes }} minutes — that's all it takes to keep moving.

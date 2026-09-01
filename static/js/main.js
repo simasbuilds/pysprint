@@ -3,9 +3,15 @@
 (function () {
   'use strict';
 
-  // ── platform-aware modifier key (Mac shows ⌘, everyone else Ctrl) ─
-  const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || '') ||
-                /Mac OS X/.test(navigator.userAgent || '');
+  // ── platform-aware modifier key ──────────────────────────────────
+  // navigator.platform is deprecated and lies behind some privacy modes,
+  // so prefer userAgentData and fall back. Anything we are not confident
+  // is a Mac gets "Ctrl", because showing a Windows user ⌘ is worse than
+  // showing a Mac user Ctrl — one is meaningless, the other merely plain.
+  const uaPlatform = (navigator.userAgentData && navigator.userAgentData.platform) || '';
+  const isMac = /mac/i.test(uaPlatform) ||
+                (!uaPlatform && (/Mac|iPod|iPhone|iPad/.test(navigator.platform || '') ||
+                                 /Mac OS X/.test(navigator.userAgent || '')));
   window.MOD_KEY = isMac ? '⌘' : 'Ctrl';
   document.querySelectorAll('.mod-key').forEach(el => {
     el.textContent = window.MOD_KEY;
@@ -70,6 +76,18 @@
       closeMenus(button);
       panel.hidden = !opening;
       button.setAttribute('aria-expanded', String(opening));
+
+      // In the mobile drawer the panel expands inline, so opening one
+      // pushes everything below it down and the trigger you just tapped
+      // drifts out of view. Pin it to the top of the drawer instead, so
+      // you always see what you opened directly above its contents.
+      const drawer = document.getElementById('navLinks');
+      if (opening && drawer && drawer.classList.contains('open')) {
+        requestAnimationFrame(() => {
+          const top = button.offsetTop - drawer.offsetTop;
+          drawer.scrollTo({ top: Math.max(0, top - 8), behavior: 'smooth' });
+        });
+      }
     });
     panel.addEventListener('click', e => e.stopPropagation());
   });

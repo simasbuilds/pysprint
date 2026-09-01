@@ -3976,3 +3976,10 @@ body.cmdk-open { overflow: hidden; }
   .legal-table td { border: none; padding: .15rem 0; }
   .legal-table td:first-child { font-weight: 700; }
 }
+
+/* the Google photo option carries a small label so it is identifiable */
+.avatar-opt { display: inline-flex; flex-direction: column; align-items: center; gap: .25rem; }
+.avatar-tag {
+  font-size: .58rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-dim); line-height: 1;
+}

@@ -8,7 +8,7 @@
 <section class="page-head dashboard-head">
   <div class="dash-head-copy">
     <span class="eyebrow">Learning command center</span>
-    <h1>Welcome back, {{ user.username }}.</h1>
+    <h1>Welcome back, {{ display_name }}.</h1>
     <p>Level {{ level.level }} — <strong>{{ level.title }}</strong>. {{ level.needed - level.into }} XP to the next level.</p>
   </div>
   <img class="dash-art" src="{{ url_for('static', filename='images/dashboard-visual.png') }}"

@@ -1196,10 +1196,10 @@ COURSES = [
                 "example": 'import json\n\nraw = \'{"city": "Vilnius", "temps": [21, 24, 19]}\'\ndata = json.loads(raw)\nprint(data["city"])\nprint(max(data["temps"]))\n\nprint(json.dumps({"ok": True}))',
                 "challenge": {
                     "prompt": "Parse the JSON string in the starter and print: the username, the number of repos, and the name of the first repo.",
-                    "starter": 'import json\nraw = \'{"user": "simasbuilds", "repos": [{"name": "pysprint", "stars": 42}, {"name": "sqltrainer", "stars": 17}]}\'\n# parse and print three lines\n',
-                    "expected_output": "simasbuilds\n2\npysprint",
+                    "starter": 'import json\nraw = \'{"user": "ada-lovelace", "repos": [{"name": "analytics-engine", "stars": 42}, {"name": "sqltrainer", "stars": 17}]}\'\n# parse and print three lines\n',
+                    "expected_output": "ada-lovelace\n2\nanalytics-engine",
                     "hint": 'data["repos"] is a list of dicts — index it with [0] then ["name"].',
-                    "solution": 'import json\nraw = \'{"user": "simasbuilds", "repos": [{"name": "pysprint", "stars": 42}, {"name": "sqltrainer", "stars": 17}]}\'\ndata = json.loads(raw)\nprint(data["user"])\nprint(len(data["repos"]))\nprint(data["repos"][0]["name"])',
+                    "solution": 'import json\nraw = \'{"user": "ada-lovelace", "repos": [{"name": "analytics-engine", "stars": 42}, {"name": "sqltrainer", "stars": 17}]}\'\ndata = json.loads(raw)\nprint(data["user"])\nprint(len(data["repos"]))\nprint(data["repos"][0]["name"])',
                 },
                 "quiz": [
                     {"q": "JSON null becomes what in Python?",
@@ -1218,7 +1218,7 @@ COURSES = [
 <p>The <code>requests</code> library is the gold standard for calling APIs from Python (install with <code>pip install requests</code>):</p>
 <pre><code>import requests
 
-resp = requests.get("https://api.github.com/users/simasbuilds")
+resp = requests.get("https://api.github.com/users/ada-lovelace")
 resp.raise_for_status()        # crash loudly on 4xx/5xx
 data = resp.json()             # parsed JSON → dict
 print(data["public_repos"])</code></pre>
@@ -1231,7 +1231,7 @@ print(data["public_repos"])</code></pre>
 </ul>
 <p><em>Note:</em> the browser sandbox can't make real network calls, so the challenge simulates a response — the parsing skills are identical.</p>
 """,
-                "example": '# Simulated response - same shape requests.json() returns\ndef fake_get(url):\n    return {"status_code": 200,\n            "json": {"login": "simasbuilds", "public_repos": 12}}\n\nresp = fake_get("https://api.github.com/users/simasbuilds")\nif resp["status_code"] == 200:\n    print(resp["json"]["login"])',
+                "example": '# Simulated response - same shape requests.json() returns\ndef fake_get(url):\n    return {"status_code": 200,\n            "json": {"login": "ada-lovelace", "public_repos": 12}}\n\nresp = fake_get("https://api.github.com/users/ada-lovelace")\nif resp["status_code"] == 200:\n    print(resp["json"]["login"])',
                 "challenge": {
                     "prompt": "The starter simulates an API returning weather for three cities. Loop through the results and print each city with its temperature as <code>City: temp°C</code>, then print the warmest city's name.",
                     "starter": 'response = {\n    "status": 200,\n    "results": [\n        {"city": "Vilnius", "temp": 22},\n        {"city": "Madrid", "temp": 31},\n        {"city": "Oslo", "temp": 14},\n    ],\n}\n# your code\n',

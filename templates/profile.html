@@ -21,8 +21,8 @@
       {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
     </span>
     <div class="profile-summary-body">
-      <h2>{{ user.username }}</h2>
-      <p class="muted">{{ user.email }}</p>
+      <h2>{{ display_name }}</h2>
+      <p class="muted">@{{ user.username }} · {{ user.email }}</p>
       <div class="profile-facts">
         <span>{{ icon('bolt') }} {{ user.xp }} XP</span>
         <span>{{ icon('flame') }} {{ user.streak }}-day streak</span>
@@ -37,14 +37,21 @@
   </div>
 
   <form class="card profile-card" method="post">
-    <h2>{{ icon('note') }} Display name</h2>
-    <p class="muted">This is the name shown on the leaderboard.</p>
-    <label>Username
+    <h2>{{ icon('note') }} Your name</h2>
+    <p class="muted">How you're greeted around the site. Spaces and capitals welcome.</p>
+    <label>Display name
+      <input type="text" name="display_name" value="{{ user.display_name or '' }}"
+             maxlength="40" placeholder="{{ user.username }}" aria-describedby="dispHelp">
+    </label>
+    <p class="field-help" id="dispHelp">Up to 40 characters. Leave blank to use your username.</p>
+
+    <label class="profile-h2-label">Username
       <input type="text" name="username" value="{{ user.username }}" required
              minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]+"
              aria-describedby="nameHelp">
     </label>
-    <p class="field-help" id="nameHelp">3–24 characters. Letters, numbers and underscores.</p>
+    <p class="field-help" id="nameHelp">Your unique handle, shown on the leaderboard.
+       3–24 characters: letters, numbers and underscores only.</p>
 
     <h2 class="profile-h2">{{ icon('spark') }} Avatar</h2>
     <p class="muted">Pick one, or use your initial.</p>
@@ -55,6 +62,15 @@
         <span class="avatar-swatch avatar-initial"><b>{{ user.username[0]|upper }}</b></span>
         <span class="sr-only">No avatar, use my initial</span>
       </label>
+      {% if user.google_avatar %}
+      <label class="avatar-opt">
+        <input type="radio" name="avatar" value="google"
+               {% if user.avatar_url == user.google_avatar %}checked{% endif %}>
+        <img class="avatar-swatch" src="{{ user.google_avatar }}" alt="Your Google profile picture"
+             width="72" height="72" referrerpolicy="no-referrer">
+        <span class="avatar-tag">Google</span>
+      </label>
+      {% endif %}
       {% for a in avatars %}
       <label class="avatar-opt">
         <input type="radio" name="avatar" value="{{ a.key }}"

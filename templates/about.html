@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
 {% block title %}About LearnWithPython — How It Works{% endblock %}
-{% block description %}How LearnWithPython teaches Python: interactive lessons, in-browser code execution, spaced repetition and gamified progress. Free and open source by simasbuilds.{% endblock %}
+{% block description %}How LearnWithPython teaches Python: interactive lessons, in-browser code execution, spaced repetition and gamified progress. Free to use, forever.{% endblock %}
 {% block structured_data %}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"AboutPage","name":"About LearnWithPython","description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","mainEntity":{"@id":"{{ site_url.rstrip('/') }}/#organization"}}
@@ -46,7 +46,7 @@
     <p>{{ n_lessons }} lessons across {{ n_courses }} courses take you from <code>print("Hello")</code> through REST APIs and automation all the way to expert Python — generators, decorators, context managers and the data model — plus {{ n_challenges }} arena challenges including genuine interview classics.</p>
 
     <h2>Open source</h2>
-    <p>LearnWithPython is built by <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">simasbuilds</a> with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
+    <p>LearnWithPython is built by the LearnWithPython team with Flask, SQLite and Pyodide, and the entire platform is open source. The APIs course even uses this site's own backend as its case study.</p>
     </div>
     <aside class="about-manifesto">
       <span class="eyebrow">The promise</span>

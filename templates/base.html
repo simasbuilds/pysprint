@@ -7,7 +7,7 @@
   <title>{% block title %}LearnWithPython — Learn Python Interactively{% endblock %}</title>
   <meta name="description" content="{% filter forceescape %}{% block description %}Learn Python for free with interactive lessons, in-browser coding challenges, quizzes, XP and achievements. From absolute beginner to building your own APIs.{% endblock %}{% endfilter %}">
   <meta name="keywords" content="learn python, python course, interactive python, python for beginners, python API tutorial, coding challenges, free python course">
-  <meta name="author" content="simasbuilds">
+  <meta name="author" content="LearnWithPython">
   <meta name="application-name" content="LearnWithPython">
   <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#07111f" media="(prefers-color-scheme: dark)">
@@ -169,7 +169,7 @@
       </nav>
       <div class="nav-right">
         <button class="cmdk-btn" id="cmdkBtn" aria-label="Quick search — Ctrl or Cmd + K" aria-haspopup="dialog">
-          {{ icon('search') }}<span class="cmdk-btn-text">Search</span><kbd><span class="mod-key">⌘</span>K</kbd>
+          {{ icon('search') }}<span class="cmdk-btn-text">Search</span><kbd class="cmdk-hint"><span class="mod-key">Ctrl</span>K</kbd>
         </button>
         {% if user %}
           <div class="nav-stats" title="Level {{ level.level }} — {{ level.title }}">
@@ -193,8 +193,8 @@
                   {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
                 </span>
                 <span class="account-id-text">
-                  <strong>{{ user.username }}</strong>
-                  <small>{{ user.email }}</small>
+                  <strong>{{ display_name }}</strong>
+                  <small>@{{ user.username }}</small>
                 </span>
               </div>
               <div class="account-meta">
@@ -273,7 +273,6 @@
         <a href="{{ url_for('about') }}">About</a>
         {% if user %}<a href="{{ url_for('dashboard') }}">Dashboard</a>
         {% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}
-        <a href="https://github.com/simasbuilds" rel="noopener" target="_blank">GitHub</a>
       </div>
       <div class="footer-col">
         <h4>The series</h4>
@@ -281,7 +280,8 @@
         <span class="footer-soon">LearnWithPython · you're here</span>
       </div>
     </div>
-    <p class="footer-copy">© {{ now_year }} LearnWithPython by simasbuilds · Built with Flask & Pyodide</p>
+    <p class="footer-copy">© {{ now_year }} LearnWithPython · Real Python 3 in your browser ·
+      <a href="{{ url_for('terms') }}">Terms</a> · <a href="{{ url_for('privacy') }}">Privacy</a></p>
   </footer>
 
   <!-- ⌘K command palette -->
