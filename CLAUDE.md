@@ -219,3 +219,27 @@ Run the same pattern over `data/challenges.py` when editing the arena.
 - `gunicorn app:app` behind any reverse proxy; SQLite is fine for this
   write volume. `DATABASE_PATH` moves the DB file (e.g. a mounted volume).
 - `FLASK_DEBUG=0` in production.
+
+## Social share card
+
+`static/images/og-card.png` is 1200x630 — the ratio every platform crops to.
+It is built by `python tools/make_og.py` from two layers, split by what each
+medium is actually good at. The plate (`assets/og-plate.png`, generated, not
+served) supplies the navy field, grid, aurora and the wordmark. Every word the
+card has to *say* — headline, proof numbers, offer, URL — is drawn in real
+Manrope from `static/fonts/`, because a misspelt wordmark or a wrong count is
+unshippable and an image model cannot be trusted with text.
+
+The shading ramp under the copy starts at 52% height on purpose: a plain
+top-to-bottom gradient greys out the wordmark, which has to stay at full
+strength. `og:image:width/height` are declared — without them scrapers often
+render the small square card instead of the large one.
+
+## Transactional email
+
+`mailer.py` posts to Resend over HTTP with `requests` (already a dependency for
+Google sign-in) on a daemon thread, so signup never waits on mail. Everything
+is a no-op when `RESEND_API_KEY` is unset, and `send_welcome_email()` swallows
+its own exceptions — a mail outage must not turn a successful signup into an
+error page. The template in `templates/email/welcome.html` is table-based with
+inline styles: Outlook renders through Word, and Gmail strips most of <head>.

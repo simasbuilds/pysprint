@@ -16,6 +16,7 @@ from flask import (Flask, Response, abort, jsonify, redirect, render_template, r
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import database as db
+import mailer
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.cheatsheet import CHEATSHEET, categories as cheat_categories
@@ -431,6 +432,47 @@ USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,24}$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
+def send_welcome_email(username, email):
+    """Fire-and-forget welcome message. Never raises: a mail outage must not
+    turn a successful signup into an error page."""
+    if not mailer.is_configured():
+        return
+    try:
+        site = (env("SITE_URL") or request.url_root).rstrip("/")
+        html = render_template(
+            "email/welcome.html",
+            name=username,
+            email=email,
+            site_url=site,
+            start_url=site + url_for("start"),
+            doors=[
+                {"title": "Start from absolute zero",
+                 "body": "What Python is, what your first hour looks like, and a line you run yourself.",
+                 "url": site + url_for("start")},
+                {"title": "Take the course path",
+                 "body": "%d lessons from your first print() to decorators, generators and real APIs." % total_lessons(),
+                 "url": site + url_for("courses")},
+                {"title": "Open a blank workspace",
+                 "body": "Write, run and download real Python with nothing installed.",
+                 "url": site + url_for("playground")},
+            ],
+            stats=[
+                {"n": total_lessons(), "label": "Lessons"},
+                {"n": len(PROJECTS), "label": "Projects"},
+                {"n": len(CHALLENGES), "label": "Challenges"},
+            ],
+        )
+        text = (
+            "You're in, %s.\n\n"
+            "Your account is live. Nothing to install - real Python runs in your browser.\n\n"
+            "Write your first line: %s\n\n"
+            "LearnWithPython - Learn Python by writing it, not watching it."
+        ) % (username, site + url_for("start"))
+        mailer.send(email, "You're in - welcome to LearnWithPython", html, text)
+    except Exception as exc:
+        print("[mail] welcome render failed: %r" % exc)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     error = None
@@ -448,6 +490,7 @@ def register():
             error = "That username or email is already registered."
         else:
             uid = db.create_user(username, email, generate_password_hash(password))
+            send_welcome_email(username, email)
             session["user_id"] = uid
             session.permanent = True
             # Come back to the lesson they were on, so device progress syncs

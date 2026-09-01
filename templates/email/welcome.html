@@ -1,0 +1,163 @@
+{#
+  Welcome email. Constraints that shape every choice below:
+    - Tables, not flexbox/grid: Outlook renders through Word's engine.
+    - Inline styles: Gmail strips most of <head>, so nothing may depend on it.
+    - 600px max: the historical safe width, still what mobile clients assume.
+    - No web fonts: almost no client loads them, so the stack degrades to the
+      system grotesk rather than serving Manrope that will not arrive.
+    - Every colour is stated literally. Custom properties do not exist here.
+  Gradients are painted as a background-image over a solid background-color,
+  so a client that drops the image still gets brand navy rather than white.
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Welcome to LearnWithPython</title>
+</head>
+<body style="margin:0; padding:0; background:#eef2f8; -webkit-font-smoothing:antialiased;">
+
+  {# Preheader: the grey line clients show beside the subject. Hidden in body. #}
+  <div style="display:none; font-size:1px; color:#eef2f8; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+    Your account is live. Real Python runs in your browser — nothing to install.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef2f8;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+               style="width:600px; max-width:100%; border-radius:18px; overflow:hidden; box-shadow:0 12px 34px rgba(7,21,47,.14);">
+
+          <!-- ── Masthead ───────────────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#07152f; background-image:linear-gradient(125deg,#07152f 0%,#0d2447 55%,#0f9f8f 190%); padding:38px 40px 34px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-right:12px; vertical-align:middle;">
+                    <div style="width:40px; height:40px; border-radius:11px; background-color:#2563eb; text-align:center; line-height:40px; font-family:'SF Mono',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#ffffff;">&gt;_</div>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <span style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:800; letter-spacing:-.5px; color:#ffffff;">LearnWith</span><span style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:800; letter-spacing:-.5px; color:#5eead4;">Python</span>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="height:26px; line-height:26px; font-size:0;">&nbsp;</div>
+
+              <h1 style="margin:0 0 10px; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:31px; line-height:1.18; font-weight:800; letter-spacing:-.9px; color:#ffffff;">
+                You're in, {{ name }}.
+              </h1>
+              <p style="margin:0; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; line-height:1.55; color:#b9cbe6;">
+                Your account is live. Nothing to install, nothing to configure —
+                real Python runs right in your browser.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ── Terminal proof block ───────────────────────────────── -->
+          <tr>
+            <td style="background:#ffffff; padding:0 40px;">
+              <div style="height:28px; line-height:28px; font-size:0;">&nbsp;</div>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background-color:#0b1a33; border-radius:12px;">
+                <tr>
+                  <td style="padding:16px 20px; font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace; font-size:13px; line-height:1.75; color:#cbd5e1;">
+                    <span style="color:#5eead4;">&gt;&gt;&gt;</span> <span style="color:#e2e8f0;">print(</span><span style="color:#fbbf24;">"hello, {{ name }}"</span><span style="color:#e2e8f0;">)</span><br>
+                    <span style="color:#7dd3fc;">hello, {{ name }}</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── CTA ────────────────────────────────────────────────── -->
+          <tr>
+            <td style="background:#ffffff; padding:26px 40px 4px;" align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border-radius:11px; background-color:#2563eb;">
+                    <a href="{{ start_url }}"
+                       style="display:inline-block; padding:15px 34px; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:11px;">
+                      Write your first line &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:14px 0 0; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; color:#7c8ba1;">
+                Takes about four minutes.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ── Three doors ────────────────────────────────────────── -->
+          <tr>
+            <td style="background:#ffffff; padding:24px 40px 8px;">
+              <div style="height:1px; background:#e6ecf5; font-size:0; line-height:1px;">&nbsp;</div>
+              <div style="height:24px; line-height:24px; font-size:0;">&nbsp;</div>
+
+              {% for item in doors %}
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
+                <tr>
+                  <td width="38" style="vertical-align:top; padding-top:2px;">
+                    <div style="width:28px; height:28px; border-radius:8px; background-color:#e8f0fe; text-align:center; line-height:28px; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; font-weight:800; color:#2563eb;">{{ loop.index }}</div>
+                  </td>
+                  <td style="vertical-align:top;">
+                    <a href="{{ item.url }}" style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; font-weight:700; color:#0d2447; text-decoration:none;">{{ item.title }}</a>
+                    <div style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#63748c; padding-top:2px;">{{ item.body }}</div>
+                  </td>
+                </tr>
+              </table>
+              {% endfor %}
+            </td>
+          </tr>
+
+          <!-- ── Proof bar ──────────────────────────────────────────── -->
+          <tr>
+            <td style="background:#ffffff; padding:6px 40px 34px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background-color:#f4f7fc; border-radius:12px;">
+                <tr>
+                  {% for stat in stats %}
+                  <td align="center" style="padding:18px 6px;">
+                    <div style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:800; color:#2563eb; letter-spacing:-.5px;">{{ stat.n }}</div>
+                    <div style="font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; color:#7c8ba1; padding-top:3px;">{{ stat.label }}</div>
+                  </td>
+                  {% endfor %}
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── Footer ─────────────────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#f4f7fc; padding:24px 40px 30px; border-top:1px solid #e6ecf5;">
+              <p style="margin:0 0 8px; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#7c8ba1;">
+                You're getting this because an account was created for
+                <strong style="color:#4a5b73;">{{ email }}</strong> at LearnWithPython.
+                If that wasn't you, ignore this — nothing else will be sent.
+              </p>
+              <p style="margin:0; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; color:#9aa8bd;">
+                <a href="{{ site_url }}/terms" style="color:#7c8ba1; text-decoration:underline;">Terms</a>
+                &nbsp;·&nbsp;
+                <a href="{{ site_url }}/privacy" style="color:#7c8ba1; text-decoration:underline;">Privacy</a>
+                &nbsp;·&nbsp;
+                <a href="{{ site_url }}/profile" style="color:#7c8ba1; text-decoration:underline;">Your account</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <p style="margin:18px 0 0; font-family:Manrope,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; color:#9aa8bd;">
+          LearnWithPython &nbsp;·&nbsp; Learn Python by writing it, not watching it
+        </p>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
