@@ -29,15 +29,29 @@ from data.walkthroughs import get_walkthrough
 load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
-app.config["SITE_URL"] = os.environ.get("SITE_URL", "http://127.0.0.1:5000")
+def env(name, default=""):
+    """Environment value with surrounding whitespace removed.
+
+    Dashboards like Vercel happily store a trailing newline when a value is
+    pasted, and it is invisible in their UI. That newline turned SITE_URL
+    into "https://site.com\n", so the OAuth redirect_uri became
+    "https://site.com\n/auth/google/callback" and Google rejected every
+    sign-in with invalid_request. The same newline on SESSION_COOKIE_SECURE
+    silently defeats the == "1" test and leaves session cookies insecure,
+    which fails far more quietly.
+    """
+    return os.environ.get(name, default).strip()
+
+
+app.config["SECRET_KEY"] = env("SECRET_KEY", "dev-only-change-me")
+app.config["SITE_URL"] = env("SITE_URL", "http://127.0.0.1:5000")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
+app.config["SESSION_COOKIE_SECURE"] = env("SESSION_COOKIE_SECURE", "0") == "1"
 
 # ── Google Sign-In (optional; activates when credentials are present) ──
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "").strip()
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET")
 google_oauth = None
 if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
     try:
@@ -726,6 +740,6 @@ def not_found(e):
 
 
 if __name__ == "__main__":
-    debug = os.environ.get("FLASK_DEBUG", "1") == "1"
-    port = int(os.environ.get("PORT", "5000"))
+    debug = env("FLASK_DEBUG", "1") == "1"
+    port = int(env("PORT", "5000"))
     app.run(debug=debug, port=port)
