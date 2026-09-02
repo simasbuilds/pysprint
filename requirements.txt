@@ -1,9 +1,10 @@
 Flask>=3.0
 python-dotenv>=1.0
 gunicorn>=21.2 ; sys_platform != "win32"
-# Optional — only needed to enable "Continue with Google" sign-in.
-# Supabase Auth (GoTrue) and Resend both speak HTTP.
+
+# Supabase Auth (GoTrue) and Resend are both plain HTTP APIs.
 requests>=2.31
 
-# Only needed when DATABASE_URL points at Postgres (e.g. Supabase).
+# Postgres. Identity lives in Supabase's auth schema, so this is required,
+# not optional — there is no local fallback backend any more.
 psycopg[binary]>=3.1
