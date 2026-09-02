@@ -12,6 +12,11 @@
  "isAccessibleForFree": true,
  "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "courseWorkload": "PT{{ course.lessons|sum(attribute='minutes') }}M"}}
 </script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"Courses","item":"{{ site_url.rstrip('/') }}{{ url_for('courses') }}"},
+ {"@type":"ListItem","position":2,"name":{{ course.title|tojson }},"item":"{{ site_url.rstrip('/') }}{{ request.path }}"}]}
+</script>
 {% endblock %}
 
 {% block content %}

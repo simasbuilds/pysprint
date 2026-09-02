@@ -7,6 +7,12 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"LearningResource","name":{{ lesson.title|tojson }},"description":{{ self.description()|striptags|trim|tojson }},"url":"{{ site_url }}{{ request.path }}","isPartOf":{"@type":"Course","name":{{ course.title|tojson }},"url":"{{ site_url }}{{ url_for('course_detail', slug=course.slug) }}"},"educationalLevel":{{ course.level|tojson }},"timeRequired":"PT{{ lesson.minutes }}M","learningResourceType":"Interactive lesson","inLanguage":"en-US","isAccessibleForFree":true}
 </script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"Courses","item":"{{ site_url.rstrip('/') }}{{ url_for('courses') }}"},
+ {"@type":"ListItem","position":2,"name":{{ course.title|tojson }},"item":"{{ site_url.rstrip('/') }}{{ url_for('course_detail', slug=course.slug) }}"},
+ {"@type":"ListItem","position":3,"name":{{ lesson.title|tojson }},"item":"{{ site_url.rstrip('/') }}{{ request.path }}"}]}
+</script>
 {% endblock %}
 
 {% block content %}

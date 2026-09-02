@@ -2,7 +2,7 @@
 {% from "_icons.html" import icon %}
 {% set is_terms = doc == 'terms' %}
 {% block title %}{{ 'Terms of Use' if is_terms else 'Privacy Policy' }} — LearnWithPython{% endblock %}
-{% block description %}{{ 'The terms you agree to when using LearnWithPython.' if is_terms else 'What data LearnWithPython collects, why, and how to remove it.' }}{% endblock %}
+{% block description %}{{ 'The terms you agree to when using LearnWithPython — a free interactive Python learning platform. Plain language, no surprises.' if is_terms else 'What data LearnWithPython collects, why it is collected, how it is stored, and how to export or delete it at any time.' }}{% endblock %}
 
 {% block content %}
 <section class="page-head legal-head">
