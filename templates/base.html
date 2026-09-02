@@ -276,6 +276,7 @@
         <a href="{{ url_for('terms') }}">Terms of use</a>
         <a href="{{ url_for('privacy') }}">Privacy policy</a>
         <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('creator') }}">Meet the creator</a>
         {% if user %}<a href="{{ url_for('dashboard') }}">Dashboard</a>
         {% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}
       </div>
@@ -315,7 +316,8 @@
       {"label": "Real-life projects", "hint": "{{ n_projects }} guided portfolio builds", "href": "{{ url_for('projects') }}", "icon": "blocks"},
       {"label": "Playground", "hint": "Blank Python workspace", "href": "{{ url_for('playground') }}", "icon": "terminal"},
       {"label": "Smart Review", "hint": "Spaced-repetition flashcards", "href": "{{ url_for('review') }}", "icon": "brain"},
-      {"label": "How it works", "hint": "About LearnWithPython", "href": "{{ url_for('about') }}", "icon": "info"}
+      {"label": "How it works", "hint": "About LearnWithPython", "href": "{{ url_for('about') }}", "icon": "info"},
+      {"label": "Meet the creator", "hint": "About Simas Bandzevicius", "href": "{{ url_for('creator') }}", "icon": "graduation"}
       {%- if user -%}
       ,{"label": "Dashboard", "hint": "XP, streaks and progress", "href": "{{ url_for('dashboard') }}", "icon": "chart"}
       {%- else -%}

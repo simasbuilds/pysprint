@@ -667,6 +667,14 @@ def profile_delete():
     return redirect(url_for("home", deleted="1"))
 
 
+@app.get("/about-me")
+def creator():
+    """The person behind the site. Separate from /about, which explains the
+    product — a visitor deciding whether to trust a free course wants both,
+    and conflating them buries each."""
+    return render_template("creator.html")
+
+
 @app.get("/terms")
 def terms():
     return render_template("legal.html", doc="terms")
@@ -861,6 +869,7 @@ def sitemap():
             ("/courses", "0.9"),
             ("/projects", "0.9"), ("/challenges", "0.8"),
             ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5"),
+            ("/about-me", "0.5"),
             ("/terms", "0.3"), ("/privacy", "0.3")]
     for p in PROJECTS:
         urls.append((f"/projects/{p['slug']}", "0.7"))

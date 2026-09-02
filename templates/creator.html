@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}About Simas Bandzevicius — Creator of LearnWithPython{% endblock %}
+{% block description %}LearnWithPython was created by Simas Bandzevicius to close the gap between following a tutorial and actually writing Python. {{ n_lessons }} interactive lessons, {{ n_projects }} projects and real code running in your browser.{% endblock %}
+{% block og_type %}profile{% endblock %}
+{% block social_image_alt %}Simas Bandzevicius, creator of LearnWithPython{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfilePage",
+ "url":"{{ site_url }}{{ request.path }}",
+ "mainEntity":{"@type":"Person","name":"Simas Bandzevicius",
+   "jobTitle":"Founder, LearnWithPython",
+   "image":"{{ site_url.rstrip('/') }}{{ url_for('static', filename='images/simas-bandzevicius.jpg') }}",
+   "sameAs":["https://www.linkedin.com/in/simasb/"],
+   "worksFor":{"@id":"{{ site_url.rstrip('/') }}/#organization"}}}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="directory-hero creator-hero">
+  <div class="directory-copy">
+    <span class="eyebrow">{{ icon('spark') }} Creator story</span>
+    <h1>Built by someone who got stuck at the <span class="grad">blank file.</span></h1>
+    <p>
+      I'm <strong>Simas Bandzevicius</strong>. I built LearnWithPython to close the gap
+      that almost every beginner falls into — you can follow a tutorial from start to
+      finish and still freeze the moment you open an empty editor.
+    </p>
+    <p>
+      So this site is built around the opposite habit. You meet an idea, you run it in
+      the same minute, you build something with it, and you see it again before it
+      fades. {{ n_lessons }} lessons, {{ n_projects }} projects and {{ n_challenges }}
+      challenges — all of it free, and all of it graded on code you actually wrote.
+    </p>
+    <div class="creator-tags">
+      <span>Practical</span><span>Self-paced</span><span>Free forever</span><span>No installs</span>
+    </div>
+    <div class="directory-actions">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('start') }}">Start from absolute zero →</a>
+      <a class="btn btn-ghost btn-lg" href="{{ url_for('courses') }}">Browse the courses</a>
+    </div>
+  </div>
+
+  <aside class="creator-card">
+    <img src="{{ url_for('static', filename='images/simas-bandzevicius.jpg') }}"
+         alt="Simas Bandzevicius" width="960" height="1200" loading="eager">
+    <div class="creator-id">
+      <strong>Simas Bandzevicius</strong>
+      <small>Founder — LearnWithPython</small>
+      <p>Building learning tools that put people at the keyboard sooner, for anyone
+         teaching themselves to build.</p>
+      <a href="https://www.linkedin.com/in/simasb/" target="_blank" rel="noopener noreferrer">
+        Connect on LinkedIn <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </aside>
+</section>
+
+<section class="section">
+  <div class="feature-grid creator-pillars">
+    <article class="card">
+      <span class="feature-icon">{{ icon('target') }}</span>
+      <strong>The mission</strong>
+      <p>Help people write Python with confidence — through guided practice, real
+         execution and deliberate repetition, not passive watching.</p>
+    </article>
+    <article class="card">
+      <span class="feature-icon">{{ icon('graduation') }}</span>
+      <strong>Who it's for</strong>
+      <p>Complete beginners who have never written a line, and self-taught coders who
+         can read Python but freeze when asked to build something on their own.</p>
+    </article>
+    <article class="card">
+      <span class="feature-icon">{{ icon('blocks') }}</span>
+      <strong>What's inside</strong>
+      <p>{{ n_courses }} courses and {{ n_lessons }} lessons, {{ n_projects }} portfolio
+         projects, {{ n_challenges }} arena challenges and a {{ n_cheats }}-snippet
+         reference — with spaced repetition to keep it.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section creator-belief">
+  <h2>What I believe about learning to code</h2>
+  <div class="feature-grid">
+    <article class="card">
+      <strong>Typing beats reading</strong>
+      <p>Understanding a concept and being able to produce it are different skills.
+         Only one of them gets you a working program, and only practice builds it.</p>
+    </article>
+    <article class="card">
+      <strong>Feedback has a shelf life</strong>
+      <p>Every lesson ends with code you run and output that is checked immediately,
+         while the idea is still in your head and a correction still lands.</p>
+    </article>
+    <article class="card">
+      <strong>Forgetting is the real problem</strong>
+      <p>Most courses are built to be finished, not remembered. Smart Review brings
+         concepts back on a schedule so what you learn survives the week.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section creator-also">
+  <div class="card creator-also-card">
+    <div>
+      <span class="eyebrow">Also built</span>
+      <strong>LearnWithSQL</strong>
+      <p>The same approach applied to SQL — practical, query-first learning for
+         analysts, founders and operators.</p>
+    </div>
+    <a class="btn btn-ghost" href="https://learnwithsql.com" target="_blank" rel="noopener noreferrer">
+      Visit LearnWithSQL <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<section class="section creator-cta">
+  <h2>Write your first line today.</h2>
+  <p>No account needed to try it, and nothing to install. Real Python runs in your browser.</p>
+  <div class="directory-actions">
+    <a class="btn btn-primary btn-lg" href="{{ url_for('start') }}">Start learning free →</a>
+    <a class="btn btn-ghost btn-lg" href="{{ url_for('about') }}">How it works</a>
+  </div>
+</section>
+{% endblock %}

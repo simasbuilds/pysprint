@@ -4045,3 +4045,57 @@ body.cmdk-open { overflow: hidden; }
   .nav-links > a.nav-start { margin-left: .3rem; padding-left: .72rem; }
   .nav-inner { gap: .5rem; }
 }
+
+/* ── Creator page ──────────────────────────────────────────────────────
+   .directory-hero gives its copy the smaller column (.9fr vs 1.1fr),
+   which suits a page whose right side is artwork. Here the right side is
+   a portrait card and the left is the actual argument, so the weighting
+   flips. The portrait is given an explicit aspect-ratio: an unconstrained
+   960x1200 img stretched the row and squeezed the headline into six
+   lines. */
+.creator-hero { grid-template-columns: 1.15fr .85fr; align-items: center; }
+.creator-hero .directory-copy > p { max-width: 52ch; }
+.creator-hero .directory-copy > p + p { margin-top: .85rem; }
+
+.creator-card { padding: clamp(1.5rem, 2.5vw, 2.25rem); display: flex; flex-direction: column; gap: 1rem; }
+.creator-card > img {
+  width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover;
+  border-radius: 18px; border: 1px solid var(--border);
+  box-shadow: 0 18px 44px -26px rgba(7, 21, 47, .55);
+}
+.creator-id { display: flex; flex-direction: column; gap: .2rem; }
+.creator-id strong { font-size: 1.08rem; letter-spacing: -.02em; }
+.creator-id small { color: var(--text-dim); font-size: .85rem; }
+.creator-id p { margin: .5rem 0 .1rem; color: var(--text-dim); font-size: .88rem; line-height: 1.55; }
+.creator-id a {
+  align-self: start; font-weight: 700; font-size: .88rem; color: var(--brand-1);
+  display: inline-flex; align-items: center; gap: .3rem; min-height: 40px;
+}
+
+.creator-tags { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 .35rem; }
+.creator-tags span {
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim);
+  border-radius: 99px; padding: .4rem .8rem; font-size: .82rem; font-weight: 600;
+}
+
+.creator-belief h2, .creator-cta h2 {
+  font-size: clamp(1.65rem, 3vw, 2.3rem); letter-spacing: -.03em; margin-bottom: 1.25rem;
+}
+.creator-also-card {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.25rem; flex-wrap: wrap;
+}
+.creator-also-card strong { display: block; font-size: 1.15rem; margin-top: .3rem; }
+.creator-also-card p { color: var(--text-dim); margin-top: .35rem; max-width: 52ch; }
+.creator-cta { text-align: center; }
+.creator-cta > p { color: var(--text-dim); margin-bottom: 1.25rem; }
+.creator-cta .directory-actions { justify-content: center; }
+
+@media (max-width: 900px) {
+  .creator-hero { grid-template-columns: 1fr; }
+  .creator-card { max-width: 420px; margin-inline: auto; padding-top: 0; }
+  .creator-also-card { flex-direction: column; align-items: flex-start; }
+}
+/* These cards carry no icon, so .card's icon-driven spacing never applies
+   and the title butted straight into its paragraph. */
+.creator-belief .card strong { display: block; margin-bottom: .45rem; }
