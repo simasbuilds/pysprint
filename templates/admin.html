@@ -130,7 +130,8 @@
             <th scope="col">XP</th>
             <th scope="col">Progress</th>
             <th scope="col">Streak</th>
-            <th scope="col">Last active</th>
+            <th scope="col">Sign-in</th>
+            <th scope="col">Status</th>
             <th scope="col"><span class="sr-only">Open</span></th>
           </tr>
         </thead>
@@ -157,7 +158,23 @@
               </div>
             </td>
             <td class="admin-num">{% if m.streak %}{{ icon('flame') }} {{ m.streak }}{% else %}—{% endif %}</td>
-            <td><small>{{ m.last_active or 'never' }}</small></td>
+            <td>
+              <span class="admin-method{% if m.has_google %} is-google{% endif %}">
+                {{ 'Google' if m.has_google else 'Email' }}
+              </span>
+            </td>
+            <td>
+              {% if m.banned_until %}
+                <span class="admin-status is-banned">Suspended</span>
+              {% elif not m.email_confirmed_at %}
+                <span class="admin-status is-pending">Unconfirmed</span>
+              {% elif m.last_sign_in_at %}
+                <span class="admin-status is-ok">Active</span>
+                <small class="admin-status-sub">{{ m.last_sign_in_at | stamp }}</small>
+              {% else %}
+                <span class="admin-status is-idle">Never signed in</span>
+              {% endif %}
+            </td>
             <td><a class="admin-open" href="{{ url_for('admin_member', uid=m.id) }}">View →</a></td>
           </tr>
           {% endfor %}

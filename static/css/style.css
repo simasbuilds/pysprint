@@ -4123,3 +4123,56 @@ body.cmdk-open { overflow: hidden; }
                        white-space: normal; }
   .resume-chip b     { grid-area: arrow; align-self: center; font-size: 1.05rem; }
 }
+
+/* ── Signed-in nav density ─────────────────────────────────────────────
+   The bar carries more when someone is signed in — XP, streak, avatar, and
+   an Admin link for operators. That pushed "Start here" and "How it works"
+   into two lines at every desktop width, and overflowed the viewport
+   between 1100 and 1280px. Anonymous sweeps never caught it because none
+   of those elements exist when signed out.
+   Keep labels on one line and let the bar tighten before it breaks. */
+@media (min-width: 1001px) {
+  .nav-links > a, .nav-menu-trigger { white-space: nowrap; }
+}
+@media (min-width: 1001px) and (max-width: 1080px) {
+  /* Tightest band: an admin bar does not fit here on labels alone, so the
+     two flat pages fall back to their icons, which the drawer already uses. */
+  .nav-links > a.nav-start span, .nav-links > a[href$="/about"] span { gap: 0; }
+  .nav-links > a.nav-start .nav-lead, .nav-links > a[href$="/about"] .nav-lead { font-size: 0; }
+  .nav-links > a.nav-start .ui-icon, .nav-links > a[href$="/about"] .ui-icon {
+    display: block; width: 18px; height: 18px; color: var(--text-dim);
+  }
+}
+@media (min-width: 1001px) and (max-width: 1300px) {
+  .nav-links > a, .nav-menu-trigger { padding-inline: .5rem; font-size: .84rem; }
+  .nav-links > a.nav-start { margin-left: .25rem; padding-left: .6rem; }
+  .nav-inner { gap: .4rem; }
+  .nav-right { gap: .35rem; }
+  /* The search label is the most expendable pixels here; the icon still reads. */
+  .cmdk-btn-text, .cmdk-hint { display: none; }
+  .nav-stats { font-size: .8rem; }
+}
+
+/* ── Admin member status ───────────────────────────────────────────────
+   An operator needs to distinguish a confirmed account from one that never
+   verified, and a real sign-in from a row that merely exists. Colour
+   carries the state, but each also has a distinct word, so the table stays
+   readable to anyone who cannot separate the hues. */
+.admin-method {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .78rem; font-weight: 700; color: var(--text-dim);
+  border: 1px solid var(--border); border-radius: 99px; padding: .2rem .55rem;
+}
+.admin-method.is-google { color: var(--brand-1); border-color: color-mix(in srgb, var(--brand-1) 35%, var(--border)); }
+.admin-status {
+  display: inline-block; font-size: .76rem; font-weight: 800;
+  border-radius: 99px; padding: .2rem .55rem; white-space: nowrap;
+}
+.admin-status.is-ok      { color: #0f7a4a; background: color-mix(in srgb, #16a34a 12%, transparent); }
+.admin-status.is-pending { color: #92600a; background: color-mix(in srgb, #f59e0b 16%, transparent); }
+.admin-status.is-banned  { color: #9b1c1c; background: color-mix(in srgb, #dc2626 14%, transparent); }
+.admin-status.is-idle    { color: var(--text-dim); background: var(--surface-2); }
+.admin-status-sub { display: block; margin-top: .2rem; font-size: .72rem; color: var(--text-dim); }
+[data-theme="dark"] .admin-status.is-ok      { color: #6ee7b7; }
+[data-theme="dark"] .admin-status.is-pending { color: #fcd34d; }
+[data-theme="dark"] .admin-status.is-banned  { color: #fca5a5; }

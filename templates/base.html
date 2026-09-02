@@ -237,7 +237,9 @@
     {% block content %}{% endblock %}
   </main>
 
-  {% if request.endpoint not in ('home', 'playground', 'login', 'register', none) %}
+  {# The admin pages are an operator tool, not a funnel — pitching "Start free, no card" to someone auditing accounts reads as unserious. #}
+  {% if request.endpoint not in ('home', 'playground', 'login', 'register',
+                                 'admin', 'admin_member', 'profile', none) %}
   <section class="global-cta">
     <div>
       <span class="eyebrow">Your next ten minutes</span>
