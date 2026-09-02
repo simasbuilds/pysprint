@@ -19,3 +19,6 @@ Thumbs.db
 
 # Project-scoped MCP config holds a Supabase access token
 .mcp.json
+
+# Pre-migration DB snapshots: contain emails and password hashes.
+backups/

@@ -11,12 +11,12 @@ from datetime import date, datetime, timezone
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import (Flask, Response, abort, jsonify, redirect, render_template, request,
+from flask import (Flask, Response, abort, g, jsonify, redirect, render_template, request,
                    session, url_for)
-from werkzeug.security import check_password_hash, generate_password_hash
 
 import database as db
 import mailer
+import supabase_auth
 from data.achievements import ACHIEVEMENTS, evaluate
 from data.challenges import CHALLENGES, get_challenge
 from data.cheatsheet import CHEATSHEET, categories as cheat_categories
@@ -51,26 +51,14 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = env("SESSION_COOKIE_SECURE", "0") == "1"
 
-# ── Google Sign-In (optional; activates when credentials are present) ──
-GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET")
-google_oauth = None
-if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
-    try:
-        from authlib.integrations.flask_client import OAuth
-        _oauth = OAuth(app)
-        google_oauth = _oauth.register(
-            name="google",
-            client_id=GOOGLE_CLIENT_ID,
-            client_secret=GOOGLE_CLIENT_SECRET,
-            server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-            client_kwargs={"scope": "openid email profile"},
-        )
-    except Exception as exc:  # Authlib missing or misconfigured — stay disabled.
-        app.logger.warning("Google OAuth disabled: %s", exc)
-        google_oauth = None
-
-app.config["GOOGLE_ENABLED"] = google_oauth is not None
+# ── Sign-in (Supabase Auth / GoTrue) ──────────────────────────────────
+# Identity lives in Supabase, not here. Google sign-in is configured in the
+# Supabase dashboard rather than in this app, so the only thing to decide
+# locally is whether the feature is available at all.
+app.config["GOOGLE_ENABLED"] = (
+    supabase_auth.is_configured() and env("GOOGLE_ENABLED", "1") == "1"
+)
+app.config["AUTH_READY"] = supabase_auth.is_configured()
 
 db.init_db()
 
@@ -88,8 +76,39 @@ LEVEL_TITLES = ["Newcomer", "Explorer", "Apprentice", "Coder", "Builder",
 # ── helpers ──────────────────────────────────────────────────────────
 
 def current_user():
-    uid = session.get("user_id")
-    return db.get_user(uid) if uid else None
+    """Cached per request: inject_globals calls this on every render, and
+    several routes call it again, so without caching a single page issues
+    the same query repeatedly.
+
+    Reads the profile straight from Postgres rather than asking GoTrue, so a
+    normal page load makes no network call to the auth service. The Flask
+    signed cookie stays the source of truth for "is this person signed in";
+    the GoTrue tokens are only needed to act on the auth record itself.
+    """
+    if "cached_user" not in g:
+        uid = session.get("user_id")
+        try:
+            g.cached_user = db.get_user(uid) if uid else None
+        except Exception:
+            # A cookie predating the UUID migration holds an integer id,
+            # which Postgres rejects outright. Fail soft to signed-out
+            # rather than 500ing every page for anyone with a stale cookie.
+            g.cached_user = None
+    return g.cached_user
+
+
+def forget_user():
+    """Drop the request cache after a write that changes the profile."""
+    g.pop("cached_user", None)
+
+
+def start_session(auth):
+    """Persist a GoTrue session in the Flask cookie."""
+    session["user_id"] = auth["user"]["id"]
+    session["access_token"] = auth.get("access_token", "")
+    session["refresh_token"] = auth.get("refresh_token", "")
+    session.permanent = True
+    forget_user()
 
 
 def safe_next(target):
@@ -173,6 +192,18 @@ def display_name_for(user):
     if not user:
         return ""
     return (user["display_name"] or "").strip() or user["username"]
+
+
+@app.template_filter("day")
+def _day(value):
+    """Render a date for display. created_at is a real timestamp since the
+    move to auth.users; it used to be TEXT that templates sliced with
+    [:10], which raises TypeError on a datetime."""
+    if not value:
+        return ""
+    if hasattr(value, "strftime"):
+        return value.strftime("%Y-%m-%d")
+    return str(value)[:10]
 
 
 @app.context_processor
@@ -486,17 +517,29 @@ def register():
             error = "Please enter a valid email address."
         elif len(password) < 8:
             error = "Password must be at least 8 characters."
-        elif db.find_user(username) or db.find_user(email):
-            error = "That username or email is already registered."
+        elif db.username_taken(username):
+            error = "That username is already taken."
         else:
-            uid = db.create_user(username, email, generate_password_hash(password))
-            send_welcome_email(username, email)
-            session["user_id"] = uid
-            session.permanent = True
-            # Come back to the lesson they were on, so device progress syncs
-            # in context instead of dumping them on the dashboard.
-            return redirect(safe_next(request.args.get("next"))
-                            or url_for("dashboard"))
+            auth, err = supabase_auth.sign_up(email, password, username=username)
+            if err:
+                error = err
+            elif not auth.get("access_token"):
+                # Email confirmation is on, so no session comes back and the
+                # person cannot be signed in yet.
+                return render_template("register.html", check_email=email)
+            else:
+                # The profile row is created by a database trigger, which
+                # picks its own unique username; apply the requested one now
+                # that the account exists.
+                uid = auth["user"]["id"]
+                if not db.username_taken(username, uid):
+                    db.update_profile(uid, username=username)
+                send_welcome_email(username, email)
+                start_session(auth)
+                # Come back to the lesson they were on, so device progress
+                # syncs in context instead of dumping them on the dashboard.
+                return redirect(safe_next(request.args.get("next"))
+                                or url_for("dashboard"))
     return render_template("register.html", error=error)
 
 
@@ -506,82 +549,76 @@ def login():
     if request.method == "POST":
         ident = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        user = db.find_user(ident)
-        if user and check_password_hash(user["password_hash"], password):
-            session["user_id"] = user["id"]
-            session.permanent = True
+        auth, err = supabase_auth.sign_in(ident, password)
+        if auth:
+            start_session(auth)
             return redirect(safe_next(request.args.get("next")) or url_for("dashboard"))
-        error = "Invalid credentials — check your username and password."
+        # Deliberately not distinguishing "no such account" from "wrong
+        # password" — that difference tells an attacker which emails exist.
+        error = "Invalid credentials — check your email and password."
     return render_template("login.html", error=error)
 
 
 @app.get("/logout")
 def logout():
+    # Revoke the refresh token server-side as well, so signing out is not
+    # merely the browser forgetting its cookie.
+    supabase_auth.sign_out(session.get("access_token"))
     session.clear()
+    forget_user()
     return redirect(url_for("home"))
 
 
-# ── Google Sign-In (OpenID Connect via Authlib) ──────────────────────
+# ── Google Sign-In (via Supabase Auth, PKCE) ─────────────────────────
 
-def _unique_username(base):
-    """Derive an available username from a Google display name / email."""
-    base = re.sub(r"[^a-zA-Z0-9_]", "", (base or "user")).lower()[:20] or "user"
-    if len(base) < 3:
-        base = (base + "user")[:20]
-    candidate, n = base, 0
-    while db.find_user(candidate):
-        n += 1
-        suffix = str(n)
-        candidate = base[: 24 - len(suffix)] + suffix
-    return candidate
+# Username generation now lives in the on_auth_user_created database
+# trigger, which runs in the same transaction as the auth user and so has
+# no race between checking a name and taking it.
 
 
 @app.get("/auth/google")
 def google_login():
-    if not google_oauth:
+    if not app.config.get("GOOGLE_ENABLED"):
         return redirect(url_for("login"))
+    # PKCE, not the implicit flow: implicit returns the code in the URL
+    # fragment, which browsers never send to the server, so a server-rendered
+    # app could not read it without JavaScript handing it back.
+    verifier = supabase_auth.make_verifier()
+    session["pkce_verifier"] = verifier
     session["oauth_next"] = safe_next(request.args.get("next")) or url_for("dashboard")
     redirect_uri = app.config["SITE_URL"].rstrip("/") + url_for("google_callback")
-    return google_oauth.authorize_redirect(redirect_uri)
+    return redirect(supabase_auth.oauth_url(
+        "google", redirect_uri, supabase_auth.challenge_for(verifier)))
 
 
 @app.get("/auth/google/callback")
 def google_callback():
-    if not google_oauth:
-        return redirect(url_for("login"))
-    try:
-        token = google_oauth.authorize_access_token()
-        info = token.get("userinfo") or google_oauth.userinfo()
-    except Exception as exc:  # user cancelled or token exchange failed
-        app.logger.warning("Google callback failed: %s", exc)
+    verifier = session.pop("pkce_verifier", None)
+    code = request.args.get("code")
+    if not code or not verifier:
+        app.logger.warning("Google callback without code or verifier")
         return redirect(url_for("login"))
 
-    sub = info.get("sub")
-    email = (info.get("email") or "").strip()
-    if not sub or not email:
+    auth, err = supabase_auth.exchange_code(code, verifier)
+    if err or not auth.get("access_token"):
+        app.logger.warning("Google code exchange failed: %s", err)
         return redirect(url_for("login"))
-    avatar = info.get("picture")
 
-    user = db.find_user_by_google(sub)
-    if user and avatar:
-        # Refresh the stored Google photo on every sign-in: people change it,
-        # and an account that predates the google_avatar column has none yet.
-        # This only touches google_avatar, never the avatar they chose.
-        db.update_google_avatar(user["id"], avatar)
-        user = db.get_user(user["id"])
-    if not user:
-        existing = db.find_user(email)          # link Google to a prior password account
-        if existing:
-            db.link_google_to_user(existing["id"], sub, avatar)
-            user = db.get_user(existing["id"])
-        else:
-            username = _unique_username(info.get("name") or email.split("@")[0])
-            uid = db.create_google_user(username, email, sub, avatar)
-            user = db.get_user(uid)
+    start_session(auth)
+    uid = auth["user"]["id"]
 
-    session["user_id"] = user["id"]
-    session.permanent = True
-    award_new_achievements(user)
+    # Refresh the stored Google photo on every sign-in: people change it, and
+    # an account created before this ran has none yet. Only google_avatar is
+    # touched, never the avatar they picked themselves.
+    meta = (auth["user"].get("user_metadata") or {})
+    picture = meta.get("avatar_url") or meta.get("picture")
+    if picture:
+        db.update_google_avatar(uid, picture)
+        forget_user()
+
+    user = current_user()
+    if user:
+        award_new_achievements(user)
     return redirect(session.pop("oauth_next", None) or url_for("dashboard"))
 
 
@@ -620,7 +657,8 @@ def profile():
                 avatar_url = url_for("static", filename=f"images/avatars/{avatar}.png")
             db.update_profile(user["id"], username=username, avatar_url=avatar_url,
                               display_name=display)
-            user = db.get_user(user["id"])
+            forget_user()
+            user = current_user()
             saved = "Profile updated."
 
     stats = user_stats(user)
@@ -650,8 +688,13 @@ def profile_delete():
     """Permanently delete the signed-in account.
 
     Requires the person to type their username, so a stray click cannot do
-    it. Password accounts must also confirm their password — without that,
-    anyone with a borrowed unlocked laptop could erase the account.
+    it. Accounts with a password must also confirm it — without that, anyone
+    with a borrowed unlocked laptop could erase the account.
+
+    The password is now checked by signing in against Supabase rather than
+    against a local hash, which is authoritative rather than a copy. Deleting
+    the auth record cascades the profile and all progress away with it, so
+    the export really does describe everything that is removed.
     """
     user = current_user()
     typed = request.form.get("confirm_username", "").strip()
@@ -659,11 +702,21 @@ def profile_delete():
 
     if typed.lower() != user["username"].lower():
         return redirect(url_for("profile", delete_error="name"))
-    if user["password_hash"] and not check_password_hash(user["password_hash"], password):
-        return redirect(url_for("profile", delete_error="password"))
 
-    db.delete_user(user["id"])
+    # Google-only accounts have no password to confirm; the template hides
+    # the field for them, and typing the username stays their sole guard.
+    if password:
+        auth, err = supabase_auth.sign_in(user["email"], password)
+        if err or not auth:
+            return redirect(url_for("profile", delete_error="password"))
+
+    _, err = supabase_auth.admin_delete_user(user["id"])
+    if err:
+        app.logger.error("Account deletion failed for %s: %s", user["id"], err)
+        return redirect(url_for("profile", delete_error="failed"))
+
     session.clear()
+    forget_user()
     return redirect(url_for("home", deleted="1"))
 
 
@@ -830,10 +883,10 @@ def admin():
                            n_lessons=total_lessons())
 
 
-@app.get("/admin/members/<int:uid>")
+@app.get("/admin/members/<uuid:uid>")
 @admin_required
 def admin_member(uid):
-    detail = db.member_detail(uid)
+    detail = db.member_detail(str(uid))
     if not detail:
         abort(404)
     course_titles = {c["slug"]: c["title"] for c in COURSES}
