@@ -64,9 +64,7 @@ db.init_db()
 
 # Admins are designated by the operator, never self-service. Set
 # ADMIN_USERNAMES="alice,bob@example.com" in the environment.
-for _name in (n.strip() for n in os.environ.get("ADMIN_USERNAMES", "").split(",")):
-    if _name:
-        db.set_admin(_name, True)
+db.sync_admins(os.environ.get("ADMIN_USERNAMES", "").split(","))
 
 XP_PER_LEVEL = 250
 LEVEL_TITLES = ["Newcomer", "Explorer", "Apprentice", "Coder", "Builder",
@@ -192,6 +190,18 @@ def display_name_for(user):
     if not user:
         return ""
     return (user["display_name"] or "").strip() or user["username"]
+
+
+@app.template_filter("stamp")
+def _stamp(value):
+    """Date and time for admin listings. These columns are timestamptz since
+    the move to auth.users; templates used to slice them as [:16] text,
+    which raises TypeError on a datetime."""
+    if not value:
+        return ""
+    if hasattr(value, "strftime"):
+        return value.strftime("%Y-%m-%d %H:%M")
+    return str(value)[:16]
 
 
 @app.template_filter("day")

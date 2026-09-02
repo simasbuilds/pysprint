@@ -69,7 +69,7 @@
             <summary>{{ c['items']|length }} lesson{{ '' if c['items']|length == 1 else 's' }} completed</summary>
             <ul>
               {% for l in c['items'] %}
-              <li><span>{{ icon('check') }} {{ l.title }}</span><small>{{ l.completed_at[:16] }}</small></li>
+              <li><span>{{ icon('check') }} {{ l.title }}</span><small>{{ l.completed_at | stamp }}</small></li>
               {% endfor %}
             </ul>
           </details>
@@ -94,7 +94,7 @@
           <span class="admin-badge-icon">{{ icon(meta.icon if meta else 'trophy') }}</span>
           <div>
             <strong>{{ meta.title if meta else a.achievement_id }}</strong>
-            <small>{{ a.earned_at[:16] }}</small>
+            <small>{{ a.earned_at | stamp }}</small>
           </div>
         </li>
         {% endfor %}
@@ -109,7 +109,7 @@
       {% if d.challenges %}
       <ul class="admin-simple-list">
         {% for c in d.challenges %}
-        <li><span>{{ c.challenge_slug.replace('project:', 'Project · ')|replace('-', ' ')|title }}</span><small>{{ c.completed_at[:16] }}</small></li>
+        <li><span>{{ c.challenge_slug.replace('project:', 'Project · ')|replace('-', ' ')|title }}</span><small>{{ c.completed_at | stamp }}</small></li>
         {% endfor %}
       </ul>
       {% else %}

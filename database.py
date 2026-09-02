@@ -113,7 +113,7 @@ def touch_streak(user_id):
     today = datetime.now(timezone.utc).date()
     user = get_user(user_id)
     if not user:
-        return
+        return 0
     last = user.get("last_active")
     if last:
         try:
@@ -121,7 +121,7 @@ def touch_streak(user_id):
         except ValueError:
             last_date = None
         if last_date == today:
-            return
+            return user["streak"]
         streak = user["streak"] + 1 if last_date == today - timedelta(days=1) else 1
     else:
         streak = 1
@@ -129,6 +129,7 @@ def touch_streak(user_id):
         db.execute(
             "UPDATE public.profiles SET streak = %s, last_active = %s WHERE id = %s",
             (streak, today.isoformat(), str(user_id)))
+    return streak
 
 
 def username_taken(username, exclude_user_id=None):
@@ -167,14 +168,25 @@ def update_google_avatar(user_id, url):
                    (url, str(user_id)))
 
 
-def set_admin(username_or_email, is_admin=True):
-    """Match on the profile's username or the auth record's email."""
+def sync_admins(names):
+    """Make ADMIN_USERNAMES authoritative, not merely additive.
+
+    The old set_admin only ever granted, so removing someone from the env
+    var left them admin forever and a stale value silently re-promoted an
+    account on the next boot. This grants to everyone named and revokes
+    from everyone else, in one statement, so the environment is the single
+    source of truth.
+
+    Names match either the profile username or the auth email.
+    """
+    names = [n.strip().lower() for n in names if n and n.strip()]
     with get_db() as db:
         db.execute("""
-            UPDATE public.profiles SET is_admin = %s
-            WHERE username = %s
-               OR id = (SELECT id FROM auth.users WHERE lower(email) = lower(%s))
-        """, (bool(is_admin), username_or_email, username_or_email))
+            UPDATE public.profiles p SET is_admin = (
+                lower(p.username) = ANY(%s)
+                OR lower(COALESCE((SELECT email FROM auth.users a WHERE a.id = p.id), '')) = ANY(%s)
+            )
+        """, (names, names))
 
 
 # ── progress ─────────────────────────────────────────────────────────
@@ -310,7 +322,13 @@ def list_members(search="", sort="recent", limit=200, offset=0):
             LEFT JOIN auth.users au ON au.id = p.id
             %s ORDER BY %s LIMIT %%s OFFSET %%s
         """ % (where, order), tuple(params)).fetchall()
-    return [dict(r) for r in rows]
+        # The portal shows a member count beside the heading, so the total
+        # must survive paging — callers unpack (rows, total).
+        total = db.execute(
+            "SELECT COUNT(*) AS n FROM public.profiles p "
+            "LEFT JOIN auth.users au ON au.id = p.id %s" % where,
+            tuple(params[:-2])).fetchone()["n"]
+    return [dict(r) for r in rows], total
 
 
 def member_detail(user_id):
@@ -338,19 +356,35 @@ def member_detail(user_id):
 
 
 def platform_stats():
+    """Headline numbers for the admin overview.
+
+    Key names are the contract admin.html renders against — renaming them
+    silently blanks tiles rather than raising, so they stay as they were.
+    """
+    from datetime import date
+    today = date.today()
     with get_db() as db:
-        row = db.execute("""
-            SELECT (SELECT COUNT(*) FROM public.profiles) AS users,
-                   (SELECT COUNT(*) FROM public.profiles WHERE is_admin) AS admins,
-                   (SELECT COUNT(*) FROM auth.identities WHERE provider = 'google') AS google_users,
-                   (SELECT COUNT(*) FROM public.profiles WHERE created_at >= %s) AS new_7d,
-                   (SELECT COUNT(*) FROM public.lesson_progress) AS lessons_done,
-                   (SELECT COUNT(*) FROM public.challenge_progress) AS challenges_done,
-                   (SELECT COUNT(*) FROM public.user_achievements) AS achievements,
-                   (SELECT COALESCE(SUM(xp), 0) FROM public.profiles) AS total_xp,
-                   (SELECT COUNT(DISTINCT user_id) FROM public.lesson_progress) AS active_learners
-        """, (_days_ago(7),)).fetchone()
-    return dict(row)
+        one = lambda q, p=(): db.execute(q, p).fetchone()[0]
+        return {
+            "members": one("SELECT COUNT(*) FROM public.profiles"),
+            "admins": one("SELECT COUNT(*) FROM public.profiles WHERE is_admin"),
+            "google_members": one(
+                "SELECT COUNT(DISTINCT user_id) FROM auth.identities WHERE provider = 'google'"),
+            "new_7d": one(
+                "SELECT COUNT(*) FROM public.profiles WHERE created_at >= %s",
+                (_days_ago(7),)),
+            "active_7d": one(
+                "SELECT COUNT(*) FROM public.profiles WHERE last_active >= %s",
+                ((today - timedelta(days=7)).isoformat(),)),
+            "active_today": one(
+                "SELECT COUNT(*) FROM public.profiles WHERE last_active = %s",
+                (today.isoformat(),)),
+            "lessons_completed": one("SELECT COUNT(*) FROM public.lesson_progress"),
+            "challenges_completed": one("SELECT COUNT(*) FROM public.challenge_progress"),
+            "total_xp": one("SELECT COALESCE(SUM(xp), 0) FROM public.profiles"),
+            "learners_with_progress": one(
+                "SELECT COUNT(DISTINCT user_id) FROM public.lesson_progress"),
+        }
 
 
 def signups_by_day(days=14):
