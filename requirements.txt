@@ -2,7 +2,7 @@ Flask>=3.0
 python-dotenv>=1.0
 gunicorn>=21.2 ; sys_platform != "win32"
 # Optional — only needed to enable "Continue with Google" sign-in.
-Authlib>=1.3
+# Supabase Auth (GoTrue) and Resend both speak HTTP.
 requests>=2.31
 
 # Only needed when DATABASE_URL points at Postgres (e.g. Supabase).

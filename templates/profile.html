@@ -30,8 +30,8 @@
         <span>{{ icon('star') }} {{ earned }} achievements</span>
       </div>
       <p class="profile-since muted">
-        {% if user.google_sub %}Signed in with Google{% else %}Email and password account{% endif %}
-        · joined {{ user.created_at[:10] }}
+        {% if user.has_google %}Signed in with Google{% else %}Email and password account{% endif %}
+        · joined {{ user.created_at | day }}
       </p>
     </div>
   </div>
@@ -106,7 +106,7 @@
           <input type="text" name="confirm_username" autocomplete="off" required
                  placeholder="{{ user.username }}">
         </label>
-        {% if not user.google_sub %}
+        {% if not user.has_google %}
         <label>Your password
           <span class="pw-field">
             <input type="password" name="password" required autocomplete="current-password">

@@ -12,6 +12,17 @@
     <p>Save every lesson, project, streak and achievement while the Python itself stays free to learn.</p>
     <div class="auth-proof"><span>{{ icon('check') }} No credit card</span><span>{{ icon('check') }} Every lesson is free</span><span>{{ icon('check') }} Start in under a minute</span></div>
   </aside>
+  {% if check_email %}
+  {# Reached only when email confirmation is enabled in Supabase: GoTrue
+     returns a user but no session, so nobody can be signed in yet. #}
+  <div class="card auth-card">
+    <span class="eyebrow">Almost there</span>
+    <h1>Check your email</h1>
+    <p class="muted">We sent a confirmation link to <strong>{{ check_email }}</strong>.
+       Open it to activate your account, then sign in.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Go to sign in</a>
+  </div>
+  {% else %}
   <form class="card auth-card" method="post" novalidate>
     <span class="eyebrow">Create your account</span>
     <h1>Start learning</h1>
@@ -40,5 +51,6 @@
     <button class="btn btn-primary btn-lg" type="submit">Create account →</button>
     <p class="auth-alt">Already have one? <a href="{{ url_for('login') }}">Log in</a></p>
   </form>
+  {% endif %}
 </section>
 {% endblock %}

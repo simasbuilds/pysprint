@@ -15,9 +15,9 @@
       <h1>{{ d.user.username }}{% if d.user.is_admin %} <em class="admin-pill">admin</em>{% endif %}</h1>
       <p>{{ d.user.email }}</p>
       <div class="course-meta">
-        <span>{{ icon('calendar') }} Joined {{ d.user.created_at[:10] }}</span>
+        <span>{{ icon('calendar') }} Joined {{ d.user.created_at | day }}</span>
         <span>{{ icon('clock') }} Last active {{ d.user.last_active or 'never' }}</span>
-        <span>{{ icon('lock') }} {{ 'Google account' if d.user.google_sub else 'Email account' }}</span>
+        <span>{{ icon('lock') }} {{ 'Google account' if d.user.has_google else 'Email account' }}</span>
       </div>
     </div>
     <div class="admin-member-level">

@@ -199,6 +199,7 @@ def complete_challenge(user_id, challenge_slug):
 
 
 def get_progress(user_id):
+    """Return {course_slug: set(lesson_slugs)} and a set of challenge slugs."""
     with get_db() as db:
         lessons = db.execute(
             "SELECT course_slug, lesson_slug FROM public.lesson_progress WHERE user_id = %s",
@@ -206,10 +207,11 @@ def get_progress(user_id):
         challenges = db.execute(
             "SELECT challenge_slug FROM public.challenge_progress WHERE user_id = %s",
             (str(user_id),)).fetchall()
-    return {
-        "lessons": {(r["course_slug"], r["lesson_slug"]) for r in lessons},
-        "challenges": {r["challenge_slug"] for r in challenges},
-    }
+    # Callers unpack this as (by_course, challenges) — keep that contract.
+    by_course = {}
+    for row in lessons:
+        by_course.setdefault(row["course_slug"], set()).add(row["lesson_slug"])
+    return by_course, {row["challenge_slug"] for row in challenges}
 
 
 def get_earned_achievements(user_id):
