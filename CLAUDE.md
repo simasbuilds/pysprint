@@ -5,7 +5,8 @@ Guidance for Claude Code (and any developer) working in this repository.
 ## What this is
 
 **LearnWithPython** is a full-stack interactive Python learning platform:
-Flask + SQLite backend, Jinja server-rendered multi-page frontend, and real
+Flask + Postgres (Supabase) backend, Jinja server-rendered multi-page
+frontend, and real
 Python 3 running **in the browser** via Pyodide (WebAssembly). Learners take
 courses, pass graded coding challenges, take quizzes, earn XP/streaks/
 achievements, and retain knowledge with a built-in spaced-repetition
@@ -19,14 +20,17 @@ cp .env.example .env        # then edit SECRET_KEY
 python app.py               # http://127.0.0.1:5000
 ```
 
-The SQLite database (`pysprint.db`) is created automatically on first start.
-No migrations, no seed step.
+Requires a Supabase project: set `DATABASE_URL` plus the three `SUPABASE_*`
+keys. Schema changes are Supabase migrations, not created at app boot.
+There is no local SQLite fallback — identity lives in Supabase's hosted
+`auth.users`, which has no offline equivalent.
 
 ## Architecture
 
 ```
 app.py               Flask app: all routes, auth, progress API, SEO routes
-database.py          SQLite layer (stdlib sqlite3, no ORM). Schema lives here.
+database.py          Postgres layer (psycopg, no ORM). Profiles + progress.
+supabase_auth.py     GoTrue REST client: sign-up/in/out, OAuth, admin.
 data/
   courses.py         THE CURRICULUM. 10 courses × lessons (content/example/
                      challenge/quiz). This is where 90% of edits happen.
@@ -140,23 +144,45 @@ repetition, project-based). It is the first entry in the Learn menu and a
 top-level nav item, because the visitor with the least context needs the
 clearest door.
 
-## Connecting to Supabase
+## Authentication (Supabase Auth)
 
-Use the **session pooler**, not the direct host. `db.<ref>.supabase.co` is
-IPv6-only and refuses connections on free projects; the pooler answers over
-IPv4:
+Identity lives in Supabase's `auth.users`, not in this app. `supabase_auth.py`
+is a small GoTrue REST client built on `requests` — no `supabase-py`, which
+would add seven packages to make six HTTP calls and fights Flask's signed
+cookie with its own session storage. Every call returns `(data, error)`
+rather than raising, so routes stay flat.
 
-    DATABASE_URL=postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres
+`public.profiles` is keyed by the same UUID and holds only what GoTrue has no
+concept of: username, display name, XP, streak, avatars, is_admin. Email and
+Google identity are **read through** via joins to `auth.users` /
+`auth.identities` — never copied, because a second copy is how they drift.
 
-Note the username is `postgres.<project_ref>`, not `postgres` — the pooler
-routes on it, and a wrong region fails with `(ENOTFOUND) tenant/user not
-found`. If the dashboard is not to hand, the region can be derived by
-resolving the direct host's AAAA record and matching it against
-`https://ip-ranges.amazonaws.com/ip-ranges.json`.
+Profile rows are created by the `on_auth_user_created` trigger, not by the
+app. With OAuth the user appears inside GoTrue during the callback and the
+app only learns about it afterwards, so app-side creation would leave a
+window where an auth user exists with no profile.
 
-`init_db()` runs at import, so an unreachable database stops the app
-booting at all rather than degrading — worth remembering when a deploy
-suddenly 500s.
+Google sign-in uses **PKCE**, not the implicit flow: implicit returns the
+code in the URL fragment, which browsers never send to the server. The
+provider is configured in the Supabase dashboard, not in this app — the only
+local switch is `GOOGLE_ENABLED`.
+
+`current_user()` is cached on `flask.g` and reads Postgres, not GoTrue, so a
+page load makes no call to the auth service. The Flask cookie is the source
+of truth for "signed in", which means revoking a Supabase session does not
+log someone out immediately. Fine here; revisit if payments appear.
+
+Login is **email-only** — GoTrue does not authenticate by username.
+
+Required env: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+(server-side only; it bypasses RLS). `DATABASE_URL` still uses the **session
+pooler**, not the direct host: `db.<ref>.supabase.co` is IPv6-only and refuses
+connections on free projects. The username is `postgres.<project_ref>` — the
+pooler routes on it, and a wrong region fails with `tenant/user not found`.
+
+RLS is enabled with correct policies, but the app connects as `postgres` and
+bypasses them. They are inert today and exist so a future role switch is
+configuration rather than a redesign.
 
 ## Accounts, profile and deletion
 
@@ -166,8 +192,9 @@ carries a baked-in frame). Presets and Google pictures share the same
 `users.avatar_url` column, so the rest of the UI never asks which it is.
 
 Deletion in `database.py` removes child rows explicitly rather than relying
-on `ON DELETE CASCADE`: Postgres declares it, the SQLite schema does not,
-and SQLite only enforces foreign keys when the pragma is on. `/profile/delete`
+`ON DELETE CASCADE` from `auth.users`: deleting the auth record removes the
+profile and every progress row with it, so the export cannot describe data
+the delete leaves behind. `/profile/delete`
 requires the username typed back, plus the password for password accounts,
 so a borrowed unlocked laptop cannot erase an account in one click.
 `export_user()` and `delete_user()` are deliberately next to each other —
@@ -216,8 +243,8 @@ Run the same pattern over `data/challenges.py` when editing the arena.
 ## Deployment notes
 
 - Set a real `SECRET_KEY` and `SITE_URL` in the environment.
-- `gunicorn app:app` behind any reverse proxy; SQLite is fine for this
-  write volume. `DATABASE_PATH` moves the DB file (e.g. a mounted volume).
+- `gunicorn app:app` behind any reverse proxy. All state is in Supabase, so
+  instances are stateless and can scale horizontally.
 - `FLASK_DEBUG=0` in production.
 
 ## Social share card

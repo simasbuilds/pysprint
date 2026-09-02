@@ -569,7 +569,7 @@ def logout():
     return redirect(url_for("home"))
 
 
-# ── Google Sign-In (OpenID Connect via Authlib) ──────────────────────
+# ── Google Sign-In (via Supabase Auth, PKCE) ─────────────────────────
 
 # Username generation now lives in the on_auth_user_created database
 # trigger, which runs in the same transaction as the auth user and so has
