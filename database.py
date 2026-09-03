@@ -85,7 +85,7 @@ def get_user(user_id):
     with get_db() as db:
         row = db.execute("""
             SELECT p.*, au.email, au.last_sign_in_at, au.email_confirmed_at,
-                   au.banned_until,
+                   (au.banned_until IS NOT NULL AND au.banned_until > now()) AS is_banned,
                    EXISTS (SELECT 1 FROM auth.identities i
                            WHERE i.user_id = p.id AND i.provider = 'google') AS has_google
             FROM public.profiles p
@@ -295,9 +295,13 @@ def delete_user(user_id):
 
 # ── admin ────────────────────────────────────────────────────────────
 
+# Keys must cover every option admin.html offers, or the select silently
+# falls back to "recent" and the control looks broken for no visible reason.
 SORTS = {
-    "recent": "p.created_at DESC",
+    "recent": "COALESCE(au.last_sign_in_at, p.created_at) DESC",
+    "joined": "p.created_at DESC",
     "xp": "p.xp DESC",
+    "lessons": "lessons_done DESC",
     "streak": "p.streak DESC",
     "name": "p.username ASC",
 }
@@ -314,7 +318,8 @@ def list_members(search="", sort="recent", limit=200, offset=0):
         rows = db.execute("""
             SELECT p.id, p.username, p.display_name, p.xp, p.streak, p.is_admin,
                    p.created_at, p.last_active, au.email,
-                   au.last_sign_in_at, au.email_confirmed_at, au.banned_until,
+                   au.last_sign_in_at, au.email_confirmed_at,
+                   (au.banned_until IS NOT NULL AND au.banned_until > now()) AS is_banned,
                    EXISTS (SELECT 1 FROM auth.identities i
                            WHERE i.user_id = p.id AND i.provider = 'google') AS has_google,
                    (SELECT COUNT(*) FROM public.lesson_progress l WHERE l.user_id = p.id) AS lessons_done,

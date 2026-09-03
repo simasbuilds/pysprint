@@ -4036,15 +4036,6 @@ body.cmdk-open { overflow: hidden; }
   .nav-menu-trigger.active .nav-lead .ui-icon { color: var(--brand-1); }
 }
 
-/* Just above the drawer the bar fits, but only barely -- at 1001px it still
-   ran 5px past the viewport. Tighten the horizontal padding through that
-   band rather than hand another 100px of width back to the drawer. */
-@media (min-width: 1001px) and (max-width: 1100px) {
-  .nav-links > a, .nav-menu-trigger { padding-inline: .58rem; }
-  .nav-links > a.nav-start { margin-left: .3rem; padding-left: .72rem; }
-  .nav-inner { gap: .5rem; }
-}
-
 /* ── Creator page ──────────────────────────────────────────────────────
    .directory-hero gives its copy the smaller column (.9fr vs 1.1fr),
    which suits a page whose right side is artwork. Here the right side is
@@ -4134,23 +4125,19 @@ body.cmdk-open { overflow: hidden; }
 @media (min-width: 1001px) {
   .nav-links > a, .nav-menu-trigger { white-space: nowrap; }
 }
-@media (min-width: 1001px) and (max-width: 1080px) {
-  /* Tightest band: an admin bar does not fit here on labels alone, so the
-     two flat pages fall back to their icons, which the drawer already uses. */
-  .nav-links > a.nav-start span, .nav-links > a[href$="/about"] span { gap: 0; }
-  .nav-links > a.nav-start .nav-lead, .nav-links > a[href$="/about"] .nav-lead { font-size: 0; }
-  .nav-links > a.nav-start .ui-icon, .nav-links > a[href$="/about"] .ui-icon {
-    display: block; width: 18px; height: 18px; color: var(--text-dim);
-  }
-}
 @media (min-width: 1001px) and (max-width: 1300px) {
   .nav-links > a, .nav-menu-trigger { padding-inline: .5rem; font-size: .84rem; }
   .nav-links > a.nav-start { margin-left: .25rem; padding-left: .6rem; }
   .nav-inner { gap: .4rem; }
   .nav-right { gap: .35rem; }
-  /* The search label is the most expendable pixels here; the icon still reads. */
+  /* The search label and its shortcut hint are the most expendable pixels
+     here — the magnifier still reads, and the button keeps its aria-label. */
   .cmdk-btn-text, .cmdk-hint { display: none; }
   .nav-stats { font-size: .8rem; }
+  /* XP and streak are glanceable extras, not navigation. Below 1100px an
+     admin bar needs their width more than the reader needs the numbers,
+     and both remain in the account menu. */
+  .nav-stats { display: none; }
 }
 
 /* ── Admin member status ───────────────────────────────────────────────

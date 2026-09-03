@@ -164,7 +164,7 @@
               </span>
             </td>
             <td>
-              {% if m.banned_until %}
+              {% if m.is_banned %}
                 <span class="admin-status is-banned">Suspended</span>
               {% elif not m.email_confirmed_at %}
                 <span class="admin-status is-pending">Unconfirmed</span>
