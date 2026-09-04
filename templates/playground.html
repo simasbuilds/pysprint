@@ -32,6 +32,7 @@
         <h2>Start from a recipe</h2>
         <p>Load it, edit it, run it.</p>
       </div>
+      <div class="recipe-rail">
       <div class="recipe-list">
         <button class="lab-recipe" data-recipe="data">
           <span>{{ icon('chart') }}</span><div><strong>Analyse sales</strong><small>Lists, totals and max()</small></div><b>→</b>
@@ -48,6 +49,7 @@
         <button class="lab-recipe" data-recipe="debug">
           <span>{{ icon('warning') }}</span><div><strong>Fix a broken report</strong><small>Exceptions and validation</small></div><b>→</b>
         </button>
+      </div>
       </div>
       <div class="shortcut-card">
         <strong>Keyboard</strong>
@@ -84,7 +86,7 @@
             <pre class="line-numbers" id="pgLines" aria-hidden="true">1</pre>
             <textarea id="pgCode" class="code-input playground-code" rows="20" spellcheck="false"
                       autocapitalize="off" autocomplete="off"
-                      placeholder="# Write Python here, or load a recipe from the left…"
+                      placeholder="# Write Python here, or load a recipe above…"
                       aria-label="Python code editor"></textarea>
           </div>
         </section>

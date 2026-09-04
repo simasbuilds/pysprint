@@ -571,4 +571,23 @@
     document.getElementById('achieveClose').addEventListener('click', showNext);
     modal.addEventListener('click', (e) => { if (e.target === modal) showNext(); });
   }
+
+  // ── scrollable rails: hide the edge fade once you reach the end ──
+  // A permanent fade would keep implying there is more to see after you
+  // have already swiped to the last card.
+  (function initRails() {
+    document.querySelectorAll('.recipe-rail, .chip-rail').forEach((rail) => {
+      const list = rail.querySelector('.recipe-list, .cheat-chips');
+      if (!list) return;
+      const sync = () => {
+        const atEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 2;
+        // Nothing to scroll at all (desktop) also counts as "end".
+        rail.classList.toggle('is-end', atEnd || list.scrollWidth <= list.clientWidth + 2);
+      };
+      list.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync, { passive: true });
+      sync();
+    });
+  })();
+
 })();

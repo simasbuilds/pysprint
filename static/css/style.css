@@ -1177,7 +1177,12 @@ pre code { background: none; border: none; padding: 0; color: inherit; }
 }
 
 @media (max-width: 760px) {
-  .announce-inner { justify-content: flex-start; overflow-x: auto; white-space: nowrap; }
+  .announce-inner {
+    /* Scrolling a one-sentence banner sideways to reveal 11px is a
+       gesture nobody performs; let it wrap instead. */
+    justify-content: center; white-space: normal; text-align: center;
+    line-height: 1.35;
+  }
   .announce-inner a { display: none; }
     .nav-inner { gap: .6rem; }
   .nav-right { margin-left: auto; }
@@ -4163,3 +4168,38 @@ body.cmdk-open { overflow: hidden; }
 [data-theme="dark"] .admin-status.is-ok      { color: #6ee7b7; }
 [data-theme="dark"] .admin-status.is-pending { color: #fcd34d; }
 [data-theme="dark"] .admin-status.is-banned  { color: #fca5a5; }
+
+/* ── Horizontally scrolling rows on phones ─────────────────────────────
+   The playground recipes lay out as a 5-column grid that scrolls sideways
+   below 1024px: 787px of content inside a 352px box, with nothing to show
+   it moves. A card clipped mid-word at the edge reads as a layout bug
+   rather than an invitation to swipe.
+
+   A right-edge fade signals more content, and scroll-snap makes the swipe
+   land on a card instead of halfway through one. The fade is painted with
+   a mask so it works on any background, and is removed once the row is
+   scrolled to its end via the `is-end` class set in JS. */
+@media (max-width: 1023px) {
+  .recipe-rail, .chip-rail {
+    position: relative;
+    /* The wrapper must not adopt its scrolling child's content width,
+       or the row stops clipping and pushes the page sideways. */
+    max-width: 100%; min-width: 0; overflow: hidden;
+  }
+  .recipe-rail::after, .chip-rail::after {
+    content: ''; position: absolute; inset: 0 0 0 auto; width: 46px;
+    pointer-events: none; border-radius: 0 12px 12px 0;
+    background: linear-gradient(90deg, transparent, var(--surface) 78%);
+    opacity: 1; transition: opacity .2s;
+  }
+  .recipe-rail.is-end::after, .chip-rail.is-end::after { opacity: 0; }
+  .recipe-list, .cheat-chips {
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: .25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .recipe-list::-webkit-scrollbar,
+  .cheat-chips::-webkit-scrollbar { display: none; }
+  .recipe-list > *, .cheat-chips > * { scroll-snap-align: start; }
+}

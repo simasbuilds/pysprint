@@ -29,11 +29,13 @@
              autocomplete="off" aria-label="Search the cheatsheet">
       <button type="button" id="cheatClear" class="cheat-clear" aria-label="Clear search" hidden>{{ icon('warning') }}</button>
     </label>
+    <div class="chip-rail">
     <div class="cheat-chips" role="tablist" aria-label="Filter by category">
       <button class="chip on" data-cat="all" role="tab" aria-selected="true">All</button>
       {% for c in cats %}
       <button class="chip" data-cat="{{ c }}" role="tab" aria-selected="false">{{ c }}</button>
       {% endfor %}
+    </div>
     </div>
     <p class="cheat-count" id="cheatCount" aria-live="polite">{{ entries|length }} snippets</p>
   </div>
