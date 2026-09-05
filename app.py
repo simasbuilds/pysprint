@@ -49,7 +49,14 @@ app.config["SECRET_KEY"] = env("SECRET_KEY", "dev-only-change-me")
 app.config["SITE_URL"] = env("SITE_URL", "http://127.0.0.1:5000")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = env("SESSION_COOKIE_SECURE", "0") == "1"
+# The session cookie now carries GoTrue access and refresh tokens, so
+# sending it over plain HTTP hands someone an account. Default to Secure
+# whenever SITE_URL is https, rather than trusting an env var to be
+# remembered — the previous default of "0" left production insecure and
+# said nothing about it. SESSION_COOKIE_SECURE=0 still forces it off for
+# local development over http://127.0.0.1.
+_secure_default = "1" if app.config["SITE_URL"].startswith("https://") else "0"
+app.config["SESSION_COOKIE_SECURE"] = env("SESSION_COOKIE_SECURE", _secure_default) == "1"
 
 # ── Sign-in (Supabase Auth / GoTrue) ──────────────────────────────────
 # Identity lives in Supabase, not here. Google sign-in is configured in the
@@ -965,6 +972,19 @@ def robots():
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def server_error(e):
+    """Without this a failure shows Flask's bare white page with no way back.
+
+    The database sits behind a connection pooler that can refuse a request
+    under load, so this is a real path, not a theoretical one. The template
+    says progress is safe because completions are written server-side as
+    they happen.
+    """
+    app.logger.exception("Unhandled error on %s", request.path)
+    return render_template("500.html"), 500
 
 
 if __name__ == "__main__":

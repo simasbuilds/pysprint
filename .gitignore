@@ -22,3 +22,10 @@ Thumbs.db
 
 # Pre-migration DB snapshots: contain emails and password hashes.
 backups/
+
+# Scratch files written by lesson and project solutions when the content
+# verification script executes them in the repo root.
+/todo.txt
+/nums.txt
+/sales.csv
+/output.txt

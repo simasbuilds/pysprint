@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}500 — Something Broke | LearnWithPython{% endblock %}
+{% block description %}Something went wrong on LearnWithPython. Your progress is saved.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="auth-wrap error-wrap">
+  <div class="card auth-card center">
+    <pre class="code-output">Traceback (most recent call last):
+  File "learnwithpython.py", line 500, in &lt;serve&gt;
+ServerError: this one is on us, not you</pre>
+    <h1>500</h1>
+    {# Anyone signed in will worry about their streak first, so answer that
+       before offering anywhere to go. Progress is written server-side on
+       completion, so it genuinely is safe. #}
+    <p class="muted">Something broke on our end. Nothing you did caused it, and
+      any lesson you have already finished is safely recorded.</p>
+
+    <div class="error-actions">
+      <a class="error-action" href="{{ url_for('home') }}">
+        <span>{{ icon('spark') }}</span>
+        <div><strong>Back to the start</strong><small>Return to the homepage</small></div>
+      </a>
+      <a class="error-action" href="{{ url_for('courses') }}">
+        <span>{{ icon('book') }}</span>
+        <div><strong>Browse courses</strong><small>{{ n_courses }} courses · {{ n_lessons }} lessons</small></div>
+      </a>
+      <a class="error-action" href="{{ url_for('playground') }}">
+        <span>{{ icon('terminal') }}</span>
+        <div><strong>Open the playground</strong><small>Runs entirely in your browser</small></div>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

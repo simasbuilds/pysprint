@@ -4203,3 +4203,11 @@ body.cmdk-open { overflow: hidden; }
   .cheat-chips::-webkit-scrollbar { display: none; }
   .recipe-list > *, .cheat-chips > * { scroll-snap-align: start; }
 }
+
+/* The auth side panel's heading is an h2 so the form's h1 is the page's
+   single title, but it should still read at the display size it had. */
+.auth-aside-title {
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(1.9rem, 3.4vw, 2.9rem); line-height: 1.08;
+  letter-spacing: -.035em; margin: .35rem 0 .75rem;
+}
