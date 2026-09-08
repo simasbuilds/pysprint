@@ -244,17 +244,6 @@ def grant_achievement(user_id, achievement_id):
         return cur.rowcount == 1
 
 
-def leaderboard(limit=10):
-    with get_db() as db:
-        rows = db.execute("""
-            SELECT username, display_name, xp, streak, avatar_url
-            FROM public.profiles ORDER BY xp DESC, username ASC LIMIT %s
-        """, (limit,)).fetchall()
-    return [dict(r) for r in rows]
-
-
-# ── export / delete ──────────────────────────────────────────────────
-
 def export_user(user_id):
     """Everything held about a person. Deliberately adjacent to
     delete_user: the export must not describe data the delete leaves."""
@@ -413,3 +402,17 @@ def course_engagement():
             ORDER BY completions DESC
         """).fetchall()
     return [dict(r) for r in rows]
+
+def set_admin_flag(user_id, is_admin):
+    """Grant or revoke admin for one account.
+
+    Separate from sync_admins, which reconciles the whole table against
+    ADMIN_USERNAMES on boot. A change made here is overwritten the next time
+    the app restarts unless the environment variable is updated too, so the
+    portal says so where it offers the control.
+    """
+    with get_db() as db:
+        cur = db.execute(
+            "UPDATE public.profiles SET is_admin = %s WHERE id = %s",
+            (bool(is_admin), str(user_id)))
+        return cur.rowcount > 0

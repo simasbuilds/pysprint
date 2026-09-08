@@ -18,6 +18,13 @@
         <span>{{ icon('calendar') }} Joined {{ d.user.created_at | day }}</span>
         <span>{{ icon('clock') }} Last active {{ d.user.last_active or 'never' }}</span>
         <span>{{ icon('lock') }} {{ 'Google account' if d.user.has_google else 'Email account' }}</span>
+        <span>{{ icon('bolt') }} Last sign-in
+          {{ d.user.last_sign_in_at | stamp if d.user.last_sign_in_at else 'never' }}</span>
+        {% if d.user.is_banned %}
+          <span class="admin-status is-banned">Suspended</span>
+        {% elif not d.user.email_confirmed_at %}
+          <span class="admin-status is-pending">Unconfirmed email</span>
+        {% endif %}
       </div>
     </div>
     <div class="admin-member-level">
@@ -122,4 +129,73 @@
     {{ icon('lock') }} This view is read-only and never exposes credentials.
   </p>
 </section>
+
+  {% if request.args.get('ok') %}
+  <p class="admin-flash is-ok" role="status">{{ request.args.get('ok') }}</p>
+  {% elif request.args.get('err') %}
+  <p class="admin-flash is-err" role="alert">{{ request.args.get('err') }}</p>
+  {% endif %}
+
+  {# Everything here changes another person's account, so each control is a
+     POST, and the two destructive ones sit behind their own disclosure. #}
+  <section class="card admin-actions">
+    <div class="admin-panel-head">
+      <h2>{{ icon('shield') }} Account actions</h2>
+      {% if is_self %}<span class="admin-panel-note">This is your own account</span>{% endif %}
+    </div>
+
+    {% if is_self %}
+    <p class="admin-empty">You cannot suspend, demote or delete the account you are
+      signed in with — doing so would lock you out of the portal that undoes it.</p>
+    {% else %}
+    <div class="admin-action-row">
+      <div>
+        <strong>{{ 'Revoke admin' if d.user.is_admin else 'Grant admin' }}</strong>
+        <small>Admin can see every account. This is overwritten on next deploy
+          unless ADMIN_USERNAMES is updated too.</small>
+      </div>
+      <form method="post" action="{{ url_for('admin_toggle_admin', uid=d.user.id) }}">
+        <input type="hidden" name="grant" value="{{ '0' if d.user.is_admin else '1' }}">
+        <button class="btn btn-ghost btn-sm">{{ 'Revoke' if d.user.is_admin else 'Grant' }}</button>
+      </form>
+    </div>
+
+    <div class="admin-action-row">
+      <div>
+        <strong>Send password reset</strong>
+        <small>Emails a reset link to {{ d.user.email }}.</small>
+      </div>
+      <form method="post" action="{{ url_for('admin_send_reset', uid=d.user.id) }}">
+        <button class="btn btn-ghost btn-sm">Send</button>
+      </form>
+    </div>
+
+    <div class="admin-action-row">
+      <div>
+        <strong>{{ 'Restore access' if d.user.is_banned else 'Suspend account' }}</strong>
+        <small>{{ 'Lets them sign in again.' if d.user.is_banned
+                  else 'Blocks sign-in. Progress is kept and it can be undone.' }}</small>
+      </div>
+      <form method="post" action="{{ url_for('admin_suspend', uid=d.user.id) }}">
+        <input type="hidden" name="lift" value="{{ '1' if d.user.is_banned else '0' }}">
+        <button class="btn {{ 'btn-ghost' if d.user.is_banned else 'btn-warn' }} btn-sm">
+          {{ 'Restore' if d.user.is_banned else 'Suspend' }}
+        </button>
+      </form>
+    </div>
+
+    <details class="admin-danger">
+      <summary>Delete this account permanently</summary>
+      <p>Removes the login and every lesson, challenge and achievement recorded
+        against it. This cannot be undone.</p>
+      <form method="post" action="{{ url_for('admin_delete_member', uid=d.user.id) }}">
+        <label>Type <strong>{{ d.user.username }}</strong> to confirm
+          <input name="confirm" autocomplete="off" required>
+        </label>
+        <button class="btn btn-danger btn-sm">Delete permanently</button>
+      </form>
+    </details>
+    {% endif %}
+  </section>
+
 {% endblock %}

@@ -191,3 +191,20 @@ def admin_delete_user(user_id):
         return None, "Admin API is not configured."
     return _request("DELETE", "/admin/users/%s" % user_id,
                     headers=_admin_headers(), label="admin_delete_user")
+
+def admin_set_ban(user_id, duration="876000h"):
+    """Suspend or restore an account.
+
+    GoTrue expects a Go duration string; "none" lifts a ban. The default is
+    100 years, which is how GoTrue itself spells "indefinite" — there is no
+    separate permanent flag.
+    """
+    if not admin_is_configured():
+        return None, "Admin API is not configured."
+    return _request("PUT", "/admin/users/%s" % user_id, headers=_admin_headers(),
+                    json={"ban_duration": duration}, label="admin_set_ban")
+
+
+def admin_send_recovery(email, redirect_to=None):
+    """Email a password-reset link on someone's behalf."""
+    return send_recovery(email, redirect_to=redirect_to)

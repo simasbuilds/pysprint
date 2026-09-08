@@ -434,8 +434,7 @@ def dashboard():
                            course_cards=course_cards,
                            achievements=achievements_view,
                            n_earned=len(earned),
-                           challenges_done=challenges_done,
-                           leaders=db.leaderboard())
+                           challenges_done=challenges_done)
 
 
 @app.get("/about")
@@ -900,6 +899,81 @@ def admin():
                            n_lessons=total_lessons())
 
 
+def _admin_target(uid):
+    """Resolve an admin action's target, refusing self-directed ones.
+
+    An operator who suspends or deletes their own account locks themselves
+    out of the portal that would let them undo it, so those actions are
+    blocked rather than merely discouraged.
+    """
+    target = db.get_user(str(uid))
+    if not target:
+        abort(404)
+    me = current_user()
+    if me and str(me["id"]) == str(uid):
+        return None, "You cannot do that to your own account."
+    return target, None
+
+
+@app.post("/admin/members/<uuid:uid>/admin")
+@admin_required
+def admin_toggle_admin(uid):
+    target, err = _admin_target(uid)
+    if err:
+        return redirect(url_for("admin_member", uid=uid, err=err))
+    grant = request.form.get("grant") == "1"
+    db.set_admin_flag(str(uid), grant)
+    forget_user()
+    app.logger.info("admin: %s admin for %s", "granted" if grant else "revoked", uid)
+    return redirect(url_for("admin_member", uid=uid,
+                            ok="Admin granted." if grant else "Admin revoked."))
+
+
+@app.post("/admin/members/<uuid:uid>/suspend")
+@admin_required
+def admin_suspend(uid):
+    target, err = _admin_target(uid)
+    if err:
+        return redirect(url_for("admin_member", uid=uid, err=err))
+    lift = request.form.get("lift") == "1"
+    _, e = supabase_auth.admin_set_ban(str(uid), "none" if lift else "876000h")
+    if e:
+        return redirect(url_for("admin_member", uid=uid, err=e))
+    app.logger.info("admin: %s %s", "restored" if lift else "suspended", uid)
+    return redirect(url_for("admin_member", uid=uid,
+                            ok="Account restored." if lift else "Account suspended."))
+
+
+@app.post("/admin/members/<uuid:uid>/reset")
+@admin_required
+def admin_send_reset(uid):
+    target, err = _admin_target(uid)
+    if err:
+        return redirect(url_for("admin_member", uid=uid, err=err))
+    site = (env("SITE_URL") or request.url_root).rstrip("/")
+    _, e = supabase_auth.admin_send_recovery(target["email"], site + url_for("login"))
+    return redirect(url_for("admin_member", uid=uid,
+                            err=e) if e else url_for("admin_member", uid=uid,
+                            ok="Password reset email sent."))
+
+
+@app.post("/admin/members/<uuid:uid>/delete")
+@admin_required
+def admin_delete_member(uid):
+    """Deleting the auth record cascades the profile and all progress."""
+    target, err = _admin_target(uid)
+    if err:
+        return redirect(url_for("admin_member", uid=uid, err=err))
+    if request.form.get("confirm", "").strip().lower() != target["username"].lower():
+        return redirect(url_for("admin_member", uid=uid,
+                                err="Type the username exactly to confirm deletion."))
+    _, e = supabase_auth.admin_delete_user(str(uid))
+    if e:
+        return redirect(url_for("admin_member", uid=uid, err=e))
+    app.logger.info("admin: deleted account %s", uid)
+    return redirect(url_for("admin", ok="Account deleted."))
+
+
 @app.get("/admin/members/<uuid:uid>")
 @admin_required
 def admin_member(uid):
@@ -922,10 +996,12 @@ def admin_member(uid):
             "title": lesson_titles.get((key, row["lesson_slug"]), row["lesson_slug"]),
         })
     achievement_titles = {a["id"]: a for a in ACHIEVEMENTS}
+    me = current_user()
     return render_template("admin_member.html", d=detail,
                            level=level_info(detail["user"]["xp"]),
                            by_course=by_course,
                            achievement_titles=achievement_titles,
+                           is_self=bool(me and str(me["id"]) == str(uid)),
                            n_lessons=total_lessons())
 
 

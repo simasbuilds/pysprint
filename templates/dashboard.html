@@ -56,23 +56,5 @@
     {% endfor %}
   </div>
 
-  {% if leaders %}
-  <h2 class="section-title left">Leaderboard</h2>
-  <div class="card leaderboard">
-    <table>
-      <thead><tr><th>#</th><th>Learner</th><th>XP</th><th>Streak</th></tr></thead>
-      <tbody>
-        {% for row in leaders %}
-        <tr {% if row.username == user.username %}class="me"{% endif %}>
-          <td>{{ loop.index }}</td>
-          <td>{{ row.username }}{% if row.username == user.username %} <span class="muted">(you)</span>{% endif %}</td>
-          <td>{{ icon('bolt') }} {{ row.xp }}</td>
-          <td>{{ icon('flame') }} {{ row.streak }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
 </section>
 {% endblock %}
