@@ -492,3 +492,48 @@ def recent_activity(limit=12):
             ORDER BY at DESC LIMIT %s
         """, (limit,)).fetchall()
     return [dict(r) for r in rows]
+
+def learning_summary(user_id):
+    """What this person has actually done, for their own profile.
+
+    The dashboard answers "what next"; this answers "what have I built up".
+    Returns the day they were last active, how many distinct days they have
+    shown up, and their first and most recent completion, which is the span
+    a streak number cannot convey.
+    """
+    with get_db() as db:
+        row = db.execute("""
+            SELECT COUNT(*) AS lessons,
+                   COUNT(DISTINCT course_slug) AS courses_touched,
+                   COUNT(DISTINCT date_trunc('day', completed_at)) AS active_days,
+                   MIN(completed_at) AS first_at,
+                   MAX(completed_at) AS last_at
+            FROM public.lesson_progress WHERE user_id = %s
+        """, (str(user_id),)).fetchone()
+        challenges = db.execute(
+            "SELECT COUNT(*) AS n FROM public.challenge_progress WHERE user_id = %s",
+            (str(user_id),)).fetchone()["n"]
+    out = dict(row)
+    out["challenges"] = challenges
+    return out
+
+
+def activity_calendar(user_id, days=91):
+    """Completions per day, for a contribution-style heatmap.
+
+    Thirteen weeks is enough to show a habit forming or lapsing without
+    becoming a wall of squares on a phone.
+    """
+    with get_db() as db:
+        rows = db.execute("""
+            SELECT to_char(date_trunc('day', completed_at), 'YYYY-MM-DD') AS day,
+                   COUNT(*) AS n
+            FROM (
+                SELECT completed_at FROM public.lesson_progress WHERE user_id = %s
+                UNION ALL
+                SELECT completed_at FROM public.challenge_progress WHERE user_id = %s
+            ) t
+            WHERE completed_at >= now() - (%s || ' days')::interval
+            GROUP BY 1
+        """, (str(user_id), str(user_id), days)).fetchall()
+    return {r["day"]: r["n"] for r in rows}

@@ -7,7 +7,7 @@ Run:  python app.py   (then open http://127.0.0.1:5000)
 import json
 import os
 import re
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import wraps
 
 from dotenv import load_dotenv
@@ -675,7 +675,40 @@ def profile():
     return render_template("profile.html", error=error, saved=saved,
                            stats=stats, avatars=avatar_choices(),
                            level=level_info(user["xp"]),
+                           summary=db.learning_summary(user["id"]),
+                           calendar=db.activity_calendar(user["id"]),
+                           heat_days=[(date.today() - timedelta(days=i)).isoformat()
+                                      for i in range(90, -1, -1)],
                            earned=len(db.get_earned_achievements(user["id"])))
+
+
+@app.post("/profile/password")
+@login_required
+def profile_password():
+    """Change your own password.
+
+    Re-authenticates with the current one first. GoTrue would accept the
+    change on the session token alone, but that means a borrowed unlocked
+    laptop can lock the owner out of their own account, which is the same
+    reasoning behind the confirm step on deletion.
+    """
+    user = current_user()
+    if user.get("has_google") and not user.get("email"):
+        return redirect(url_for("profile", pw_error="unavailable"))
+    current = request.form.get("current_password", "")
+    new = request.form.get("new_password", "")
+    if len(new) < 8:
+        return redirect(url_for("profile", pw_error="short"))
+    auth, err = supabase_auth.sign_in(user["email"], current)
+    if err or not auth:
+        return redirect(url_for("profile", pw_error="wrong"))
+    _, err2 = supabase_auth.update_password(auth["access_token"], new)
+    if err2:
+        return redirect(url_for("profile", pw_error="failed"))
+    # The change invalidates other sessions, so refresh the one in hand.
+    session["access_token"] = auth.get("access_token", "")
+    session["refresh_token"] = auth.get("refresh_token", "")
+    return redirect(url_for("profile", saved="password"))
 
 
 @app.get("/profile/export")

@@ -4422,3 +4422,61 @@ body.cmdk-open { overflow: hidden; }
 .nav-xp, .nav-streak { white-space: nowrap; }
 .nav-streak { padding-left: .55rem; border-left: 1px solid var(--border); }
 
+
+/* ── Profile: your learning ────────────────────────────────────────────
+   The profile was a settings form. It showed XP and a streak as bare
+   numbers but nothing about the work behind them, which is the thing
+   someone opens their own profile to see. */
+.profile-journey { margin-bottom: 1.25rem; }
+.profile-journey-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: .75rem; margin-bottom: 1rem;
+}
+.profile-journey-head h2 { margin: 0; }
+
+.journey-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: .6rem; margin-bottom: 1.1rem;
+}
+.journey-stats > div {
+  background: var(--surface-2); border-radius: 12px;
+  padding: .7rem .5rem; text-align: center;
+}
+.journey-stats strong {
+  display: block; font-family: var(--display); font-size: 1.45rem;
+  font-weight: 800; color: var(--brand-1); line-height: 1;
+}
+.journey-stats span { font-size: .74rem; color: var(--text-dim); }
+
+/* 13 weeks of days, laid out in columns of 7 so each column is a week. */
+.heatmap {
+  display: grid; grid-auto-flow: column;
+  grid-template-rows: repeat(7, 12px);
+  /* Columns must be the cell width, not a stretched fraction, or the weeks
+     spread out and it stops reading as a contribution graph. */
+  grid-auto-columns: 12px;
+  gap: 3px; overflow-x: auto; padding-bottom: .3rem;
+  justify-content: start;
+}
+.heat {
+  width: 12px; height: 12px; border-radius: 3px;
+  background: var(--surface-2); display: block;
+}
+.heat-1 { background: color-mix(in srgb, var(--brand-1) 32%, var(--surface-2)); }
+.heat-2 { background: color-mix(in srgb, var(--brand-1) 62%, var(--surface-2)); }
+.heat-3 { background: var(--brand-1); }
+.heatmap-key {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .75rem; margin-top: .5rem; font-size: .74rem; color: var(--text-dim);
+}
+.heatmap-scale { display: inline-flex; align-items: center; gap: 3px; }
+
+.pw-form { display: grid; gap: .75rem; max-width: 380px; }
+.pw-form .btn { justify-self: start; }
+
+@media (max-width: 560px) {
+  /* Four columns squeeze the labels past readability on a narrow phone. */
+  .journey-stats { grid-template-columns: repeat(2, 1fr); }
+  .heatmap { grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; }
+  .heat { width: 10px; height: 10px; }
+}
