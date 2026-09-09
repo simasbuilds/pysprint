@@ -4577,6 +4577,14 @@ body.cmdk-open { overflow: hidden; }
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-1) 9%, transparent),
               0 10px 26px -12px color-mix(in srgb, var(--brand-1) 65%, transparent);
   font-size: 0;   /* the glyph is an SVG; a font-size here does nothing */
+  /* The earlier .achieve-icon rule sets an infinite bounce, written when
+     this was a bare glyph. A 92px medallion with a ring and a drop shadow
+     bobbing forever is a distraction, so it settles once instead. */
+  animation: achieveIn .5s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+@keyframes achieveIn {
+  from { transform: scale(.6) translateY(8px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
 }
 .achieve-icon .ui-icon,
 .achievement-glyph {
@@ -4596,6 +4604,3 @@ body.cmdk-open { overflow: hidden; }
   text-transform: uppercase; color: var(--brand-1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .modal-card, .achieve-icon { animation: none; }
-}

@@ -553,8 +553,21 @@
   const queue = [];
   let showing = false;
 
+  let returnFocusTo = null;
+
+  function closeModal() {
+    // Escape dismisses everything. Stepping through a backlog one press at
+    // a time is not what "close" means, and with several achievements
+    // earned at once it traps someone who wants out.
+    queue.length = 0;
+    showing = false;
+    modal.hidden = true;
+    if (returnFocusTo && document.contains(returnFocusTo)) returnFocusTo.focus();
+    returnFocusTo = null;
+  }
+
   function showNext() {
-    if (!queue.length) { showing = false; modal.hidden = true; return; }
+    if (!queue.length) { closeModal(); return; }
     showing = true;
     const a = queue.shift();
     const iconName = /^[a-z0-9-]+$/.test(a.icon || '') ? a.icon : 'trophy';
@@ -564,6 +577,9 @@
     document.getElementById('achieveTitle').textContent = a.title;
     document.getElementById('achieveDesc').textContent = a.desc;
     modal.hidden = false;
+    // Remember where focus was so closing returns it, rather than dropping
+    // the person at the top of the document having lost their place.
+    if (!returnFocusTo) returnFocusTo = document.activeElement;
     const btn = document.getElementById('achieveClose');
     if (btn) btn.focus();
   }
@@ -580,9 +596,24 @@
     // Escape dismisses it, and focus moves into the dialog when it opens.
     // Without either, a keyboard user is stranded behind a modal they can
     // neither reach nor close.
+    // Capture phase, and stop propagation: three other global Escape
+    // handlers exist, and the nav one calls focus() on its trigger, which
+    // would yank focus straight back out of this dialog.
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) showNext();
-    });
+      if (modal.hidden) return;
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        closeModal();
+        return;
+      }
+      // aria-modal="true" tells a screen reader everything behind is inert.
+      // Without a trap, Tab still walks out into it, so the promise is a
+      // lie. Only one control is focusable here, so the cycle is trivial.
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        closeBtn.focus();
+      }
+    }, true);
   }
 
   // ── scrollable rails: hide the edge fade once you reach the end ──
