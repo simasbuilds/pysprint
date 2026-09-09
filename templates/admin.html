@@ -72,6 +72,72 @@
       </div>
     </section>
 
+    {# ── the funnel: where people stop ──
+       Counts of members say nothing about whether the product works. These
+       four stages are the drop-offs that matter, each shown against the
+       stage before it so the loss is visible rather than inferred. #}
+    <section class="card admin-panel admin-funnel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('path') }} Learner funnel</h2>
+        <span class="admin-panel-note">all time</span>
+      </div>
+      {% set stages = [
+        ('Signed up', funnel.signed_up, 'Created an account'),
+        ('Ran a lesson', funnel.started, 'Completed at least one'),
+        ('Kept going', funnel.continued, 'Completed more than one'),
+        ('Came back', funnel.returned, 'Returned on a later day')] %}
+      {% set top = stages[0][1] or 1 %}
+      <ol class="funnel-list">
+        {% for label, n, help in stages %}
+        {% set pct = (n / top * 100)|round|int %}
+        <li class="funnel-step" style="--pct: {{ pct }}%">
+          <div class="funnel-meta">
+            <strong>{{ label }}</strong>
+            <span class="funnel-n">{{ n }}</span>
+          </div>
+          <div class="funnel-track"><span class="funnel-fill"></span></div>
+          <small>{{ help }}{% if not loop.first %} · {{ pct }}% of signups{% endif %}</small>
+        </li>
+        {% endfor %}
+      </ol>
+      {% if not funnel.signed_up %}
+      <p class="admin-empty">No accounts yet — this fills in as people sign up.</p>
+      {% endif %}
+    </section>
+
+    {# ── where the curriculum loses people ── #}
+    <section class="card admin-panel">
+      <div class="admin-panel-head">
+        <h2>{{ icon('warning') }} Where learners stop</h2>
+        <span class="admin-panel-note">last lesson reached</span>
+      </div>
+      {% if dropoff %}
+      <p class="admin-panel-lede">A lesson many people reach but few pass is either
+        badly explained or in the wrong place. These are worth reading again.</p>
+      <ul class="dropoff-list">
+        {% for row in dropoff %}
+        {% set share = (row.stopped_here / (row.learners or 1) * 100)|round|int %}
+        <li class="dropoff-row" style="--share: {{ share }}%">
+          <div class="dropoff-id">
+            <strong>{{ row.title }}</strong>
+            <small>{{ row.course }}</small>
+          </div>
+          <div class="dropoff-bar" role="img"
+               aria-label="{{ row.stopped_here }} of {{ row.learners }} learners stopped here">
+            <span></span>
+          </div>
+          <div class="dropoff-n">
+            <strong>{{ row.stopped_here }}</strong>
+            <small>of {{ row.learners }}</small>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="admin-empty">No lesson completions yet, so there is nowhere to stop.</p>
+      {% endif %}
+    </section>
+
     {# ── which courses land ── #}
     <section class="card admin-panel">
       <div class="admin-panel-head">
@@ -101,7 +167,40 @@
 
   {# ── member roster ── #}
   <section class="card admin-panel admin-members">
+      {# ── what is happening right now ──
+     Aggregates hide the individual. This is the one place an operator can
+     see a real person moving through the product. #}
+  <section class="card admin-panel admin-feed">
     <div class="admin-panel-head">
+      <h2>{{ icon('bolt') }} Recent activity</h2>
+      <span class="admin-panel-note">newest first</span>
+    </div>
+    {% if activity %}
+    <ol class="feed-list">
+      {% for a in activity %}
+      <li class="feed-row feed-{{ a.kind }}" style="--i: {{ loop.index0 }}">
+        <span class="feed-dot" aria-hidden="true"></span>
+        <div class="feed-body">
+          <a href="{{ url_for('admin_member', uid=a.id) }}">{{ a.username }}</a>
+          {% if a.kind == 'lesson' %}
+            finished <strong>{{ lesson_titles.get((a.a, a.b), a.b) }}</strong>
+          {% elif a.kind == 'challenge' %}
+            solved <strong>{{ a.a.replace('project:', 'project · ')|replace('-', ' ') }}</strong>
+          {% else %}
+            earned <strong>{{ a.a.replace('-', ' ')|title }}</strong>
+          {% endif %}
+        </div>
+        <time datetime="{{ a.at }}">{{ a.at | stamp }}</time>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="admin-empty">Nothing yet. Completed lessons, solved challenges and
+      earned achievements appear here as they happen.</p>
+    {% endif %}
+  </section>
+
+<div class="admin-panel-head">
       <h2>{{ icon('graduation') }} Members <span class="muted">({{ total }})</span></h2>
       <form class="admin-tools" method="get" action="{{ url_for('admin') }}">
         <label class="admin-search">

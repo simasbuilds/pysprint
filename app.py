@@ -891,11 +891,23 @@ def admin():
         })
     for m in members:
         m["level"] = level_info(m["xp"])
+    lesson_titles = {(c["slug"], l["slug"]): l["title"]
+                     for c in COURSES for l in c["lessons"]}
+    dropoff = []
+    for row in db.lesson_dropoff():
+        dropoff.append({**row,
+                        "title": lesson_titles.get((row["course_slug"], row["lesson_slug"]),
+                                                   row["lesson_slug"]),
+                        "course": course_titles.get(row["course_slug"], row["course_slug"])})
     return render_template("admin.html", members=members, total=total,
                            search=search, sort=sort,
                            stats=db.platform_stats(),
                            signups=db.signups_by_day(),
                            engagement=engagement,
+                           funnel=db.funnel_stats(),
+                           dropoff=dropoff,
+                           activity=db.recent_activity(),
+                           lesson_titles=lesson_titles,
                            n_lessons=total_lessons())
 
 

@@ -181,6 +181,12 @@ def sync_admins(names):
     Names match either the profile username or the auth email.
     """
     names = [n.strip().lower() for n in names if n and n.strip()]
+    if not names:
+        # An empty list would revoke every admin and lock the operator out of
+        # the portal that grants it back, recoverable only by hand-editing
+        # the database. A deploy that forgets the variable is far more likely
+        # than a deliberate decision to have no admins at all, so do nothing.
+        return 0
     with get_db() as db:
         db.execute("""
             UPDATE public.profiles p SET is_admin = (
@@ -416,3 +422,73 @@ def set_admin_flag(user_id, is_admin):
             "UPDATE public.profiles SET is_admin = %s WHERE id = %s",
             (bool(is_admin), str(user_id)))
         return cur.rowcount > 0
+
+def funnel_stats():
+    """Where people stop, not just how many arrived.
+
+    A count of members says nothing about whether the product works. These
+    four numbers are the drop-offs that matter: signed up, ran one lesson,
+    kept going past the first, and came back on a later day.
+    """
+    with get_db() as db:
+        row = db.execute("""
+            SELECT (SELECT COUNT(*) FROM public.profiles) AS signed_up,
+                   (SELECT COUNT(DISTINCT user_id) FROM public.lesson_progress) AS started,
+                   (SELECT COUNT(*) FROM (
+                        SELECT user_id FROM public.lesson_progress
+                        GROUP BY user_id HAVING COUNT(*) > 1) t) AS continued,
+                   (SELECT COUNT(*) FROM (
+                        SELECT user_id FROM public.lesson_progress
+                        GROUP BY user_id
+                        HAVING COUNT(DISTINCT date_trunc('day', completed_at)) > 1) t) AS returned
+        """).fetchone()
+    return dict(row)
+
+
+def lesson_dropoff(limit=8):
+    """Lessons where the most people stop.
+
+    A lesson many learners reach but few pass the next one is either badly
+    explained or wrongly placed. Ordered by how many got here and went no
+    further within the same course.
+    """
+    with get_db() as db:
+        rows = db.execute("""
+            WITH reached AS (
+                SELECT course_slug, lesson_slug, COUNT(DISTINCT user_id) AS learners,
+                       MAX(completed_at) AS last_at
+                FROM public.lesson_progress GROUP BY course_slug, lesson_slug),
+            last_in_course AS (
+                SELECT DISTINCT ON (user_id, course_slug)
+                       user_id, course_slug, lesson_slug
+                FROM public.lesson_progress
+                ORDER BY user_id, course_slug, completed_at DESC)
+            SELECT r.course_slug, r.lesson_slug, r.learners, r.last_at,
+                   COUNT(l.user_id) AS stopped_here
+            FROM reached r
+            LEFT JOIN last_in_course l
+              ON l.course_slug = r.course_slug AND l.lesson_slug = r.lesson_slug
+            GROUP BY r.course_slug, r.lesson_slug, r.learners, r.last_at
+            HAVING COUNT(l.user_id) > 0
+            ORDER BY stopped_here DESC, r.learners DESC
+            LIMIT %s
+        """, (limit,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def recent_activity(limit=12):
+    """A live feed of what learners are actually doing."""
+    with get_db() as db:
+        rows = db.execute("""
+            SELECT p.username, p.id, 'lesson' AS kind,
+                   l.course_slug AS a, l.lesson_slug AS b, l.completed_at AS at
+            FROM public.lesson_progress l JOIN public.profiles p ON p.id = l.user_id
+            UNION ALL
+            SELECT p.username, p.id, 'challenge', c.challenge_slug, NULL, c.completed_at
+            FROM public.challenge_progress c JOIN public.profiles p ON p.id = c.user_id
+            UNION ALL
+            SELECT p.username, p.id, 'achievement', a.achievement_id, NULL, a.earned_at
+            FROM public.user_achievements a JOIN public.profiles p ON p.id = a.user_id
+            ORDER BY at DESC LIMIT %s
+        """, (limit,)).fetchall()
+    return [dict(r) for r in rows]
