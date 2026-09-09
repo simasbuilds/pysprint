@@ -417,6 +417,10 @@
       (last.course ? ' · ' + last.course : '');
     slot.appendChild(link);
     slot.hidden = false;
+    // Tell the hero it has a resume card, so the beginner invitation can
+    // step down rather than compete with it for the same slot.
+    const hero = slot.closest('.hero-copy') || slot.parentElement;
+    if (hero) hero.classList.add('has-resume');
   })();
 
   // ── lesson keyboard nav: ← previous, → next ─────────────────────

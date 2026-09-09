@@ -4332,3 +4332,37 @@ body.cmdk-open { overflow: hidden; }
   .funnel-fill, .dropoff-bar span, .feed-row { animation: none; }
   .funnel-fill, .dropoff-bar span { transform: none; }
 }
+
+/* ── Resume vs. beginner card on phones ────────────────────────────────
+   These were two white cards of identical width sitting flush against
+   each other with a 0px gap, both offering a way into a lesson. They read
+   as one broken component, and the wrong one led: someone mid-course
+   wants their lesson back, not an invitation to start from zero.
+
+   Resume now comes first and looks like the primary action — brand tint,
+   accent border. The beginner card only appears below it when there is no
+   saved progress at full strength, and steps down to a quiet text link
+   when there is, since by then it is a fallback rather than the offer. */
+@media (max-width: 760px) {
+  .resume-slot { margin: 1.1rem 0 0; }
+
+  .resume-chip {
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--brand-1) 9%, var(--surface)),
+      color-mix(in srgb, var(--brand-2) 7%, var(--surface)));
+    border-color: color-mix(in srgb, var(--accent, var(--brand-1)) 55%, transparent);
+    box-shadow: 0 6px 20px -12px color-mix(in srgb, var(--brand-1) 55%, transparent);
+  }
+  .resume-chip small { color: color-mix(in srgb, var(--brand-1) 78%, var(--text-dim)); }
+  .resume-chip b { font-size: 1.15rem; }
+
+  /* With progress saved, the beginner card is no longer the main door. */
+  .hero-copy.has-resume .hero-beginner {
+    margin-top: .8rem; padding: .7rem .9rem;
+    background: transparent; border-color: transparent; border-left-color: var(--border);
+    box-shadow: none;
+  }
+  .hero-copy.has-resume .hero-beginner span { font-size: .84rem; color: var(--text-dim); }
+  .hero-copy.has-resume .hero-beginner span b { color: var(--text); }
+  .hero-copy.has-resume .hero-beginner .ui-icon { opacity: .55; }
+}

@@ -50,6 +50,11 @@
         <span>{{ icon('check') }} Try every lesson without an account</span>
         <span>{{ icon('lock') }} Code stays on your device</span>
       </div>
+      {# Resume comes first when it exists: someone mid-course wants their
+         lesson back, not an invitation to start from zero. JS adds the
+         .has-resume class to the hero when it finds saved progress, which
+         demotes the beginner card below rather than competing with it. #}
+      <div id="resumeSlot" class="resume-slot stagger d4" hidden></div>
       {# The visitor with the least context needs the clearest door. #}
       <a class="hero-beginner stagger d4" href="{{ url_for('start') }}">
         {{ icon('graduation') }}
@@ -58,7 +63,6 @@
         <b class="hero-beginner-go">→</b>
       </a>
       {% endif %}
-      <div id="resumeSlot" class="resume-slot stagger d4" hidden></div>
       {% if me %}
       <div class="hero-progress stagger d5">
         <div class="hp-ring" style="--pct: {{ level.pct }}">
