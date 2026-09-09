@@ -564,6 +564,8 @@
     document.getElementById('achieveTitle').textContent = a.title;
     document.getElementById('achieveDesc').textContent = a.desc;
     modal.hidden = false;
+    const btn = document.getElementById('achieveClose');
+    if (btn) btn.focus();
   }
 
   window.celebrateAchievements = function (list) {
@@ -572,8 +574,15 @@
   };
 
   if (modal) {
-    document.getElementById('achieveClose').addEventListener('click', showNext);
+    const closeBtn = document.getElementById('achieveClose');
+    closeBtn.addEventListener('click', showNext);
     modal.addEventListener('click', (e) => { if (e.target === modal) showNext(); });
+    // Escape dismisses it, and focus moves into the dialog when it opens.
+    // Without either, a keyboard user is stranded behind a modal they can
+    // neither reach nor close.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) showNext();
+    });
   }
 
   // ── scrollable rails: hide the edge fade once you reach the end ──

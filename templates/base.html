@@ -345,9 +345,11 @@
   <button class="to-top" id="toTop" aria-label="Back to top">↑</button>
 
   <!-- Achievement celebration modal -->
-  <div id="achieveModal" class="modal" hidden>
+  <div id="achieveModal" class="modal" hidden role="dialog" aria-modal="true"
+       aria-labelledby="achieveTitle" aria-describedby="achieveDesc">
     <div class="modal-card achieve-card">
       <div class="achieve-icon" id="achieveIcon">{{ icon('trophy', 'achievement-glyph') }}</div>
+      <span class="achieve-kicker">Achievement unlocked</span>
       <h3 id="achieveTitle">Achievement unlocked!</h3>
       <p id="achieveDesc"></p>
       <button class="btn btn-primary" id="achieveClose">Nice!</button>

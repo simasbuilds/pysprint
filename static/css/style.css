@@ -4542,3 +4542,60 @@ body.cmdk-open { overflow: hidden; }
   .journey-heat { padding: .7rem; }
   .journey-heat .heatmap { justify-content: start; }
 }
+
+/* ── Achievement modal ─────────────────────────────────────────────────
+   It shipped invisible. `.modal-card` set width, padding and an animation
+   but never a background, border, radius or shadow, so the celebration was
+   bare text floating on a blurred page. And `.achievement-glyph` had no
+   rule anywhere, so the trophy SVG computed to 0px and never appeared —
+   the icon element was there, sized by a font-size that an SVG ignores.
+
+   Earning something should feel like an event, so the card is now a real
+   surface with a brand-tinted medallion, and the copy leads with what was
+   earned rather than a generic banner. */
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 28px 70px -24px rgba(7, 21, 47, .55);
+  max-width: 400px; padding: 2.1rem 1.9rem 1.7rem;
+}
+[data-theme="dark"] .modal-card {
+  box-shadow: 0 28px 70px -20px rgba(0, 0, 0, .7);
+}
+
+.achieve-card { gap: .55rem; }
+
+/* The medallion: a ring around the glyph so the trophy reads as a prize
+   rather than a stray icon. */
+.achieve-icon {
+  width: 92px; height: 92px; border-radius: 50%;
+  display: grid; place-items: center; margin-bottom: .35rem;
+  background: radial-gradient(circle at 50% 35%,
+    color-mix(in srgb, var(--brand-1) 22%, var(--surface)),
+    color-mix(in srgb, var(--brand-2) 12%, var(--surface)));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-1) 9%, transparent),
+              0 10px 26px -12px color-mix(in srgb, var(--brand-1) 65%, transparent);
+  font-size: 0;   /* the glyph is an SVG; a font-size here does nothing */
+}
+.achieve-icon .ui-icon,
+.achievement-glyph {
+  width: 44px; height: 44px; color: var(--brand-1);
+}
+
+.achieve-card h3 {
+  font-family: var(--display); font-size: 1.4rem; letter-spacing: -.02em; margin: 0;
+}
+.achieve-card p { color: var(--text-dim); margin: 0 0 .5rem; max-width: 30ch; }
+.achieve-card .btn { min-width: 140px; }
+
+/* A small eyebrow above the title, so the first thing read is the fact that
+   something was unlocked. */
+.achieve-kicker {
+  font-size: .72rem; font-weight: 800; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--brand-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-card, .achieve-icon { animation: none; }
+}
