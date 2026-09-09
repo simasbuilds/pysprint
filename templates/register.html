@@ -34,13 +34,11 @@
     </a>
     <div class="auth-divider"><span>or use email</span></div>
     {% endif %}
-    <label>Username
-      <input type="text" name="username" required minlength="3" maxlength="24"
-             pattern="[a-zA-Z0-9_]+" autocomplete="username" autofocus
-             placeholder="letters, numbers, underscores">
-    </label>
+    {# One field fewer: the username was only ever needed for a leaderboard
+       that no longer exists, and the database trigger generates one anyway. #}
     <label>Email
-      <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      <input type="email" name="email" required autocomplete="email" autofocus
+             placeholder="you@example.com">
     </label>
     <label>Password
       <span class="pw-field">

@@ -18,11 +18,11 @@
   <div class="profile-summary card">
     <span class="profile-avatar-lg">
       {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="" width="96" height="96">
-      {% else %}<b>{{ user.username[0]|upper }}</b>{% endif %}
+      {% else %}<b>{{ (display_name or user.email)[0]|upper }}</b>{% endif %}
     </span>
     <div class="profile-summary-body">
       <h2>{{ display_name }}</h2>
-      <p class="muted">@{{ user.username }} · {{ user.email }}</p>
+      <p class="muted">{{ user.email }}</p>
       <div class="profile-facts">
         <span>{{ icon('bolt') }} {{ user.xp }} XP</span>
         <span>{{ icon('flame') }} {{ user.streak }}-day streak</span>
@@ -41,17 +41,11 @@
     <p class="muted">How you're greeted around the site. Spaces and capitals welcome.</p>
     <label>Display name
       <input type="text" name="display_name" value="{{ user.display_name or '' }}"
-             maxlength="40" placeholder="{{ user.username }}" aria-describedby="dispHelp">
+             maxlength="40" placeholder="{{ user.email.split('@')[0] }}"
+             aria-describedby="dispHelp">
     </label>
-    <p class="field-help" id="dispHelp">Up to 40 characters. Leave blank to use your username.</p>
-
-    <label class="profile-h2-label">Username
-      <input type="text" name="username" value="{{ user.username }}" required
-             minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]+"
-             aria-describedby="nameHelp">
-    </label>
-    <p class="field-help" id="nameHelp">Your unique handle. Private to your account.
-       3–24 characters: letters, numbers and underscores only.</p>
+    <p class="field-help" id="dispHelp">Up to 40 characters. Leave blank and we'll
+       use the first part of your email address.</p>
 
     <h2 class="profile-h2">{{ icon('spark') }} Avatar</h2>
     <p class="muted">Pick one, or use your initial.</p>
@@ -59,7 +53,7 @@
       <label class="avatar-opt">
         <input type="radio" name="avatar" value="none"
                {% if not user.avatar_url %}checked{% endif %}>
-        <span class="avatar-swatch avatar-initial"><b>{{ user.username[0]|upper }}</b></span>
+        <span class="avatar-swatch avatar-initial"><b>{{ (display_name or user.email)[0]|upper }}</b></span>
         <span class="sr-only">No avatar, use my initial</span>
       </label>
       {% if user.google_avatar %}
@@ -95,16 +89,16 @@
     <p>This erases your account, XP, streak, lesson and challenge progress, and every
        achievement. <strong>It cannot be undone</strong> and we keep no backup copy of it.</p>
     {% if request.args.get('delete_error') == 'name' %}
-      <p class="form-error" role="alert">The username didn't match, so nothing was deleted.</p>
+      <p class="form-error" role="alert">The email didn't match, so nothing was deleted.</p>
     {% elif request.args.get('delete_error') == 'password' %}
       <p class="form-error" role="alert">That password was wrong, so nothing was deleted.</p>
     {% endif %}
     <details class="danger-details">
       <summary>I want to delete my account</summary>
       <form method="post" action="{{ url_for('profile_delete') }}" class="danger-form">
-        <label>Type <code>{{ user.username }}</code> to confirm
+        <label>Type <code>{{ user.email }}</code> to confirm
           <input type="text" name="confirm_username" autocomplete="off" required
-                 placeholder="{{ user.username }}">
+                 placeholder="{{ user.email }}">
         </label>
         {% if not user.has_google %}
         <label>Your password
