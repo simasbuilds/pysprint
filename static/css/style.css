@@ -4366,3 +4366,33 @@ body.cmdk-open { overflow: hidden; }
   .hero-copy.has-resume .hero-beginner span b { color: var(--text); }
   .hero-copy.has-resume .hero-beginner .ui-icon { opacity: .55; }
 }
+
+/* ── Creator callout on /about ─────────────────────────────────────────
+   A face and a name, because "who made this?" is a trust question and the
+   answer was previously two clicks deep in a footer. */
+.creator-callout-card {
+  display: grid; grid-template-columns: 96px 1fr; gap: 1.25rem;
+  align-items: center; padding: 1.25rem; text-decoration: none;
+  transition: transform .18s, box-shadow .18s, border-color .18s;
+}
+.creator-callout-card:hover {
+  transform: translateY(-2px); box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--brand-1) 35%, var(--border));
+  text-decoration: none;
+}
+.creator-callout-card img {
+  width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+  object-position: 50% 22%;   /* keep the face centred in a circular crop */
+  border: 2px solid var(--surface); box-shadow: 0 4px 16px -6px rgba(7,21,47,.4);
+}
+.creator-callout-card strong { display: block; font-size: 1.15rem; margin-top: .15rem; }
+.creator-callout-card p { color: var(--text-dim); margin: .4rem 0 .6rem; max-width: 58ch; }
+.creator-callout-go { font-weight: 700; color: var(--brand-1); font-size: .9rem; }
+.creator-callout-card:hover .creator-callout-go b { display: inline-block; transform: translateX(3px); }
+.creator-callout-go b { transition: transform .18s; }
+
+@media (max-width: 620px) {
+  /* Stacked, so the portrait stays large enough to read as a person. */
+  .creator-callout-card { grid-template-columns: 1fr; text-align: left; gap: .9rem; }
+  .creator-callout-card img { width: 84px; height: 84px; }
+}

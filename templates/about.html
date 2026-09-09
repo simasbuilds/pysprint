@@ -104,4 +104,23 @@
     </article>
   </div>
 </section>
+
+{# Someone who has just read how the site teaches is exactly the person who
+   wonders who decided it should teach that way. The creator page was
+   reachable only from the footer and the search palette. #}
+<section class="section creator-callout">
+  <a class="card creator-callout-card" href="{{ url_for('creator') }}">
+    <img src="{{ url_for('static', filename='images/simas-bandzevicius.jpg') }}"
+         alt="Simas Bandzevicius" width="960" height="1200" loading="lazy">
+    <div>
+      <span class="eyebrow">Who built this</span>
+      <strong>Simas Bandzevicius</strong>
+      <p>I built LearnWithPython to close the gap between following a tutorial
+         and actually writing Python. Here's why, and what I believe about
+         learning to code.</p>
+      <span class="creator-callout-go">Read the creator story <b aria-hidden="true">→</b></span>
+    </div>
+  </a>
+</section>
+
 {% endblock %}
