@@ -4139,9 +4139,14 @@ body.cmdk-open { overflow: hidden; }
      here — the magnifier still reads, and the button keeps its aria-label. */
   .cmdk-btn-text, .cmdk-hint { display: none; }
   .nav-stats { font-size: .8rem; }
-  /* XP and streak are glanceable extras, not navigation. Below 1100px an
-     admin bar needs their width more than the reader needs the numbers,
-     and both remain in the account menu. */
+}
+
+/* XP and streak are glanceable extras, not navigation. A signed-in admin's
+   bar also carries an Admin link and an avatar, and measured across widths
+   it does not fit alongside them until ~1500px — the previous 1300px bound
+   left a band where the stats showed and the page scrolled sideways. Both
+   numbers remain in the account menu and on the dashboard. */
+@media (max-width: 1500px) {
   .nav-stats { display: none; }
 }
 
@@ -4396,3 +4401,24 @@ body.cmdk-open { overflow: hidden; }
   .creator-callout-card { grid-template-columns: 1fr; text-align: left; gap: .9rem; }
   .creator-callout-card img { width: 84px; height: 84px; }
 }
+
+/* ── Nav XP and streak ─────────────────────────────────────────────────
+   "0 XP" was wrapping onto two lines, giving the badge a 44px box in a bar
+   whose other controls are 38px — the number and its unit split across
+   lines, which reads as a rendering fault rather than a stat.
+
+   They are one unit of meaning, so they never wrap. Given a shared pill
+   they also stop floating loose between the search box and the avatar,
+   which is what made them look unfinished next to everything else. */
+.nav-stats {
+  align-items: center;
+  gap: .55rem;
+  padding: .3rem .65rem;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  line-height: 1;
+}
+.nav-xp, .nav-streak { white-space: nowrap; }
+.nav-streak { padding-left: .55rem; border-left: 1px solid var(--border); }
+
