@@ -4480,3 +4480,65 @@ body.cmdk-open { overflow: hidden; }
   .heatmap { grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; }
   .heat { width: 10px; height: 10px; }
 }
+
+/* ── Profile learning, second pass ─────────────────────────────────────
+   The first version had four failures visible at a glance: the card sat
+   wider than its siblings because it was a <section> inheriting .section's
+   padding; a new account saw four zeros and 91 grey squares, which reads
+   as broken rather than empty; the heatmap huddled in the left corner of a
+   full-width card; and the stat tiles were flat grey with nothing tying
+   them to the brand. */
+.profile-journey { padding: 1.6rem; }
+.profile-journey-head { margin-bottom: 1.15rem; }
+
+/* Empty state: an invitation, not a grid of zeros. */
+.journey-empty { display: flex; gap: 1.1rem; align-items: flex-start; }
+.journey-empty-icon {
+  flex: 0 0 44px; width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--brand-1) 12%, transparent);
+  color: var(--brand-1);
+}
+.journey-empty h2 { margin: 0 0 .35rem; font-size: 1.2rem; }
+.journey-empty p { color: var(--text-dim); margin: 0 0 .9rem; max-width: 54ch; }
+.journey-empty-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+/* Level progress: the answer to "how close am I", which XP alone never gives. */
+.journey-level { margin-bottom: 1.1rem; }
+.journey-level-top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: .75rem; margin-bottom: .45rem; font-size: .9rem;
+}
+
+.journey-stats { margin-bottom: 1.25rem; }
+.journey-stats > div {
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--brand-1) 7%, var(--surface-2)), var(--surface-2));
+  border: 1px solid var(--border);
+  padding: .85rem .5rem;
+}
+
+/* The heatmap needs its own surface, or 91 small squares float in the
+   corner of a wide card looking like a rendering artefact. */
+.journey-heat {
+  /* The panel must not be --surface-2: that is exactly the colour an empty
+     cell uses, so every unworked day disappeared into the background and
+     the grid looked like one stray dot. */
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: .9rem 1rem;
+}
+.journey-heat .heat-0 {
+  background: color-mix(in srgb, var(--text-dim) 14%, var(--surface));
+}
+.journey-heat .heatmap { justify-content: center; }
+.journey-heat .heatmap-key { margin-top: .7rem; }
+.heat { transition: transform .12s; }
+.heat:hover { transform: scale(1.35); }
+
+@media (max-width: 560px) {
+  .profile-journey { padding: 1.15rem; }
+  .journey-empty { flex-direction: column; gap: .8rem; }
+  .journey-empty-actions .btn { width: 100%; justify-content: center; }
+  .journey-heat { padding: .7rem; }
+  .journey-heat .heatmap { justify-content: start; }
+}

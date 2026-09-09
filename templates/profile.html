@@ -51,44 +51,65 @@
   {# ── what you have actually built up ──
      The dashboard answers "what next". This answers "what have I done",
      which is the question someone opens their own profile asking. #}
-  <section class="card profile-journey">
+  <div class="card profile-journey">
+    {% if not summary.lessons and not summary.challenges %}
+    {# A brand-new account showing four zeros and 91 grey squares reads as a
+       broken page, not an empty one. Show the invitation instead, and let
+       the data arrive once there is any. #}
+    <div class="journey-empty">
+      <span class="journey-empty-icon">{{ icon('spark') }}</span>
+      <div>
+        <h2>Your learning starts here</h2>
+        <p>Finish your first lesson and this fills with what you have completed,
+          the days you showed up, and how far through the curriculum you are.</p>
+        <div class="journey-empty-actions">
+          <a class="btn btn-primary" href="{{ url_for('courses') }}">Browse courses →</a>
+          <a class="btn btn-ghost" href="{{ url_for('start') }}">Start from zero</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
     <div class="profile-journey-head">
       <h2>{{ icon('chart') }} Your learning</h2>
-      {% if summary.first_at %}
-      <span class="muted">since {{ summary.first_at | day }}</span>
-      {% endif %}
+      {% if summary.first_at %}<span class="muted">since {{ summary.first_at | day }}</span>{% endif %}
+    </div>
+
+    {# Progress toward the next level, which is the number a bare XP count
+       never answers: how close am I? #}
+    <div class="journey-level">
+      <div class="journey-level-top">
+        <strong>Level {{ level.level }} · {{ level.title }}</strong>
+        <span class="muted">{{ level.into }} / {{ level.needed }} XP</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width: {{ level.pct }}%"></div></div>
     </div>
 
     <div class="journey-stats">
-      <div><strong>{{ summary.lessons }}</strong><span>lessons</span></div>
-      <div><strong>{{ summary.challenges }}</strong><span>challenges</span></div>
-      <div><strong>{{ summary.active_days }}</strong><span>active days</span></div>
-      <div><strong>{{ summary.courses_touched }}</strong><span>courses</span></div>
+      <div><strong>{{ summary.lessons }}</strong><span>lesson{{ '' if summary.lessons == 1 else 's' }}</span></div>
+      <div><strong>{{ summary.challenges }}</strong><span>challenge{{ '' if summary.challenges == 1 else 's' }}</span></div>
+      <div><strong>{{ summary.active_days }}</strong><span>active day{{ '' if summary.active_days == 1 else 's' }}</span></div>
+      <div><strong>{{ summary.courses_touched }}</strong><span>course{{ '' if summary.courses_touched == 1 else 's' }}</span></div>
     </div>
 
-    {# 13 weeks of squares: enough to show a habit forming or lapsing
-       without becoming a wall on a phone. #}
     {% set peak = calendar.values() | max if calendar else 0 %}
-    <div class="heatmap" role="img"
-         aria-label="{{ summary.active_days }} active days in the last 13 weeks">
-      {% for d in heat_days %}
-        {% set n = calendar.get(d, 0) %}
-        {% set lvl = 0 if not n else (1 if n <= peak * 0.34 else (2 if n <= peak * 0.67 else 3)) %}
-        <i class="heat heat-{{ lvl }}" title="{{ d }}: {{ n }} completed"></i>
-      {% endfor %}
+    <div class="journey-heat">
+      <div class="heatmap" role="img"
+           aria-label="{{ summary.active_days }} active days in the last 13 weeks">
+        {% for d in heat_days %}
+          {% set n = calendar.get(d, 0) %}
+          {% set lvl = 0 if not n else (1 if n <= peak * 0.34 else (2 if n <= peak * 0.67 else 3)) %}
+          <i class="heat heat-{{ lvl }}" title="{{ d }}: {{ n }} completed"></i>
+        {% endfor %}
+      </div>
+      <div class="heatmap-key">
+        <span>Last 13 weeks</span>
+        <span class="heatmap-scale">
+          Less <i class="heat heat-0"></i><i class="heat heat-1"></i><i class="heat heat-2"></i><i class="heat heat-3"></i> More
+        </span>
+      </div>
     </div>
-    <div class="heatmap-key">
-      <span class="muted">13 weeks</span>
-      <span class="heatmap-scale">
-        Less <i class="heat heat-0"></i><i class="heat heat-1"></i><i class="heat heat-2"></i><i class="heat heat-3"></i> More
-      </span>
-    </div>
-
-    {% if not summary.lessons %}
-    <p class="admin-empty">Nothing recorded yet. Finish a lesson and it appears here.</p>
-    <a class="btn btn-primary btn-sm" href="{{ url_for('courses') }}">Start a course →</a>
     {% endif %}
-  </section>
+  </div>
 
   <form class="card profile-card" method="post">
     <h2>{{ icon('note') }} Your name</h2>
@@ -134,7 +155,7 @@
     {# Google accounts have no password to change, and offering the form
      would only produce a failure they cannot act on. #}
   {% if not user.has_google %}
-  <section class="card profile-card">
+  <div class="card profile-card">
     <h2>{{ icon('lock') }} Password</h2>
     <p class="muted">Changing it signs out your other devices.</p>
     <form method="post" action="{{ url_for('profile_password') }}" class="pw-form">
@@ -148,7 +169,7 @@
       <p class="field-help" id="pwHelp">At least 8 characters.</p>
       <button class="btn btn-ghost">Update password</button>
     </form>
-  </section>
+  </div>
   {% endif %}
 
 <div class="card profile-card">
