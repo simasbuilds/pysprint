@@ -1,0 +1,74 @@
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef2f8; margin:0; padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; border-radius:18px; overflow:hidden; box-shadow:0 12px 34px rgba(7,21,47,.14);">
+
+        <!-- masthead -->
+        <tr>
+          <td style="background-color:#07152f; background-image:linear-gradient(125deg,#07152f 0%,#0d2447 55%,#0f9f8f 190%); padding:34px 40px 30px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-right:12px; vertical-align:middle;">
+                  <div style="width:38px; height:38px; border-radius:11px; background-color:#2563eb; text-align:center; line-height:38px; font-family:'SF Mono',Menlo,Consolas,monospace; font-size:16px; font-weight:700; color:#ffffff;">&gt;_</div>
+                </td>
+                <td style="vertical-align:middle;">
+                  <span style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:21px; font-weight:800; letter-spacing:-.5px; color:#ffffff;">LearnWith</span><span style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:21px; font-weight:800; letter-spacing:-.5px; color:#5eead4;">Python</span>
+                </td>
+              </tr>
+            </table>
+            <div style="height:22px; line-height:22px; font-size:0;">&nbsp;</div>
+            <h1 style="margin:0 0 8px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:28px; line-height:1.2; font-weight:800; letter-spacing:-.7px; color:#ffffff;">Your sign-in link</h1>
+            <p style="margin:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:1.55; color:#b9cbe6;">No password needed — just this link.</p>
+          </td>
+        </tr>
+
+        <!-- body -->
+        <tr>
+          <td style="background:#ffffff; padding:30px 40px 8px;" align="center">
+            <p style="margin:0 0 22px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:1.6; color:#56657a;">
+              Click below to sign in. The link works once and expires in an hour.
+            </p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="border-radius:11px; background-color:#2563eb;">
+                  <a href="{{ .ConfirmationURL }}" style="display:inline-block; padding:15px 36px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:11px;">Sign in to LearnWithPython</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- fallback link: some clients strip or mangle button hrefs -->
+        <tr>
+          <td style="background:#ffffff; padding:22px 40px 4px;">
+            <p style="margin:0 0 6px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; color:#7c8ba1;">Button not working? Paste this into your browser:</p>
+            <p style="margin:0; font-family:'SF Mono',Menlo,Consolas,monospace; font-size:12px; line-height:1.5; word-break:break-all; color:#2563eb;">{{ .ConfirmationURL }}</p>
+          </td>
+        </tr>
+
+        <!-- reassurance -->
+        <tr>
+          <td style="background:#ffffff; padding:24px 40px 30px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7fc; border-radius:12px;">
+              <tr>
+                <td style="padding:16px 18px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#56657a;">
+                  <strong style="color:#0d2447;">Didn't request this?</strong> Ignore it — nobody can sign in without opening the link.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- footer -->
+        <tr>
+          <td style="background-color:#f4f7fc; padding:22px 40px 26px; border-top:1px solid #e6ecf5;">
+            <p style="margin:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; color:#9aa8bd;">
+              LearnWithPython &nbsp;·&nbsp; Learn Python by writing it, not watching it
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
