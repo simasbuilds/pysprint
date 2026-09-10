@@ -61,6 +61,17 @@
       <span class="loop-step" style="--i:5">{{ icon('brain') }} Review</span>
     </div>
 
+    {# The section nav that lets desktop jump straight to the editor is
+       display:none on phones, so a newcomer had to scroll ~1900px of prose
+       before touching code — on a site whose headline is "by writing it,
+       not watching it". These two chips are the mobile equivalent. #}
+    <nav class="lesson-jump" aria-label="Jump to section">
+      <a href="#workspace" class="lesson-jump-primary">
+        {{ icon('terminal') }} Jump to the code
+      </a>
+      <a href="#challenge">{{ icon('target') }} Challenge</a>
+    </nav>
+
     <details class="mobile-course-nav card">
       <summary>Lesson {{ idx + 1 }} of {{ n_lessons }} · View course roadmap</summary>
       <nav class="side-lessons" aria-label="Course lessons">

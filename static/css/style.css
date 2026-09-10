@@ -4659,3 +4659,33 @@ body.cmdk-open { overflow: hidden; }
   .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; }
   .avatar-swatch { width: 100%; height: auto; aspect-ratio: 1; }
 }
+
+/* ── Lesson: jump to the code (phones) ─────────────────────────────────
+   The sticky section nav is desktop-only, so on a phone the editor sat
+   ~1900px down with nothing on the first screen pointing at it. Someone
+   arriving to *write* Python had to read four sections first. */
+.lesson-jump { display: none; }
+
+@media (max-width: 1024px) {
+  .lesson-jump {
+    display: flex; gap: .5rem; margin: 0 0 .85rem; flex-wrap: wrap;
+  }
+  .lesson-jump a {
+    display: inline-flex; align-items: center; gap: .4rem;
+    min-height: 44px; padding: .55rem .95rem; border-radius: 99px;
+    font-size: .87rem; font-weight: 700; text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-dim);
+  }
+  .lesson-jump a .ui-icon { width: 17px; height: 17px; }
+  .lesson-jump .lesson-jump-primary {
+    background: color-mix(in srgb, var(--accent, var(--brand-1)) 12%, var(--surface));
+    border-color: color-mix(in srgb, var(--accent, var(--brand-1)) 45%, var(--border));
+    color: color-mix(in srgb, var(--accent, var(--brand-1)) 60%, var(--text));
+  }
+  .lesson-jump a:active { transform: scale(.97); }
+}
+
+/* Anchored sections must clear the sticky header, or jumping lands with the
+   heading hidden behind it. */
+#workspace, #challenge, #learn, #walkthrough, #notes { scroll-margin-top: 92px; }
