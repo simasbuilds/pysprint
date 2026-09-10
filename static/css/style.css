@@ -4619,3 +4619,43 @@ body.cmdk-open { overflow: hidden; }
 [data-theme="dark"] .course-row-go {
   color: color-mix(in srgb, var(--accent) 72%, var(--text));
 }
+
+/* ── Post-signup name prompt ───────────────────────────────────────────
+   Shown once, immediately after an account is created. It reuses the auth
+   layout so the moment reads as the last step of signing up rather than a
+   new place someone has been sent. */
+.welcome-wrap .auth-card h1 { margin-bottom: .4rem; }
+.welcome-wrap .auth-card .btn-lg { width: 100%; justify-content: center; margin-top: .3rem; }
+.welcome-wrap .auth-alt { text-align: center; margin-top: .75rem; }
+
+/* ── Avatar picker ─────────────────────────────────────────────────────
+   The selected state was a 3px border colour change, which disappears
+   against tiles that are themselves saturated and rounded — twelve bright
+   squares with no clear answer to "which one am I using". A ring that sits
+   outside the tile plus a check badge reads at a glance regardless of what
+   colour the tile happens to be. */
+.avatar-opt input:checked ~ .avatar-swatch {
+  border-color: var(--surface);
+  box-shadow: 0 0 0 3px var(--brand-1), 0 8px 20px -8px color-mix(in srgb, var(--brand-1) 60%, transparent);
+  transform: translateY(-2px);
+}
+.avatar-opt input:checked ~ .avatar-swatch::after {
+  content: '✓';
+  position: absolute; right: -4px; bottom: -4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--brand-1); color: #fff;
+  font-size: 12px; font-weight: 800; line-height: 22px; text-align: center;
+  border: 2px solid var(--surface);
+}
+.avatar-swatch { position: relative; transition: transform .15s, box-shadow .15s, border-color .15s; }
+
+/* The tiles are the content here, so give them room to breathe and a
+   consistent rhythm rather than wrapping tight against the heading. */
+.avatar-grid { gap: .85rem; margin: .6rem 0 1.25rem; }
+
+@media (max-width: 560px) {
+  /* A fixed grid beats flex-wrap on a phone: twelve tiles otherwise leave
+     a ragged last row that reads as a mistake. */
+  .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; }
+  .avatar-swatch { width: 100%; height: auto; aspect-ratio: 1; }
+}

@@ -4,6 +4,7 @@ Flask backend: pages, auth, progress API, achievements, SEO routes.
 Run:  python app.py   (then open http://127.0.0.1:5000)
 """
 
+import hashlib
 import json
 import os
 import re
@@ -549,6 +550,12 @@ def register():
                 uid = auth["user"]["id"]
                 send_welcome_email(email.split("@")[0], email)
                 start_session(auth)
+                assign_starter_avatar(current_user())
+                forget_user()
+                # Straight to the name prompt; safe_next still wins if they
+                # were part-way through a lesson when they signed up.
+                if not safe_next(request.args.get("next")):
+                    return redirect(url_for("welcome"))
                 # Come back to the lesson they were on, so device progress
                 # syncs in context instead of dumping them on the dashboard.
                 return redirect(safe_next(request.args.get("next"))
@@ -570,6 +577,34 @@ def login():
         # password" — that difference tells an attacker which emails exist.
         error = "Invalid credentials — check your email and password."
     return render_template("login.html", error=error)
+
+
+@app.route("/welcome", methods=["GET", "POST"])
+@login_required
+def welcome():
+    """One-time 'what should we call you?' step, shown after signing up.
+
+    Kept off the register form on purpose: that form was cut to email and
+    password to reduce the number of fields between someone and an account.
+    Asking once afterwards gets a real name without lengthening the thing
+    that decides whether they sign up at all.
+
+    Anyone who already has a name — every Google account, since the signup
+    trigger reads full_name — is sent straight on rather than being asked
+    for something they have already provided.
+    """
+    user = current_user()
+    if user and (user.get("display_name") or "").strip():
+        return redirect(url_for("dashboard"))
+    if request.method == "POST":
+        name = request.form.get("display_name", "").strip()
+        if len(name) > 40:
+            return render_template("welcome.html", error="Please keep it to 40 characters or fewer.")
+        if name:
+            db.update_profile(user["id"], display_name=name)
+            forget_user()
+        return redirect(url_for("dashboard"))
+    return render_template("welcome.html")
 
 
 @app.route("/forgot", methods=["GET", "POST"])
@@ -669,6 +704,9 @@ def google_callback():
 
     user = current_user()
     if user:
+        assign_starter_avatar(user)
+        forget_user()
+        user = current_user()
         award_new_achievements(user)
     return redirect(session.pop("oauth_next", None) or url_for("dashboard"))
 
@@ -680,6 +718,28 @@ AVATARS = ["bolt", "cat", "flame", "fox", "leaf", "moon",
 def avatar_choices():
     return [{"key": a, "url": url_for("static", filename=f"images/avatars/{a}.png")}
             for a in AVATARS]
+
+
+def assign_starter_avatar(user):
+    """Give a new account one of the twelve avatars at random.
+
+    A bare coloured initial is what every other product defaults to, and it
+    reads as an account that has not been set up. Picking one means somebody
+    has a face from their first page, and the picker on /profile becomes a
+    choice to change something rather than a chore to complete.
+
+    Seeded off the account id so the same person keeps the same avatar if
+    this ever runs twice, and skipped entirely when they already have one.
+    """
+    if not user or (user.get("avatar_url") or "").strip():
+        return
+    if (user.get("google_avatar") or "").strip():
+        # A real photo beats an illustration; Google accounts get theirs.
+        db.update_profile(user["id"], avatar_url=user["google_avatar"])
+        return
+    key = AVATARS[int(hashlib.sha256(str(user["id"]).encode()).hexdigest(), 16) % len(AVATARS)]
+    db.update_profile(user["id"],
+                      avatar_url=url_for("static", filename=f"images/avatars/{key}.png"))
 
 
 @app.route("/profile", methods=["GET", "POST"])

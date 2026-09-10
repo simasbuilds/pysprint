@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}What should we call you? — LearnWithPython{% endblock %}
+{% block description %}Choose the name LearnWithPython greets you by.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="auth-wrap welcome-wrap">
+  <aside class="auth-context">
+    <span class="eyebrow">You're in</span>
+    <h2 class="auth-aside-title">Account created.</h2>
+    <p>Everything you complete from here is saved — lessons, XP, streak and
+       achievements — and it follows you to any device you sign in on.</p>
+    <div class="auth-proof">
+      <span>{{ icon('check') }} Nothing to install</span>
+      <span>{{ icon('check') }} Free forever</span>
+    </div>
+  </aside>
+
+  <form class="card auth-card" method="post" novalidate>
+    <span class="eyebrow">One quick thing</span>
+    <h1>What should we call you?</h1>
+    <p class="muted">This is how you'll be greeted around the site. Spaces and
+       capitals are welcome — it's a name, not a handle.</p>
+
+    {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+    <label>Your name
+      <input type="text" name="display_name" maxlength="40" autofocus
+             autocomplete="name" placeholder="{{ user.email.split('@')[0] }}"
+             aria-describedby="wHelp">
+    </label>
+    <p class="field-help" id="wHelp">Up to 40 characters. You can change it any
+       time in your profile.</p>
+
+    <button class="btn btn-primary btn-lg">Continue →</button>
+    {# Skipping is a real option, not a dark pattern: the greeting falls back
+       to the first part of their email and nothing else depends on it. A link
+       rather than a second submit button, which would post two values for the
+       same field name. #}
+    <p class="auth-alt"><a href="{{ url_for('dashboard') }}">Skip for now</a></p>
+  </form>
+</section>
+{% endblock %}

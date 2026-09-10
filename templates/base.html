@@ -239,8 +239,14 @@
   </main>
 
   {# The admin pages are an operator tool, not a funnel — pitching "Start free, no card" to someone auditing accounts reads as unserious. #}
-  {% if request.endpoint not in ('home', 'playground', 'login', 'register',
-                                 'admin', 'admin_member', 'profile', none) %}
+  {# Pages where a "start free, no card" pitch is wrong: someone who has
+     just created an account, is recovering one, or is operating the site.
+     This list has been missed twice when adding pages, so it is grouped by
+     reason rather than left as a flat sequence. #}
+  {% set _no_cta = ('home', 'playground',
+                    'login', 'register', 'forgot', 'reset', 'welcome',
+                    'admin', 'admin_member', 'profile', none) %}
+  {% if request.endpoint not in _no_cta %}
   <section class="global-cta">
     <div>
       <span class="eyebrow">Your next ten minutes</span>
