@@ -16,6 +16,9 @@
     <span class="eyebrow">Account access</span>
     <h1>Log in</h1>
     <p class="muted">Continue your Python path.</p>
+    {% if request.args.get("reset") %}
+    <p class="form-ok" role="status">Password updated. Sign in with it now.</p>
+    {% endif %}
     {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
     {% if google_enabled %}
     <a class="btn btn-google btn-lg" href="{{ url_for('google_login', next=request.args.get('next', '')) }}">
@@ -33,6 +36,7 @@
       </span>
     </label>
     <button class="btn btn-primary btn-lg" type="submit">Log in →</button>
+    <p class="auth-alt"><a href="{{ url_for('forgot') }}">Forgot your password?</a></p>
     <p class="auth-alt">New here? <a href="{{ url_for('register') }}">Create a free account</a></p>
   </form>
 </section>

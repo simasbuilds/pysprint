@@ -572,6 +572,44 @@ def login():
     return render_template("login.html", error=error)
 
 
+@app.route("/forgot", methods=["GET", "POST"])
+def forgot():
+    """Request a password reset link.
+
+    Always reports success, whether or not the address exists. Saying "no
+    such account" turns this form into a way to discover who has signed up.
+    """
+    sent = False
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        if EMAIL_RE.match(email):
+            site = (env("SITE_URL") or request.url_root).rstrip("/")
+            supabase_auth.send_recovery(email, site + url_for("reset"))
+        sent = True
+    return render_template("forgot.html", sent=sent)
+
+
+@app.route("/reset", methods=["GET", "POST"])
+def reset():
+    """Set a new password from a recovery link.
+
+    GoTrue returns its token in the URL fragment, which browsers never send
+    to a server, so the page reads it in JavaScript and posts it back here.
+    """
+    if request.method == "POST":
+        token = request.form.get("access_token", "").strip()
+        new = request.form.get("new_password", "")
+        if not token:
+            return render_template("reset.html", error="That reset link has expired. Request a new one.")
+        if len(new) < 8:
+            return render_template("reset.html", error="Password must be at least 8 characters.")
+        _, err = supabase_auth.update_password(token, new)
+        if err:
+            return render_template("reset.html", error="That reset link has expired. Request a new one.")
+        return redirect(url_for("login", reset="1"))
+    return render_template("reset.html")
+
+
 @app.get("/logout")
 def logout():
     # Revoke the refresh token server-side as well, so signing out is not
@@ -1058,7 +1096,8 @@ def sitemap():
             ("/projects", "0.9"), ("/challenges", "0.8"),
             ("/playground", "0.7"), ("/review", "0.6"), ("/about", "0.5"),
             ("/about-me", "0.5"),
-            ("/terms", "0.3"), ("/privacy", "0.3")]
+            ("/terms", "0.3"), ("/privacy", "0.3"),
+            ("/forgot", "0.3")]
     for p in PROJECTS:
         urls.append((f"/projects/{p['slug']}", "0.7"))
     for c in COURSES:

@@ -4604,3 +4604,18 @@ body.cmdk-open { overflow: hidden; }
   text-transform: uppercase; color: var(--brand-1);
 }
 
+
+/* ── Accent text contrast ──────────────────────────────────────────────
+   Course accents are bright by design — #22d3ee, #fbbf24 — which reads
+   well as a border or a fill but not as text on white. The course row's
+   arrow measured 1.8:1 against its card, where 4.5 is the floor.
+
+   Mixing the accent toward the ink keeps each course recognisable while
+   putting the glyph back above the threshold. The undiluted accent is
+   still used for borders and fills, where contrast rules do not apply. */
+.course-row-go {
+  color: color-mix(in srgb, var(--accent) 55%, var(--text));
+}
+[data-theme="dark"] .course-row-go {
+  color: color-mix(in srgb, var(--accent) 72%, var(--text));
+}

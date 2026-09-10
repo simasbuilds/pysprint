@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Reset your password — LearnWithPython{% endblock %}
+{% block description %}Forgot your LearnWithPython password? Enter your email and we'll send a link to set a new one.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <aside class="auth-context">
+    <span class="eyebrow">Account recovery</span>
+    <h2 class="auth-aside-title">Back to where you left off.</h2>
+    <p>Your progress, XP and streak are safe. A reset link is all it takes to get to them again.</p>
+  </aside>
+
+  {% if sent %}
+  {# Deliberately identical whether or not the address exists: a different
+     message here would turn this form into a way to discover who signed up. #}
+  <div class="card auth-card">
+    <span class="eyebrow">Check your inbox</span>
+    <h1>Link sent</h1>
+    <p class="muted">If an account exists for that address, a reset link is on its way.
+       It expires in an hour.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Back to sign in</a>
+  </div>
+  {% else %}
+  <form class="card auth-card" method="post" novalidate>
+    <span class="eyebrow">Forgot your password?</span>
+    <h1>Reset it</h1>
+    <p class="muted">We'll email you a link to choose a new one.</p>
+    <label>Email
+      <input type="email" name="email" required autocomplete="email" autofocus
+             placeholder="you@example.com">
+    </label>
+    <button class="btn btn-primary btn-lg">Send reset link</button>
+    <p class="auth-alt">Remembered it? <a href="{{ url_for('login') }}">Sign in</a></p>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

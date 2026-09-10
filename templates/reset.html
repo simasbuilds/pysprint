@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Choose a new password — LearnWithPython{% endblock %}
+{% block description %}Set a new password for your LearnWithPython account.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <aside class="auth-context">
+    <span class="eyebrow">Account recovery</span>
+    <h2 class="auth-aside-title">Almost there.</h2>
+    <p>Choose something you'll remember. Signing in again restores everything you've completed.</p>
+  </aside>
+
+  <form class="card auth-card" method="post" novalidate id="resetForm">
+    <span class="eyebrow">New password</span>
+    <h1>Set it</h1>
+    {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+    <p class="muted" id="resetHint">Checking your link…</p>
+
+    {# GoTrue puts the token in the URL fragment, which browsers never send
+       to a server. JS lifts it out and posts it back with the form. #}
+    <input type="hidden" name="access_token" id="resetToken">
+
+    <label>New password
+      <input type="password" name="new_password" required minlength="8"
+             autocomplete="new-password" aria-describedby="resetHelp">
+    </label>
+    <p class="field-help" id="resetHelp">At least 8 characters.</p>
+    <button class="btn btn-primary btn-lg" id="resetSubmit">Save new password</button>
+    <p class="auth-alt">Link expired? <a href="{{ url_for('forgot') }}">Send a new one</a></p>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var params = new URLSearchParams(location.hash.replace(/^#/, ''));
+    var token = params.get('access_token');
+    var hint = document.getElementById('resetHint');
+    if (token) {
+      document.getElementById('resetToken').value = token;
+      hint.textContent = 'Link verified. Choose a new password below.';
+      // Strip the token from the address bar so it does not sit in history.
+      history.replaceState(null, '', location.pathname);
+    } else if (!document.querySelector('.form-error')) {
+      hint.textContent = 'This page needs a link from a reset email.';
+      document.getElementById('resetSubmit').disabled = true;
+    }
+  })();
+</script>
+{% endblock %}
