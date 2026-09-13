@@ -4884,6 +4884,38 @@ body.cmdk-open { overflow: hidden; }
   }
 }
 
+/* ═══════════════════ v14: /about-me below the hero ════════════════════════
+   The three-card rows had no padding at all. `.card` is a surface only —
+   padding arrives via `.card.pad` (1.75rem) or `.feature` (1.6rem) — and
+   creator.html uses a bare `class="card"` inside `.feature-grid`, so it got
+   neither. Measured on production: the icon sat 1px from the card's corner
+   and body text ran flush to the border, clipping the first glyph of a
+   wrapped line. `.feature-grid` appears only in creator.html, both times,
+   so this cannot reach another page. */
+.feature-grid > .card { padding: 1.5rem; }
+
+/* The two rows also read as different components because only one has
+   icons. Give the icon row and the text row the same internal rhythm. */
+.creator-pillars .feature-icon { margin-bottom: .7rem; }
+.creator-pillars .card strong,
+.creator-belief .card strong { display: block; font-size: 1.05rem; margin-bottom: .4rem; }
+.feature-grid > .card p { color: var(--text-dim); font-size: .93rem; line-height: 1.6; margin: 0; }
+
+/* 3.25rem of section padding top and bottom stacked into 113px between
+   every block, and .feature-grid added another 2.25rem of margin-top even
+   directly under a heading that already separates it. */
+.creator-pillars, .creator-belief .feature-grid { margin-top: 0; }
+.creator-pillars-sec, .creator-belief, .creator-also, .creator-cta { padding-block: 2.25rem; }
+.creator-pillars { margin-top: .5rem; }
+
+/* A 118px text block beside a 46px button, centred against each other in a
+   space-between row, left the button floating opposite the middle of the
+   paragraph. Align both to the top so the button sits with the title. */
+@media (min-width: 901px) {
+  .creator-also-card { align-items: flex-start; }
+  .creator-also-card .btn { margin-top: .15rem; }
+}
+
 /* ── Profile: a head that is mostly empty, and a floating avatar ───────── */
 /* .page-head is a single column, so on /profile a 3.35rem "Profile" plus one
    line of help text left ~900px of empty gradient to its right — the widest,
