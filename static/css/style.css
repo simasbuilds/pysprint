@@ -4092,6 +4092,10 @@ body.cmdk-open { overflow: hidden; }
   font-size: clamp(1.65rem, 3vw, 2.3rem); letter-spacing: -.03em; margin-bottom: 1.25rem;
 }
 .creator-also-card {
+  /* Padding, because `.card` supplies none and this one sits outside
+     `.feature-grid`, so the rule that padded the other creator cards never
+     reached it. Measured: text and button both sat 1px off the border. */
+  padding: 1.5rem;
   display: flex; align-items: center; justify-content: space-between;
   gap: 1.25rem; flex-wrap: wrap;
 }
@@ -4106,9 +4110,10 @@ body.cmdk-open { overflow: hidden; }
   .creator-card { max-width: 420px; margin-inline: auto; padding-top: 0; }
   .creator-also-card { flex-direction: column; align-items: flex-start; }
 }
-/* These cards carry no icon, so .card's icon-driven spacing never applies
-   and the title butted straight into its paragraph. */
-.creator-belief .card strong { display: block; margin-bottom: .45rem; }
+/* The .creator-belief .card strong rule that lived here is gone: the v14
+   block near the end of this file redeclares every one of its properties
+   at equal specificity, so this copy never won. Its .45rem margin looked
+   editable and was not. */
 
 /* ── Resume chip on phones ─────────────────────────────────────────────
    The label explaining what this is was hidden below 760px, which left a
@@ -4904,9 +4909,15 @@ body.cmdk-open { overflow: hidden; }
 /* 3.25rem of section padding top and bottom stacked into 113px between
    every block, and .feature-grid added another 2.25rem of margin-top even
    directly under a heading that already separates it. */
-.creator-pillars, .creator-belief .feature-grid { margin-top: 0; }
-.creator-pillars-sec, .creator-belief, .creator-also, .creator-cta { padding-block: 2.25rem; }
 .creator-pillars { margin-top: .5rem; }
+.creator-belief .feature-grid { margin-top: 0; }
+/* Scoped to >=761px so it stops outranking `.section { padding: 2.5rem .85rem }`
+   in the 760px block. Both selectors are 0-1-0, so this one was winning on
+   source order alone — only ~4px today, but it would have silently swallowed
+   any future edit to the mobile value. */
+@media (min-width: 761px) {
+  .creator-pillars-sec, .creator-belief, .creator-also, .creator-cta { padding-block: 2.25rem; }
+}
 
 /* A 118px text block beside a 46px button, centred against each other in a
    space-between row, left the button floating opposite the middle of the
