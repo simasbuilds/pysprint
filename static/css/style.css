@@ -4810,3 +4810,114 @@ body.cmdk-open { overflow: hidden; }
   .hero-capabilities { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
   .hero-capabilities span { width: auto; }
 }
+
+/* ═══════════════════ v13: balance the split heroes and the dashboard head ══
+   Measured across the four sibling pages before touching anything. They use
+   three different ratios for the same layout:
+
+       /about, /courses    45 / 55   copy gets the SMALLER column
+       /challenges         50 / 50
+       /about-me           57 / 42   copy gets the larger column
+
+   /about-me is the one that reads correctly, and its own comment says why:
+   the copy is the argument, the art is support. On /about and /courses the
+   weighting is inverted, which is what crushes a 64px headline into four
+   stacked lines ("Go from / curious to / capable / with Python." = 256px of
+   heading). Unify on the ratio that already works. */
+@media (min-width: 901px) {
+  .directory-hero { grid-template-columns: 1.08fr .92fr; }
+  /* .arena-hero declared a 1fr 1fr of its own; it is the same layout and
+     should not be a third ratio. */
+  .arena-hero { grid-template-columns: 1.08fr .92fr; }
+  /* .creator-hero keeps its own slightly wider copy column: the portrait is
+     a fixed 4/5 card rather than a bleed image, so it needs less room. */
+  .creator-hero { grid-template-columns: 1.15fr .85fr; }
+
+  /* With the copy column wider, the headline no longer needs to be shouted
+     to fill it. 4.8vw put /courses at 64px over four lines; this lands it
+     near 56px over two or three, which is the same emphasis with far less
+     vertical cost. */
+  .directory-copy h1 { font-size: clamp(2.35rem, 4vw, 3.6rem); }
+
+  /* Narrowing the art column from 55% to 46% tightened `object-fit: cover`
+     past what these illustrations tolerate: on /courses an orange tile was
+     sliced in half at the right edge and the purple one cut at the left.
+     The subjects sit centre-left in every plate, so pulling the focal point
+     left keeps whole tiles in frame at the narrower width. */
+  /* /about and /challenges crop cleanly at centre and keep `cover`.
+     The courses plate is composed wider: at a 46% column, cover clipped a
+     tile whichever way the focal point moved (50% sliced the orange one,
+     38% the purple one), and `contain` fixed the clipping only by adding
+     ~90px letterbox bands above and below — a 1600x900 image in a 551x484
+     box. Give that one page's art a little more width instead, so cover
+     has room to frame the whole illustration. */
+  .arena-visual img { object-position: 50% center; }
+}
+@media (min-width: 901px) {
+  /* The courses plate is composed edge to edge, unlike the /about and
+     /challenges art which have margin around their subjects. Every crop
+     narrower than its original column clipped a tile — 46% and 51% both
+     sliced the rocket at the right and the purple tile at the left, and
+     `contain` only traded that for ~90px letterbox bands. So this one page
+     keeps the wider art column the illustration was drawn for; its headline
+     is short enough to sit in the smaller half without stacking badly. */
+  .courses-hero { grid-template-columns: .9fr 1.1fr; }
+}
+
+/* ── Dashboard head: close the hole beside the art ──────────────────────── */
+@media (min-width: 901px) {
+  /* .dashboard-head is a space-between flex row holding copy and a fixed
+     300px image, so on a 1440px screen ~200px of white opened up between
+     them and the header read as two objects that had drifted apart.
+     A grid with a content-sized second column keeps them related. */
+  .dashboard-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2.5rem; align-items: center; }
+  .dash-art { width: clamp(260px, 26vw, 360px); }
+
+  /* .page-head::after is a 54px accent bar that sits under left-aligned copy
+     on /course, /project and /profile and reads as deliberate. In the
+     dashboard's two-column head it landed in open space beside the art with
+     nothing above it. Tie it to the copy column instead of the section. */
+  .dashboard-head::after { display: none; }
+  .dash-head-copy::after {
+    content: ''; display: block; width: 54px; height: 4px; margin-top: 1.25rem;
+    background: var(--brand-2); border-radius: 99px;
+  }
+}
+
+/* ── Profile: a head that is mostly empty, and a floating avatar ───────── */
+/* .page-head is a single column, so on /profile a 3.35rem "Profile" plus one
+   line of help text left ~900px of empty gradient to its right — the widest,
+   emptiest block on the page. The copy is short by nature here, so cap the
+   measure and let the head be only as tall as it needs. */
+@media (min-width: 901px) {
+  .profile-head { padding-block: clamp(1.4rem, 2.4vw, 1.9rem); }
+  .profile-head h1 { font-size: clamp(1.9rem, 3vw, 2.5rem); }
+  .profile-head > p { max-width: 56ch; }
+}
+/* .profile-summary centres its items, which is right for a one-line body and
+   wrong here: against name + email + facts + joined-date the 96px avatar
+   floated beside the second line instead of registering with the name.
+   Align to the top and nudge it onto the name's cap-height. */
+.profile-summary { align-items: flex-start; }
+.profile-avatar-lg { margin-top: .15rem; }
+
+/* ── Stat grid: no orphan tile ──────────────────────────────────────────── */
+/* repeat(5, 1fr) across 1180px gives five thin strips, and every fallback
+   below it (3, then 2) leaves the fifth tile alone on its own row. auto-fit
+   with a floor lets the row pick a count that divides evenly at each width. */
+/* Five tiles. The column count has to be chosen per width, not derived:
+   `auto-fit` picked 4 at 1200px and broke the clean single row, and a
+   :last-child:nth-child(odd) rule meant to catch a lone last tile fired on
+   the 5th of 5 as well — turning [5] into [4,1] and [3,2] into [3,1,1].
+   Measured at each breakpoint instead:
+       >=1180px   5 across, one row, no remainder
+       900-1179   3 + 2, both rows balanced
+       <900       2 + 2 + 1, last tile spans so nothing sits half-width */
+.stat-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1179px) {
+  .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 899px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-grid > :last-child { grid-column: 1 / -1; }
+}
